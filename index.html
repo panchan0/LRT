@@ -6388,7 +6388,7 @@ define("diagnostics/CompatibilityScanner", ["require", "exports", "filesystem/Mi
         if (/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(value)) return null;
         if (!value.startsWith('.') && !value.startsWith('/')) return resolveBare(project, fromFile, value, textCache);
         try {
-            const resolved = PathResolver_js_1.PathResolver.resolve(fromFile, value);
+            const resolved = value.startsWith('/') ? PathResolver_js_1.PathResolver.normalizeAbsolute(`${PathResolver_js_1.PathResolver.dirname(project.entryPoint)}${value.slice(1)}`) : PathResolver_js_1.PathResolver.resolve(fromFile, value);
             return resolved ? candidate(project, resolved) : null;
         } catch { return null; }
     }
@@ -6659,7 +6659,18 @@ define("importer/ProjectDetector", ["require", "exports", "filesystem/PathResolv
             if (!html.length)
                 throw new Error('No se encontró ningún archivo HTML dentro del ZIP.');
             const indexes = html.filter(path => PathResolver_js_2.PathResolver.basename(path).toLowerCase() === 'index.html');
-            const candidates = (indexes.length ? indexes : html).sort((a, b) => PathResolver_js_2.PathResolver.depth(a) - PathResolver_js_2.PathResolver.depth(b) || a.localeCompare(b));
+            const pool = indexes.length ? indexes : html;
+            const score = path => {
+                const lower = path.toLowerCase();
+                const parts = lower.split('/').filter(Boolean);
+                let value = PathResolver_js_2.PathResolver.depth(path) * 4;
+                if (/(^|\/)(dist|build|out|public|www|web)(\/|$)/.test(lower)) value -= 24;
+                if (/(^|\/)(node_modules|examples?|demo|docs?|test|tests|coverage|storybook-static)(\/|$)/.test(lower)) value += 90;
+                if (parts.length <= 2) value -= 8;
+                if (lower.endsWith('/index.html')) value -= 4;
+                return value;
+            };
+            const candidates = [...pool].sort((a, b) => score(a) - score(b) || PathResolver_js_2.PathResolver.depth(a) - PathResolver_js_2.PathResolver.depth(b) || a.localeCompare(b));
             return { entryPoint: candidates[0], entryCandidates: candidates, usedIndexHtml: indexes.length > 0 };
         }
     }
@@ -6893,12 +6904,50 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
         nodeModuleCache = new Map();
         remoteModuleCache = new Map();
         disposed = false;
-        constructor(vfs, errors) { this.vfs = vfs; this.errors = errors; }
+        webRoot = '/';
+        importMap = { imports: {} };
+        importMapBase = '/index.html';
+        constructor(vfs, errors, webRoot = '/') { this.vfs = vfs; this.errors = errors; this.webRoot = PathResolver_js_4.PathResolver.dirname(PathResolver_js_4.PathResolver.normalizeAbsolute(`${webRoot}index.html`)); }
         getObjectUrl(path) { return this.vfs.createObjectUrl(path); }
+        setImportMap(value, baseFile) {
+            const imports = value && typeof value === 'object' && value.imports && typeof value.imports === 'object' ? value.imports : {};
+            this.importMap = { imports: { ...imports } };
+            this.importMapBase = baseFile || this.importMapBase;
+        }
+        resolvePath(fromFile, reference) {
+            const value = String(reference ?? '').trim();
+            if (PathResolver_js_4.PathResolver.isExternal(value)) return null;
+            const { pathname } = PathResolver_js_4.PathResolver.splitReference(value);
+            if (!pathname) return PathResolver_js_4.PathResolver.normalizeAbsolute(fromFile);
+            if (pathname.startsWith('/')) return PathResolver_js_4.PathResolver.normalizeAbsolute(`${this.webRoot}${pathname.slice(1)}`);
+            return PathResolver_js_4.PathResolver.resolve(fromFile, value);
+        }
+        importMapTarget(specifier) {
+            const imports = this.importMap?.imports ?? {};
+            if (Object.prototype.hasOwnProperty.call(imports, specifier)) return typeof imports[specifier] === 'string' ? imports[specifier] : null;
+            let best = '';
+            for (const key of Object.keys(imports)) if (key.endsWith('/') && specifier.startsWith(key) && key.length > best.length) best = key;
+            if (!best) return null;
+            const target = imports[best];
+            return typeof target === 'string' ? `${target}${specifier.slice(best.length)}` : null;
+        }
+        async resolveImportMapModule(specifier, stack = []) {
+            const mapped = this.importMapTarget(specifier);
+            if (!mapped) return null;
+            if (/^https?:\/\//i.test(mapped)) return this.resolveRemoteModule(mapped, []);
+            if (PathResolver_js_4.PathResolver.isExternal(mapped)) return mapped;
+            if (!mapped.startsWith('.') && !mapped.startsWith('/')) return this.resolvePackageModule(this.importMapBase, mapped, stack);
+            let path;
+            try { path = this.resolvePath(this.importMapBase, mapped); }
+            catch (error) { this.errors.error('Import map contiene una ruta inválida.', { source: this.importMapBase, technical: `${specifier} → ${mapped}: ${String(error)}` }); return null; }
+            if (!path || !this.vfs.has(path)) { this.errors.error(`Import map apunta a un archivo inexistente: ${path ?? mapped}`, { source: this.importMapBase, technical: `${specifier} → ${mapped}` }); return null; }
+            const ext = MimeResolver_js_3.MimeResolver.extension(path);
+            return ['js','mjs','cjs'].includes(ext) ? this.resolveModuleFile(path, stack) : this.getObjectUrl(path);
+        }
         async resolveReference(fromFile, reference) {
             if (PathResolver_js_4.PathResolver.isExternal(reference)) return reference;
             let path;
-            try { path = PathResolver_js_4.PathResolver.resolve(fromFile, reference); }
+            try { path = this.resolvePath(fromFile, reference); }
             catch (error) { this.errors.error('Ruta inválida bloqueada por el runtime.', { source: fromFile, technical: String(error) }); return reference; }
             if (!path || !this.vfs.has(path)) { this.errors.error(`No se encontró: ${path ?? reference}`, { source: fromFile, technical: `Referencia original: ${reference}` }); return reference; }
             const url = MimeResolver_js_3.MimeResolver.extension(path) === 'css' ? await this.resolveCssFile(path) : this.getObjectUrl(path);
@@ -6918,7 +6967,7 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
                 if (index === undefined || !raw || PathResolver_js_4.PathResolver.isExternal(raw)) continue;
                 importRanges.push({ start: index, end: index + whole.length });
                 replacements.push((async () => {
-                    const resolved = PathResolver_js_4.PathResolver.resolve(fromFile, raw);
+                    const resolved = this.resolvePath(fromFile, raw);
                     if (!resolved || !this.vfs.has(resolved)) { this.errors.error(`No se encontró: ${resolved ?? raw}`, { source: fromFile }); return null; }
                     if (stack.has(resolved)) { this.errors.warn(`Se detectó un ciclo de @import en ${resolved}.`, { source: fromFile }); return null; }
                     const url = await this.resolveCssFile(resolved, new Set([...stack, resolved]));
@@ -7001,25 +7050,65 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
             }
             return null;
         }
+        pickPackageTarget(value) {
+            if (typeof value === 'string') return value;
+            if (Array.isArray(value)) { for (const item of value) { const target = this.pickPackageTarget(item); if (target) return target; } return null; }
+            if (!value || typeof value !== 'object') return null;
+            for (const key of ['browser','import','module','default','require']) if (Object.prototype.hasOwnProperty.call(value, key)) { const target = this.pickPackageTarget(value[key]); if (target) return target; }
+            for (const item of Object.values(value)) { const target = this.pickPackageTarget(item); if (target) return target; }
+            return null;
+        }
+        exportTarget(exportsField, subpath) {
+            if (!exportsField) return null;
+            const key = subpath ? `./${subpath}` : '.';
+            if (typeof exportsField === 'string' || Array.isArray(exportsField)) return !subpath ? this.pickPackageTarget(exportsField) : null;
+            if (typeof exportsField !== 'object') return null;
+            if (Object.prototype.hasOwnProperty.call(exportsField, key)) return this.pickPackageTarget(exportsField[key]);
+            if (!subpath && !Object.keys(exportsField).some(k => k.startsWith('.'))) return this.pickPackageTarget(exportsField);
+            for (const [pattern, value] of Object.entries(exportsField)) {
+                if (!pattern.includes('*')) continue;
+                const [prefix, suffix] = pattern.split('*');
+                if (!key.startsWith(prefix) || !key.endsWith(suffix)) continue;
+                const middle = key.slice(prefix.length, key.length - suffix.length);
+                const target = this.pickPackageTarget(value);
+                if (target) return target.replaceAll('*', middle);
+            }
+            return null;
+        }
+        browserTarget(pkg, candidate) {
+            if (!pkg || !pkg.browser || typeof pkg.browser !== 'object' || Array.isArray(pkg.browser)) return candidate;
+            const clean = `./${String(candidate).replace(/^\.\//, '')}`;
+            const mapped = pkg.browser[clean] ?? pkg.browser[String(candidate).replace(/^\.\//, '')];
+            if (mapped === false) return null;
+            return typeof mapped === 'string' ? mapped : candidate;
+        }
         async tryPackageCandidate(base, subpath) {
+            const packageJson = `${base}/package.json`;
+            let pkg = null;
+            if (this.vfs.has(packageJson)) {
+                try { pkg = JSON.parse(await this.vfs.text(packageJson)); }
+                catch (error) { this.errors.warn(`No se pudo leer ${packageJson}.`, { technical: String(error) }); }
+            }
+            const exportTarget = pkg ? this.exportTarget(pkg.exports, subpath) : null;
+            if (exportTarget) {
+                const found = this.tryFileVariants(`${base}/${exportTarget.replace(/^\.\//, '')}`);
+                if (found) return found;
+            }
             if (subpath) {
+                const browserSub = pkg ? this.browserTarget(pkg, `./${subpath}`) : `./${subpath}`;
+                if (browserSub) { const hit = this.tryFileVariants(`${base}/${String(browserSub).replace(/^\.\//, '')}`); if (hit) return hit; }
                 const direct = this.tryFileVariants(`${base}/${subpath}`);
                 if (direct) return direct;
             }
-            const packageJson = `${base}/package.json`;
-            if (this.vfs.has(packageJson)) {
-                try {
-                    const pkg = JSON.parse(await this.vfs.text(packageJson));
-                    const exportKey = subpath ? `./${subpath}` : '.';
-                    const exp = pkg?.exports?.[exportKey] ?? (!subpath ? pkg?.exports : undefined);
-                    const exportTarget = typeof exp === 'string' ? exp : (exp && typeof exp === 'object' ? exp.browser ?? exp.import ?? exp.default ?? exp.require : undefined);
-                    const candidates = subpath ? [exportTarget] : [typeof pkg.browser === 'string' ? pkg.browser : null, pkg.module, exportTarget, pkg.main, 'index.js'];
-                    for (const value of candidates) {
-                        if (typeof value !== 'string' || !value) continue;
-                        const found = this.tryFileVariants(`${base}/${value.replace(/^\.\//, '')}`);
-                        if (found) return found;
-                    }
-                } catch (error) { this.errors.warn(`No se pudo leer ${packageJson}.`, { technical: String(error) }); }
+            if (pkg) {
+                const candidates = [typeof pkg.browser === 'string' ? pkg.browser : null, pkg.module, exportTarget, pkg.main, 'index.js'];
+                for (let value of candidates) {
+                    if (typeof value !== 'string' || !value) continue;
+                    value = this.browserTarget(pkg, value);
+                    if (!value) continue;
+                    const found = this.tryFileVariants(`${base}/${String(value).replace(/^\.\//, '')}`);
+                    if (found) return found;
+                }
             }
             return this.tryFileVariants(`${base}/${subpath || 'index'}`);
         }
@@ -7027,7 +7116,7 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
             let normalized;
             try { normalized = PathResolver_js_4.PathResolver.normalizeAbsolute(path); } catch { return null; }
             if (this.vfs.has(normalized)) return normalized;
-            for (const ext of ['.mjs', '.js', '.cjs', '.json']) if (this.vfs.has(`${normalized}${ext}`)) return `${normalized}${ext}`;
+            for (const ext of ['.mjs', '.js', '.cjs', '.json', '.wasm']) if (this.vfs.has(`${normalized}${ext}`)) return `${normalized}${ext}`;
             for (const index of ['/index.mjs', '/index.js', '/index.cjs', '/index.json']) if (this.vfs.has(`${normalized}${index}`)) return `${normalized}${index}`;
             return null;
         }
@@ -7079,6 +7168,15 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
             }
             const pending = [];
             walk(ast, node => {
+                if (node.type === 'MemberExpression' && node.object?.type === 'MetaProperty' && node.object.meta?.name === 'import' && node.object.property?.name === 'meta' && node.property?.type === 'Identifier' && node.property.name === 'env') pending.push(Promise.resolve({ start: node.start, end: node.end, value: 'globalThis.__LWR_IMPORT_META_ENV__' }));
+                if (node.type === 'NewExpression' && node.callee?.type === 'Identifier' && node.callee.name === 'URL' && node.arguments?.length >= 2) {
+                    const first = node.arguments[0], second = node.arguments[1];
+                    const isImportMeta = second?.type === 'MemberExpression' && second.object?.type === 'MetaProperty' && second.object.meta?.name === 'import' && second.object.property?.name === 'meta' && second.property?.type === 'Identifier' && second.property.name === 'url';
+                    if (isImportMeta && first?.type === 'Literal' && typeof first.value === 'string') {
+                        try { const absoluteAsset = new URL(first.value, remoteUrl).href; pending.push(Promise.resolve({ start: node.start, end: node.end, value: `new URL(${JSON.stringify(absoluteAsset)})` })); }
+                        catch {}
+                    }
+                }
                 let literal = null;
                 if (['ImportDeclaration', 'ExportAllDeclaration', 'ExportNamedDeclaration'].includes(node.type) && isNode(node.source)) literal = node.source;
                 else if (node.type === 'ImportExpression' && isNode(node.source) && node.source.type === 'Literal') literal = node.source;
@@ -7138,11 +7236,51 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
             catch (error) { this.errors.error(`No se pudo analizar el módulo ${path}.`, { source: path, technical: error instanceof Error ? error.message : String(error) }); throw error; }
             const pending = [];
             walk(ast, node => {
+                if (node.type === 'MemberExpression' && node.object?.type === 'MetaProperty' && node.object.meta?.name === 'import' && node.object.property?.name === 'meta' && node.property?.type === 'Identifier' && node.property.name === 'env') {
+                    pending.push(Promise.resolve({ start: node.start, end: node.end, value: 'globalThis.__LWR_IMPORT_META_ENV__' }));
+                }
+                if (node.type === 'NewExpression' && node.callee?.type === 'Identifier' && ['Worker','SharedWorker'].includes(node.callee.name) && node.arguments?.[0]?.type === 'Literal' && typeof node.arguments[0].value === 'string' && !PathResolver_js_4.PathResolver.isExternal(node.arguments[0].value)) {
+                    const literalArg = node.arguments[0];
+                    pending.push((async () => {
+                        let workerPath; try { workerPath = this.resolvePath(path, literalArg.value); } catch { return null; }
+                        if (!workerPath || !this.vfs.has(workerPath)) return null;
+                        const options = node.arguments?.[1];
+                        let moduleWorker = false;
+                        if (options?.type === 'ObjectExpression') for (const prop of options.properties ?? []) if (prop?.key?.name === 'type' && prop?.value?.type === 'Literal' && prop.value.value === 'module') moduleWorker = true;
+                        const target = moduleWorker ? await this.resolveModuleFile(workerPath, stack) : this.getObjectUrl(workerPath);
+                        const quote = source.slice(literalArg.start, literalArg.start + 1), q = quote === '"' || quote === "'" ? quote : '"';
+                        return { start: literalArg.start, end: literalArg.end, value: `${q}${target}${q}` };
+                    })());
+                }
+                if (node.type === 'NewExpression' && node.callee?.type === 'Identifier' && node.callee.name === 'URL' && node.arguments?.length >= 2) {
+                    const first = node.arguments[0], second = node.arguments[1];
+                    const isImportMeta = second?.type === 'MemberExpression' && second.object?.type === 'MetaProperty' && second.object.meta?.name === 'import' && second.object.property?.name === 'meta' && second.property?.type === 'Identifier' && second.property.name === 'url';
+                    if (isImportMeta && first?.type === 'Literal' && typeof first.value === 'string' && !PathResolver_js_4.PathResolver.isExternal(first.value)) {
+                        pending.push((async () => {
+                            let assetPath;
+                            try { assetPath = this.resolvePath(path, first.value); } catch { return null; }
+                            if (!assetPath || !this.vfs.has(assetPath)) return null;
+                            const ext = MimeResolver_js_3.MimeResolver.extension(assetPath);
+                            const target = ['js','mjs'].includes(ext) ? await this.resolveModuleFile(assetPath, stack) : this.getObjectUrl(assetPath);
+                            return { start: node.start, end: node.end, value: `new URL(${JSON.stringify(target)})` };
+                        })());
+                    }
+                }
                 let literal = null;
                 if (['ImportDeclaration', 'ExportAllDeclaration', 'ExportNamedDeclaration'].includes(node.type) && isNode(node.source)) literal = node.source;
                 else if (node.type === 'ImportExpression' && isNode(node.source) && node.source.type === 'Literal') literal = node.source;
                 if (!literal || typeof literal.value !== 'string') return;
                 const specifier = literal.value;
+                const mapped = this.importMapTarget(specifier);
+                if (mapped) {
+                    pending.push((async () => {
+                        const target = await this.resolveImportMapModule(specifier, stack);
+                        if (!target) return null;
+                        const quote = source.slice(literal.start, literal.start + 1), q = quote === '"' || quote === "'" ? quote : '"';
+                        return { start: literal.start, end: literal.end, value: `${q}${target}${q}` };
+                    })());
+                    return;
+                }
                 if (isNodeBuiltin(specifier)) {
                     pending.push((async () => {
                         const target = await this.resolveNodeBuiltinModule(specifier);
@@ -7172,7 +7310,7 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
                 }
                 pending.push((async () => {
                     let resolved;
-                    try { resolved = PathResolver_js_4.PathResolver.resolve(path, specifier); }
+                    try { resolved = this.resolvePath(path, specifier); }
                     catch (error) { this.errors.error('Importación bloqueada por ruta inválida.', { source: path, technical: String(error) }); return null; }
                     if (!resolved || !this.vfs.has(resolved)) { this.errors.error(`No se encontró el módulo ${resolved ?? specifier}.`, { source: path }); return null; }
                     const ext = MimeResolver_js_3.MimeResolver.extension(resolved);
@@ -7289,7 +7427,8 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
         constructor(project, errors, options = {}) {
             this.project = project; this.errors = errors; this.options = options;
             this.vfs = new VirtualFileSystem_js_1.VirtualFileSystem(project);
-            this.resolver = new AssetResolver_js_1.AssetResolver(this.vfs, errors);
+            const webRoot = PathResolver_js_5.PathResolver.dirname(project.entryPoint);
+            this.resolver = new AssetResolver_js_1.AssetResolver(this.vfs, errors, webRoot);
         }
         async mount(host) {
             if (this.disposed) throw new Error('Runtime liberado.');
@@ -7317,25 +7456,58 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
                 this.errors.warn('Se eliminó <base> local para conservar las rutas del proyecto virtual.', { source: entry });
             }
             for (const meta of [...doc.querySelectorAll('meta[http-equiv]')]) if (meta.getAttribute('http-equiv')?.toLowerCase() === 'content-security-policy') { meta.remove(); this.errors.warn('La CSP del proyecto se desactivó dentro del sandbox local.', { source: entry }); }
+            await this.prepareImportMaps(doc, entry);
             this.nodeData = await this.buildNodeData(doc);
             const bootstrap = doc.createElement('script'); bootstrap.dataset.localRuntimeBootstrap = 'true'; bootstrap.textContent = this.bootstrap(this.nodeData); doc.head.insertBefore(bootstrap, doc.head.firstChild);
             await this.rewriteStyles(doc, entry); await this.rewriteLinks(doc, entry); await this.rewriteScripts(doc, entry); await this.rewriteAssets(doc, entry);
             return `<!doctype html>\n${doc.documentElement.outerHTML}`;
         }
+        async prepareImportMaps(doc, entry) {
+            const merged = { imports: {} };
+            let count = 0;
+            for (const script of [...doc.querySelectorAll('script[type="importmap"]')]) {
+                const src = script.getAttribute('src');
+                if (src) { this.errors.warn('Import map externo no se incrusta todavía; conserva el archivo dentro del ZIP como import map inline.', { source: entry, technical: src }); continue; }
+                try {
+                    const parsed = JSON.parse(script.textContent || '{}');
+                    if (parsed?.imports && typeof parsed.imports === 'object') Object.assign(merged.imports, parsed.imports);
+                    count++;
+                    script.remove();
+                } catch (error) { this.errors.error('Import map inválido.', { source: entry, technical: String(error) }); }
+            }
+            if (count) { this.resolver.setImportMap(merged, entry); this.errors.info(`Import map local preparado (${Object.keys(merged.imports).length} entradas).`, { source: entry }); }
+        }
         async buildNodeData(doc) {
             const sources = {}, sizes = {};
             const allFiles = this.vfs.list();
             for (const file of allFiles) sizes[file.path] = file.size;
-            let needed = [...doc.querySelectorAll('script:not([type="module"])')].some(script => NODE_HINT.test(script.textContent ?? ''));
             const jsCache = new Map();
-            for (const file of allFiles) {
-                const ext = MimeResolver_js_4.MimeResolver.extension(file.path);
-                if (!['js','cjs','mjs'].includes(ext)) continue;
-                try {
-                    const text = await file.blob.text();
-                    jsCache.set(file.path, text);
-                    if (NODE_HINT.test(text)) needed = true;
-                } catch {}
+            const readJs = async path => {
+                if (jsCache.has(path)) return jsCache.get(path);
+                const file = this.vfs.get(path); if (!file) return null;
+                const ext = MimeResolver_js_4.MimeResolver.extension(path); if (!['js','cjs','mjs'].includes(ext)) return null;
+                try { const text = await file.blob.text(); jsCache.set(path, text); return text; } catch { return null; }
+            };
+            let needed = [...doc.querySelectorAll('script:not([type="module"]):not([src])')].some(script => NODE_HINT.test(script.textContent ?? ''));
+            const queue = [];
+            for (const script of [...doc.querySelectorAll('script[src]')]) {
+                const src = script.getAttribute('src'); if (!src || PathResolver_js_5.PathResolver.isExternal(src)) continue;
+                const path = this.safeResolve(this.project.entryPoint, src); if (path && this.vfs.has(path)) queue.push(path);
+            }
+            const seen = new Set();
+            while (queue.length && seen.size < 4096) {
+                const path = queue.shift(); if (!path || seen.has(path)) continue; seen.add(path);
+                const text = await readJs(path); if (text == null) continue;
+                if (NODE_HINT.test(text)) needed = true;
+                const re = /(?:require\s*\(\s*['"]([^'"]+)['"]\s*\)|(?:import|export)\s+(?:[^'";]*?\s+from\s*)?['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\))/g;
+                for (const m of text.matchAll(re)) {
+                    const spec = m[1] || m[2] || m[3] || ''; if (!spec || /^node:/.test(spec)) continue;
+                    if (!spec.startsWith('.') && !spec.startsWith('/')) {
+                        try { const p = await this.resolver.resolvePackagePath(path, spec); if (p) queue.push(p); } catch {}
+                    } else {
+                        try { const p = this.resolver.resolvePath(path, spec); if (p) { const hit = this.resolver.tryFileVariants(p) || p; if (this.vfs.has(hit)) queue.push(hit); } } catch {}
+                    }
+                }
             }
             if (!needed) return { sources, sizes, needed: false, used: 0 };
             const ordered = allFiles.filter(f => f.path !== this.project.entryPoint && TEXT_EXT.has(MimeResolver_js_4.MimeResolver.extension(f.path))).sort((a,b) => {
@@ -7346,10 +7518,8 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
             let used = 0, skipped = 0;
             for (const file of ordered) {
                 if (used + file.size > NODE_TEXT_BUDGET) { skipped++; continue; }
-                try {
-                    const text = jsCache.get(file.path) ?? await file.blob.text();
-                    sources[file.path] = text; used += file.size;
-                } catch { skipped++; }
+                try { const text = jsCache.get(file.path) ?? await file.blob.text(); sources[file.path] = text; used += file.size; }
+                catch { skipped++; }
             }
             if (skipped) this.errors.warn(`Node Compat limitó su registro de texto para proteger la memoria (${skipped} archivos omitidos).`, { technical: `Presupuesto: ${NODE_TEXT_BUDGET} bytes` });
             return { sources, sizes, needed, used };
@@ -7361,19 +7531,27 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
         }
         async rewriteLinks(doc, entry) {
             for (const link of [...doc.querySelectorAll('link[href]')]) {
-                const href = link.getAttribute('href'); if (!href || PathResolver_js_5.PathResolver.isExternal(href)) continue;
+                const href = link.getAttribute('href'); if (!href) continue;
+                if (PathResolver_js_5.PathResolver.isExternal(href)) {
+                    if (link.rel.toLowerCase().split(/\s+/).includes('modulepreload') && /^https?:\/\//i.test(href)) { try { link.href = await this.resolver.resolveRemoteModule(href); link.removeAttribute('integrity'); } catch {} }
+                    continue;
+                }
                 const path = this.safeResolve(entry, href); if (!path || !this.vfs.has(path)) continue;
                 const rel = link.rel.toLowerCase().split(/\s+/);
                 if (rel.includes('stylesheet')) link.href = await this.resolver.resolveCssFile(path);
                 else if (rel.includes('modulepreload')) { try { link.href = await this.resolver.resolveModuleFile(path); } catch { link.remove(); } }
                 else link.href = await this.resolver.resolveReference(entry, href);
+                link.removeAttribute('integrity');
             }
         }
         async rewriteScripts(doc, entry) {
             for (const script of [...doc.querySelectorAll('script')]) {
                 if (script.dataset.localRuntimeBootstrap === 'true') continue;
                 const src = script.getAttribute('src'), module = script.type.trim().toLowerCase() === 'module';
-                if (src && !PathResolver_js_5.PathResolver.isExternal(src)) {
+                if (src && module && /^https?:\/\//i.test(src)) {
+                    try { script.src = await this.resolver.resolveRemoteModule(src); script.removeAttribute('integrity'); }
+                    catch (error) { this.errors.error(`No se pudo preparar el módulo remoto ${src}.`, { technical: String(error), source: entry }); }
+                } else if (src && !PathResolver_js_5.PathResolver.isExternal(src)) {
                     const path = this.safeResolve(entry, src); if (!path) continue;
                     if (!this.vfs.has(path)) {
                         if (this.remoteBaseHref) continue;
@@ -7390,13 +7568,14 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
                                 script.dataset.nodeCompat = 'true';
                             } else script.src = this.resolver.getObjectUrl(path);
                         }
+                        script.removeAttribute('integrity');
                     } catch (error) { this.errors.error(`No se pudo preparar ${path}.`, { technical: String(error), source: entry }); script.remove(); }
                 } else if (!src && module && script.textContent?.trim()) {
                     try { script.textContent = await this.resolver.rewriteInlineModule(script.textContent, entry); }
                     catch (error) { this.errors.error('No se pudo preparar un módulo inline. Si usa una dependencia web, revisa la conexión o CORS del proveedor.', { technical: String(error), source: entry }); script.remove(); }
                 } else if (!src && !module && script.textContent?.trim() && NODE_HINT.test(script.textContent)) {
                     const body = script.textContent;
-                    script.textContent = `(()=>{const require=globalThis.__LWR_NODE__.createRequire(${JSON.stringify(entry)});const module={exports:{}};const exports=module.exports;const process=globalThis.__LWR_NODE__.process;const Buffer=globalThis.__LWR_NODE__.Buffer;${body}\n})();`;
+                    script.textContent = `(()=>{const require=globalThis.__LWR_NODE__.createRequire(${JSON.stringify(entry)});const module={exports:{}};const exports=module.exports;const process=globalThis.__LWR_NODE__.process;const Buffer=globalThis.__LWR_NODE__.Buffer;const __filename=${JSON.stringify(entry)};const __dirname=${JSON.stringify(PathResolver_js_5.PathResolver.dirname(entry).replace(/\/$/, '') || '/')};${body}\n})();`;
                     script.dataset.nodeCompat = 'true';
                 }
             }
@@ -7417,7 +7596,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
             }
         }
         remoteHost(url) { try { return new URL(url).host; } catch { return String(url); } }
-        safeResolve(from, reference) { try { return PathResolver_js_5.PathResolver.resolve(from, reference); } catch (error) { this.errors.error('Ruta inválida bloqueada por el runtime.', { source: from, technical: String(error) }); return null; } }
+        safeResolve(from, reference) { try { return this.resolver.resolvePath(from, reference); } catch (error) { this.errors.error('Ruta inválida bloqueada por el runtime.', { source: from, technical: String(error) }); return null; } }
         bootstrap(nodeData) {
             const manifest = {}; for (const file of this.vfs.list()) manifest[file.path] = this.resolver.getObjectUrl(file.path);
             const reverse = Object.fromEntries(Object.entries(manifest).map(([path,url]) => [url,path]));
@@ -7425,6 +7604,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
             const scriptJson = value => JSON.stringify(value).replace(/&/g, '\\u0026').replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
             return `(()=>{'use strict';
 const C='local-web-runtime/v1',M=${scriptJson(manifest)},R=${scriptJson(reverse)},D=${scriptJson(entryDir)},ENTRY=${scriptJson(entry)},S=${scriptJson(nodeData.sources)},SZ=${scriptJson(nodeData.sizes)},NODE_NEEDED=${scriptJson(nodeData.needed)};
+globalThis.__LWR_IMPORT_META_ENV__=Object.freeze({MODE:'production',DEV:false,PROD:true,SSR:false,BASE_URL:'/'});
 const send=(type,payload)=>parent.postMessage({channel:C,type,payload},'*');
 const split=v=>{const q=v.indexOf('?'),h=v.indexOf('#');let c=v.length;if(q>=0)c=Math.min(c,q);if(h>=0)c=Math.min(c,h);return{path:v.slice(0,c),suffix:v.slice(c)}};
 const norm=v=>{const o=[];for(const p of String(v).replace(/\\\\/g,'/').split('/')){if(!p||p==='.')continue;if(p==='..'){if(!o.length)return null;o.pop()}else o.push(p)}return'/'+o.join('/')};
@@ -7437,7 +7617,7 @@ const hasPath=p=>{p=norm(p);return !!p&&(overlay.has(p)||Object.prototype.hasOwn
 const textOf=p=>{p=norm(p);if(!p)return undefined;if(overlay.has(p)){const v=overlay.get(p);return typeof v==='string'?v:new TextDecoder().decode(v)}return S[p]};
 class BufferCompat extends Uint8Array{static from(v,e='utf8'){if(v instanceof BufferCompat)return new BufferCompat(v);if(v instanceof Uint8Array)return new BufferCompat(v);if(v instanceof ArrayBuffer)return new BufferCompat(new Uint8Array(v));if(ArrayBuffer.isView(v))return new BufferCompat(new Uint8Array(v.buffer,v.byteOffset,v.byteLength));if(Array.isArray(v))return new BufferCompat(v);if(typeof v==='number')return new BufferCompat(v);const s=String(v);if(e==='base64'){const b=atob(s),a=new BufferCompat(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}if(e==='hex'){const a=new BufferCompat(Math.floor(s.length/2));for(let i=0;i<a.length;i++)a[i]=parseInt(s.slice(i*2,i*2+2),16)||0;return a}return new BufferCompat(new TextEncoder().encode(s))}static alloc(n,f=0){const b=new BufferCompat(n);b.fill(typeof f==='number'?f:0);return b}static allocUnsafe(n){return new BufferCompat(n)}static isBuffer(v){return v instanceof BufferCompat}static byteLength(v,e){return BufferCompat.from(v,e).length}static concat(list,total){const len=total??list.reduce((n,b)=>n+b.length,0),out=new BufferCompat(len);let o=0;for(const b of list){out.set(b.subarray(0,Math.max(0,len-o)),o);o+=b.length;if(o>=len)break}return out}toString(e='utf8',a=0,z=this.length){const v=this.subarray(a,z);if(e==='base64'){let s='';for(const x of v)s+=String.fromCharCode(x);return btoa(s)}if(e==='hex')return[...v].map(x=>x.toString(16).padStart(2,'0')).join('');return new TextDecoder(e==='utf8'?'utf-8':e).decode(v)}};
 class EventEmitter{constructor(){this._e=new Map()}on(n,f){const a=this._e.get(n)||[];a.push(f);this._e.set(n,a);return this}addListener(n,f){return this.on(n,f)}once(n,f){const w=(...a)=>{this.off(n,w);f(...a)};return this.on(n,w)}off(n,f){const a=this._e.get(n)||[];this._e.set(n,a.filter(x=>x!==f));return this}removeListener(n,f){return this.off(n,f)}removeAllListeners(n){n===undefined?this._e.clear():this._e.delete(n);return this}emit(n,...a){const l=[...(this._e.get(n)||[])];for(const f of l)try{f(...a)}catch(e){queueMicrotask(()=>{throw e})}return l.length>0}listeners(n){return[...(this._e.get(n)||[])]}}
-const processShim={env:{},argv:[],versions:{node:'browser-compat',localRuntime:'0.5'},platform:'browser',browser:true,title:'LocalRuntime',cwd:()=>D.length>1&&D.endsWith('/')?D.slice(0,-1):D,chdir:()=>{},nextTick:(f,...a)=>queueMicrotask(()=>f(...a)),uptime:()=>performance.now()/1000,hrtime:p=>{const n=performance.now()/1000,s=Math.floor(n),ns=Math.floor((n-s)*1e9);if(!p)return[s,ns];let ds=s-p[0],dn=ns-p[1];if(dn<0){ds--;dn+=1e9}return[ds,dn]}};processShim.hrtime.bigint=()=>BigInt(Math.floor(performance.now()*1e6));
+const processShim={env:{NODE_ENV:'production'},argv:[],versions:{node:'browser-compat',localRuntime:'0.6'},platform:'browser',browser:true,title:'LocalRuntime',cwd:()=>D.length>1&&D.endsWith('/')?D.slice(0,-1):D,chdir:()=>{},nextTick:(f,...a)=>queueMicrotask(()=>f(...a)),uptime:()=>performance.now()/1000,hrtime:p=>{const n=performance.now()/1000,s=Math.floor(n),ns=Math.floor((n-s)*1e9);if(!p)return[s,ns];let ds=s-p[0],dn=ns-p[1];if(dn<0){ds--;dn+=1e9}return[ds,dn]}};processShim.hrtime.bigint=()=>BigInt(Math.floor(performance.now()*1e6));
 const pathShim={normalize:p=>norm(p)||'.',join:(...p)=>join(...p),resolve:(...p)=>join('/',...p),dirname:p=>dir(p),basename:(p,e)=>{let b=base(p);return e&&b.endsWith(e)?b.slice(0,-e.length):b},extname:p=>{const b=base(p),i=b.lastIndexOf('.');return i>0?b.slice(i):''},relative:(a,b)=>{const A=(norm(a)||'/').split('/').filter(Boolean),B=(norm(b)||'/').split('/').filter(Boolean);while(A.length&&B.length&&A[0]===B[0]){A.shift();B.shift()}return[...A.map(()=> '..'),...B].join('/')},isAbsolute:p=>String(p).startsWith('/'),sep:'/',delimiter:':'};pathShim.posix=pathShim;pathShim.win32=pathShim;
 const fsPath=p=>norm(String(p).startsWith('/')?String(p):D+String(p));
 const statFor=p=>{p=fsPath(p);const isFile=hasPath(p),prefix=(p==='/'?'/':p+'/'),isDirectory=!isFile&&[...Object.keys(M),...Object.keys(S),...overlay.keys()].some(x=>x.startsWith(prefix));if(!isFile&&!isDirectory){const e=new Error('ENOENT: no such file or directory, stat '+p);e.code='ENOENT';throw e}return{size:isFile?(overlay.has(p)?BufferCompat.from(overlay.get(p)).length:(SZ[p]||0)):0,isFile:()=>isFile,isDirectory:()=>isDirectory,mtime:new Date(),ctime:new Date(),mode:isFile?0o100644:0o040755}};
@@ -7466,11 +7646,13 @@ const isBuiltin=s=>Object.prototype.hasOwnProperty.call(builtins,builtinName(s))
 const resolveModule=(spec,from)=>{if(isBuiltin(spec))return'node:'+builtinName(spec);if(spec.startsWith('.')||spec.startsWith('/')){const p=spec.startsWith('/')?spec:dir(from)+'/'+spec,r=tryFile(p);if(r)return r}else{let d=dir(from);for(;;){const r=tryFile((d==='/'?'':d)+'/node_modules/'+spec);if(r)return r;if(d==='/')break;d=dir(d)}}const e=new Error("Cannot find module '"+spec+"' from "+from);e.code='MODULE_NOT_FOUND';throw e};
 const loadResolved=p=>{if(p.startsWith('node:'))return builtins[p.slice(5)];if(cache.has(p))return cache.get(p).exports;const src=S[p];if(src===undefined)throw new Error('Node Compat no precargó '+p);const mod={id:p,filename:p,exports:{},loaded:false};cache.set(p,mod);if(p.endsWith('.json')){mod.exports=JSON.parse(src);mod.loaded=true;return mod.exports}const req=createRequire(p);try{const fn=new Function('require','module','exports','__filename','__dirname','process','Buffer','global','globalThis',src+'\\n//# sourceURL=localruntime:'+p);fn(req,mod,mod.exports,p,dir(p),processShim,BufferCompat,globalThis,globalThis);mod.loaded=true;return mod.exports}catch(e){cache.delete(p);send('runtime-error',{message:'Node Compat: '+(e?.message||String(e)),file:p,technical:e?.stack||String(e)});throw e}};
 function createRequire(from){const r=s=>loadResolved(resolveModule(String(s),from));r.resolve=s=>resolveModule(String(s),from);r.cache=cache;return r}
-const NodeCompat=Object.freeze({createRequire,requireBuiltin:n=>{n=builtinName(n);if(!Object.prototype.hasOwnProperty.call(builtins,n))throw new Error('Builtin Node no soportado: '+n);return builtins[n]},requirePath:p=>loadResolved(tryFile(p)||p),runEntry:p=>loadResolved(tryFile(p)||p),process:processShim,Buffer:BufferCompat,fs:fsShim,path:pathShim,version:'0.4'});globalThis.__LWR_NODE__=NodeCompat;
+const NodeCompat=Object.freeze({createRequire,requireBuiltin:n=>{n=builtinName(n);if(!Object.prototype.hasOwnProperty.call(builtins,n))throw new Error('Builtin Node no soportado: '+n);return builtins[n]},requirePath:p=>loadResolved(tryFile(p)||p),runEntry:p=>loadResolved(tryFile(p)||p),process:processShim,Buffer:BufferCompat,fs:fsShim,path:pathShim,version:'0.6'});globalThis.__LWR_NODE__=NodeCompat;
 if(NODE_NEEDED){globalThis.process=processShim;globalThis.Buffer=BufferCompat;globalThis.global=globalThis;globalThis.require=createRequire(ENTRY)}
 const patch=(proto,key)=>{const d=Object.getOwnPropertyDescriptor(proto,key);if(!d?.get||!d?.set)return;Object.defineProperty(proto,key,{...d,get:d.get,set(value){const u=typeof value==='string'?map(value):null;d.set.call(this,u||value)}})};patch(HTMLImageElement.prototype,'src');patch(HTMLMediaElement.prototype,'src');patch(HTMLSourceElement.prototype,'src');patch(HTMLTrackElement.prototype,'src');patch(HTMLVideoElement.prototype,'poster');
 const NativeAudio=window.Audio;window.Audio=function(src){const a=new NativeAudio();if(src)a.src=map(src)||src;return a};window.Audio.prototype=NativeAudio.prototype;
-const F=fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==='string'){const u=map(input);if(u)input=u}return F(input,init)};const O=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){const u=typeof url==='string'?map(url):null;return O.call(this,method,u||url,...rest)};
+if(typeof Worker==='function'){const NativeWorker=Worker;globalThis.Worker=function(url,opt){const raw=url instanceof URL?url.href:String(url),u=map(raw);return new NativeWorker(u||raw,opt)};globalThis.Worker.prototype=NativeWorker.prototype}
+if(typeof SharedWorker==='function'){const NativeSharedWorker=SharedWorker;globalThis.SharedWorker=function(url,opt){const raw=url instanceof URL?url.href:String(url),u=map(raw);return new NativeSharedWorker(u||raw,opt)};globalThis.SharedWorker.prototype=NativeSharedWorker.prototype}
+const F=fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==='string'){const u=map(input);if(u)input=u}else if(input instanceof Request){const u=map(input.url);if(u)input=new Request(u,input)}return F(input,init)};const O=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){const u=typeof url==='string'?map(url):null;return O.call(this,method,u||url,...rest)};
 const P=HTMLMediaElement.prototype.play,B=new Set();HTMLMediaElement.prototype.play=function(...a){const r=P.apply(this,a);if(r&&typeof r.catch==='function')return r.catch(e=>{if(e?.name==='NotAllowedError'){B.add(this);send('audio-blocked')}throw e});return r};const unlock=()=>{for(const m of [...B])P.call(m).then(()=>B.delete(m)).catch(()=>{})};addEventListener('pointerdown',unlock,{capture:true});addEventListener('touchstart',unlock,{capture:true});
 addEventListener('error',e=>{const t=e.target;if(t&&t!==window&&t instanceof Element){const u=t.getAttribute('src')||t.getAttribute('href')||t.getAttribute('data')||'';send('resource-error',{tag:t.tagName.toLowerCase(),url:u,path:R[split(u).path]||u||'recurso desconocido'});return}send('runtime-error',{message:e.message||'Error de JavaScript',file:e.filename||'',technical:[e.filename,e.lineno,e.colno].filter(Boolean).join(':')})},true);addEventListener('unhandledrejection',e=>{const r=e.reason;send('runtime-error',{message:r?.message||'Promise rechazada sin manejar',technical:r?.stack||String(r??'')})});addEventListener('DOMContentLoaded',()=>send('runtime-ready'),{once:true});
 window.LocalRuntime=Object.freeze({requestFullscreen:()=>send('request-fullscreen'),requestOrientation:o=>send('request-orientation',{orientation:o}),close:()=>send('close-project'),restart:()=>send('restart-project'),nodeCompat:NodeCompat})})();`;
