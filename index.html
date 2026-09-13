@@ -7,6 +7,8 @@
   <meta name="color-scheme" content="dark light">
   <title>Raven</title>
   <meta name="application-name" content="Raven">
+  <meta name="raven:app-id" content="raven">
+  <meta name="app-version" content="0.14.2">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -263,7 +265,7 @@
   background:radial-gradient(circle at 18% 4%,rgba(var(--ambient-rgb),.15),transparent 30%),linear-gradient(180deg,rgba(var(--ambient-rgb),.035),transparent 28%);
 }
 .detail-cover-shell{box-shadow:0 18px 34px rgba(0,0,0,.28),0 0 26px rgba(var(--ambient-rgb),.09),0 0 0 1px rgba(var(--ambient-rgb),.08) inset}
-.detail-hero-backdrop{display:none;position:absolute;inset:-5%;z-index:0;width:110%;height:110%;object-fit:cover;object-position:center;filter:blur(42px) saturate(112%);opacity:.48;transform:scale(1.04)}
+.detail-hero-backdrop{display:none;position:absolute;inset:-9%;z-index:0;width:118%;height:118%;object-fit:cover;object-position:center;filter:blur(32px) saturate(118%) brightness(.76);opacity:.76;transform:scale(1.12)}
 @media (orientation: landscape) and (min-width:760px){
   .detail-no-banner .detail-body{display:block}
   .detail-no-banner .detail-panel{
@@ -280,23 +282,296 @@
     backdrop-filter:blur(22px) saturate(118%);
     -webkit-backdrop-filter:blur(22px) saturate(118%);
   }
+  .detail-hero.detail-hero-narrow{background:rgb(7,8,13)}
   .detail-hero.detail-hero-narrow .detail-hero-backdrop{display:block}
   .detail-hero.detail-hero-narrow .detail-hero-media{
-    inset:0 0 0 auto;
-    width:72%;
+    inset:0;
+    width:100%;
     height:100%;
-    object-fit:contain;
-    object-position:right center;
+    object-fit:cover;
+    object-position:center center;
     background:transparent;
   }
   .detail-hero.detail-hero-narrow::after{
-    background:linear-gradient(90deg,rgba(5,6,10,.18) 0%,rgba(5,6,10,.08) 46%,rgba(5,6,10,.02) 76%,transparent 100%);
+    background:linear-gradient(90deg,rgba(5,6,10,.22) 0%,rgba(5,6,10,.10) 44%,rgba(5,6,10,.02) 74%,transparent 100%);
   }
-  .detail-hero.detail-hero-narrow .detail-hero-blur-left{opacity:.68}
+  .detail-hero.detail-hero-narrow .detail-hero-blur-left{opacity:.58}
 }
 @media (orientation: landscape) and (min-width:760px) and (max-height:520px){
   .detail-no-banner .detail-panel{width:min(52vw,560px);padding-top:calc(max(28px,env(safe-area-inset-top)) + 42px)}
-  .detail-hero.detail-hero-narrow .detail-hero-media{width:68%}
+}
+</style>
+
+
+<style id="raven-v0.13-history-storage">
+.version-history-list{display:grid;gap:10px;margin-top:8px}.version-history-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.08)}.version-history-main{min-width:0}.version-history-version{font-size:16px;font-weight:720;line-height:1.2}.version-history-meta{margin-top:5px;color:var(--muted);font-size:12px;line-height:1.4}.version-history-action{min-width:88px;height:36px;padding:0 14px;border:1px solid rgba(130,112,255,.2);border-radius:999px;background:rgba(96,72,201,.22);color:#fff;font-size:12px;font-weight:700}.version-history-action:disabled{opacity:.48;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}.version-history-note{margin:12px 0 0;color:#aaaab3;font-size:12px;line-height:1.5}.storage-badge{display:inline-flex;align-items:center;gap:6px;color:#a9d8ff;font-size:11px}.storage-badge:before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.sheet-error{margin-top:10px;color:#ffadad;font-size:12px}
+</style>
+
+<style id="raven-v0.13.1-banner-cover">
+/* Universal banner fitting: every real portada fills its existing frame proportionally. */
+.detail-hero{position:relative;overflow:hidden}
+.detail-hero-media{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:var(--cover-x,50%) var(--cover-y,50%);
+  background:transparent;
+}
+/* The old narrow-image helper is no longer needed. The real image itself always covers the frame. */
+.detail-hero-backdrop{display:none!important}
+.detail-hero.detail-hero-narrow .detail-hero-backdrop{display:none!important}
+.detail-hero.detail-hero-narrow .detail-hero-media{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:var(--cover-x,50%) var(--cover-y,50%);
+  background:transparent;
+}
+</style>
+
+<style id="raven-universal-runtime-v014">
+.console-runtime{position:absolute;inset:0;overflow:auto;background:radial-gradient(circle at 50% 5%,rgba(81,62,150,.16),transparent 42%),#07070a;color:#fff;display:flex;justify-content:center;align-items:flex-start;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));touch-action:none;user-select:none;-webkit-user-select:none}
+.console-shell{--shell:#c9c7bc;--shell2:#aead9f;--ink:#242430;--accent:#6b557e;position:relative;width:min(430px,calc(100vw - 28px));min-height:min(720px,calc(var(--visual-height) - 36px));border-radius:30px 30px 54px 30px;padding:28px 24px 30px;background:linear-gradient(155deg,var(--shell),var(--shell2));box-shadow:0 28px 70px rgba(0,0,0,.46),inset 0 1px rgba(255,255,255,.34),inset 0 -1px rgba(0,0,0,.16);display:flex;flex-direction:column;gap:22px;transition:width .2s ease,min-height .2s ease,padding .2s ease}
+.console-shell.gbc{--shell:#443c62;--shell2:#27243b;--ink:#e9e7f0;--accent:#b45f86;box-shadow:0 28px 70px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.10),inset 0 -1px rgba(0,0,0,.34)}
+.console-screen-bezel{position:relative;margin:0 auto;width:100%;aspect-ratio:160/144;border-radius:18px 18px 28px 18px;background:linear-gradient(145deg,#222832,#101318);padding:16px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 7px 16px rgba(0,0,0,.42),0 7px 22px rgba(0,0,0,.22);overflow:hidden}
+.console-screen{width:100%;height:100%;display:block;background:#9bbc0f;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:5px;box-shadow:0 0 0 1px rgba(0,0,0,.5);touch-action:none}
+.console-runtime.smooth .console-screen{image-rendering:auto}
+.console-brandline{display:flex;align-items:center;justify-content:space-between;color:color-mix(in srgb,var(--ink) 72%,transparent);font-size:10px;font-weight:720;letter-spacing:.11em;text-transform:uppercase;margin-top:-12px;padding:0 8px}
+.console-controls{position:relative;flex:1;min-height:250px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:20px;padding:2px 4px 0}
+.console-dpad{position:relative;width:152px;height:152px;justify-self:start;touch-action:none}
+.console-dpad::before,.console-dpad::after{content:'';position:absolute;background:linear-gradient(145deg,#303039,#111116);border-radius:9px;box-shadow:0 7px 12px rgba(0,0,0,.30),inset 0 1px rgba(255,255,255,.08)}
+.console-dpad::before{left:51px;top:0;width:50px;height:152px}.console-dpad::after{top:51px;left:0;width:152px;height:50px}
+.console-dpad-center{position:absolute;left:51px;top:51px;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,#24242b,#151519);z-index:2;pointer-events:none}
+.console-dpad-mark{position:absolute;z-index:3;color:rgba(255,255,255,.14);font-size:11px;pointer-events:none}.console-dpad-mark.up{top:13px;left:72px}.console-dpad-mark.down{bottom:13px;left:72px}.console-dpad-mark.left{left:17px;top:69px}.console-dpad-mark.right{right:17px;top:69px}
+.console-dpad[data-up='1']::before{box-shadow:0 3px 8px rgba(0,0,0,.30),inset 0 3px 7px rgba(0,0,0,.26)}.console-dpad[data-down='1']::before{box-shadow:0 3px 8px rgba(0,0,0,.30),inset 0 -3px 7px rgba(0,0,0,.26)}.console-dpad[data-left='1']::after{box-shadow:0 3px 8px rgba(0,0,0,.30),inset 3px 0 7px rgba(0,0,0,.26)}.console-dpad[data-right='1']::after{box-shadow:0 3px 8px rgba(0,0,0,.30),inset -3px 0 7px rgba(0,0,0,.26)}
+.console-actions{justify-self:end;display:flex;gap:19px;transform:rotate(-18deg);padding-right:2px}
+.console-action{width:66px;height:66px;border-radius:50%;border:0;background:linear-gradient(145deg,#9e325c,#5e1736);color:rgba(255,255,255,.84);font-size:17px;font-weight:780;box-shadow:0 8px 13px rgba(0,0,0,.30),inset 0 2px rgba(255,255,255,.11);touch-action:none}.console-shell.gbc .console-action{background:linear-gradient(145deg,#d06f95,#7f3158)}
+.console-action.pressed{transform:translateY(3px) scale(.965);box-shadow:0 3px 7px rgba(0,0,0,.28),inset 0 3px 8px rgba(0,0,0,.20)}
+.console-system-controls{grid-column:1/-1;display:flex;justify-content:center;gap:15px;margin-top:6px}.console-system-button{min-width:72px;height:24px;border:0;border-radius:999px;background:linear-gradient(180deg,#5d5d65,#303038);color:rgba(255,255,255,.70);font-size:9px;font-weight:750;letter-spacing:.09em;box-shadow:0 4px 8px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.07);transform:rotate(-7deg);touch-action:none}.console-system-button.pressed{transform:rotate(-7deg) translateY(2px) scale(.98);box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 2px rgba(0,0,0,.24)}
+.console-status{height:18px;display:flex;align-items:center;justify-content:center;gap:7px;color:color-mix(in srgb,var(--ink) 65%,transparent);font-size:10px}.console-status-dot{width:6px;height:6px;border-radius:50%;background:#bd3b56;box-shadow:0 0 8px rgba(189,59,86,.36)}
+.console-runtime.touch-hidden .console-controls{display:none}.console-runtime.touch-hidden .console-shell{min-height:auto}
+.console-runtime.display-focus .console-shell{width:min(720px,calc(100vw - 28px));min-height:auto;padding:22px}.console-runtime.display-focus .console-screen-bezel{width:min(100%,640px)}.console-runtime.display-focus .console-controls{min-height:190px;opacity:.78;transform:scale(.88);transform-origin:top center;margin-bottom:-24px}
+.console-runtime-error{margin:auto;width:min(520px,calc(100vw - 40px));padding:24px;border:1px solid rgba(255,255,255,.10);border-radius:20px;background:rgba(22,22,28,.94);text-align:center}.console-runtime-error h2{margin:0 0 9px;font-size:19px}.console-runtime-error p{margin:0;color:#aaaab5;font-size:13px;line-height:1.5}
+@media (orientation:landscape) and (max-height:700px){.console-runtime{align-items:center;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(10px,env(safe-area-inset-bottom))}.console-shell{width:min(820px,calc(100vw - 36px));min-height:auto;height:min(480px,calc(var(--visual-height) - 20px));border-radius:28px;display:grid;grid-template-columns:minmax(300px,1.08fr) minmax(280px,.92fr);grid-template-rows:1fr auto;gap:18px 28px;padding:20px 24px}.console-screen-bezel{grid-row:1/3;width:auto;height:100%;max-width:100%;aspect-ratio:160/144}.console-brandline{grid-column:2;grid-row:2;margin:0}.console-controls{grid-column:2;grid-row:1;min-height:0;align-self:center}.console-dpad{width:130px;height:130px}.console-dpad::before{left:44px;width:42px;height:130px}.console-dpad::after{top:44px;height:42px;width:130px}.console-dpad-center{left:44px;top:44px;width:42px;height:42px}.console-dpad-mark.up{top:11px;left:61px}.console-dpad-mark.down{bottom:11px;left:61px}.console-dpad-mark.left{left:14px;top:58px}.console-dpad-mark.right{right:14px;top:58px}.console-action{width:58px;height:58px}.console-status{display:none}.console-runtime.display-focus .console-shell{width:min(920px,calc(100vw - 24px));height:calc(var(--visual-height) - 16px);grid-template-columns:minmax(0,1fr) 230px}.console-runtime.display-focus .console-controls{transform:none;margin:0}}
+</style>
+
+
+<style id="raven-v0.14.2-detail-landscape-restoration">
+/*
+  Landscape Detail restoration.
+  This block deliberately overrides earlier experimental landscape layouts only.
+  Portrait, library, runtime and preflight remain untouched.
+*/
+@media (orientation: landscape) and (min-width: 560px) {
+  .detail-screen:not(.detail-no-banner) {
+    min-height: var(--visual-height);
+    overflow: hidden;
+    background: #07080d;
+  }
+
+  /* Raven owns the two regions. Intrinsic image dimensions never size the UI. */
+  .detail-screen:not(.detail-no-banner) .detail-body {
+    width: 100%;
+    max-width: none;
+    height: var(--visual-height);
+    min-height: var(--visual-height);
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: clamp(280px, 44vw, 560px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: none;
+    column-gap: 0;
+    row-gap: 0;
+    align-items: stretch;
+    overflow: hidden;
+  }
+
+  /* RIGHT: real banner region. Never flips sides and never shrinks to the image. */
+  .detail-screen:not(.detail-no-banner) .detail-hero {
+    position: relative;
+    inset: auto;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #07080d;
+    isolation: isolate;
+    z-index: 1;
+  }
+
+  .detail-screen:not(.detail-no-banner) .detail-hero-media,
+  .detail-screen:not(.detail-no-banner) .detail-hero.detail-hero-narrow .detail-hero-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    min-width: 100%;
+    max-width: none;
+    height: 100%;
+    min-height: 100%;
+    max-height: none;
+    display: block;
+    object-fit: cover !important;
+    object-position: var(--cover-x, 50%) var(--cover-y, 50%) !important;
+    background: transparent;
+    transform: none;
+  }
+
+  /* Blur belongs to the information material, not to the visible hero. */
+  .detail-screen:not(.detail-no-banner) .detail-hero-blur,
+  .detail-screen:not(.detail-no-banner) .detail-hero-backdrop {
+    display: none !important;
+  }
+
+  .detail-screen:not(.detail-no-banner) .detail-hero::after,
+  .detail-screen:not(.detail-no-banner) .detail-hero.detail-hero-narrow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(6,7,11,.17) 0%, rgba(6,7,11,.045) 14%, transparent 29%),
+      linear-gradient(180deg, rgba(0,0,0,.035), transparent 38%, rgba(0,0,0,.055) 100%);
+  }
+
+  .detail-screen:not(.detail-no-banner) .detail-cover-transition {
+    display: none;
+  }
+
+  /* LEFT: information. Same content/order, restored dark glass material. */
+  .detail-screen:not(.detail-no-banner) .detail-panel {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    padding:
+      calc(max(34px, env(safe-area-inset-top)) + 48px)
+      32px
+      calc(max(28px, env(safe-area-inset-bottom)) + 18px)
+      max(28px, env(safe-area-inset-left));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0 30px 30px 0;
+    background:
+      linear-gradient(90deg, rgba(7,8,12,.91) 0%, rgba(7,8,12,.84) 48%, rgba(8,9,14,.72) 100%);
+    -webkit-backdrop-filter: blur(27px) saturate(124%);
+    backdrop-filter: blur(27px) saturate(124%);
+    box-shadow: 18px 0 46px rgba(0,0,0,.16);
+    z-index: 4;
+  }
+
+  /* Dynamic blurred sample from this app's own banner. It never touches text. */
+  .detail-screen:not(.detail-no-banner) .detail-panel::before {
+    content: '';
+    position: absolute;
+    inset: -8%;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background-image: var(--detail-banner-image);
+    background-size: cover;
+    background-position: var(--cover-x, 50%) var(--cover-y, 50%);
+    background-repeat: no-repeat;
+    filter: blur(34px) saturate(122%) brightness(.68);
+    transform: scale(1.10);
+    opacity: .23;
+    -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.46) 0%, rgba(0,0,0,.72) 54%, #000 100%);
+    mask-image: linear-gradient(90deg, rgba(0,0,0,.46) 0%, rgba(0,0,0,.72) 54%, #000 100%);
+  }
+
+  /* Subtle glass reflection. Not a conventional white stroke. */
+  .detail-screen:not(.detail-no-banner) .detail-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      transparent 76%,
+      rgba(255,255,255,.018) 86%,
+      rgba(255,255,255,.105) 100%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: .72;
+  }
+
+  .detail-screen:not(.detail-no-banner) .detail-summary,
+  .detail-screen:not(.detail-no-banner) .detail-section {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+  }
+
+  /* Keep the current visual hierarchy and sizes. Only spacing/layout ownership is corrected. */
+  .detail-screen:not(.detail-no-banner) .detail-summary {
+    margin-top: 0;
+  }
+
+  .detail-screen:not(.detail-no-banner) .detail-section {
+    max-width: min(100%, 460px);
+  }
+
+  /* Controls belong to viewport/safe-area, never to the banner crop. */
+  .detail-screen:not(.detail-no-banner) .detail-controls {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+  }
+  .detail-screen:not(.detail-no-banner) .detail-float-button {
+    pointer-events: auto;
+    top: max(14px, calc(env(safe-area-inset-top) + 8px));
+  }
+  .detail-screen:not(.detail-no-banner) .detail-float-back {
+    left: max(14px, env(safe-area-inset-left));
+  }
+  .detail-screen:not(.detail-no-banner) .detail-float-more {
+    right: max(14px, env(safe-area-inset-right));
+  }
+}
+
+/* Very short landscape keeps the same LEFT/RIGHT hierarchy; only available space is tightened. */
+@media (orientation: landscape) and (min-width: 560px) and (max-height: 430px) {
+  .detail-screen:not(.detail-no-banner) .detail-body {
+    grid-template-columns: minmax(270px, 46vw) minmax(0, 1fr);
+  }
+  .detail-screen:not(.detail-no-banner) .detail-panel {
+    padding-top: calc(max(24px, env(safe-area-inset-top)) + 38px);
+    padding-right: 24px;
+    padding-bottom: calc(max(18px, env(safe-area-inset-bottom)) + 10px);
+    padding-left: max(22px, env(safe-area-inset-left));
+    border-radius: 0 26px 26px 0;
+  }
 }
 </style>
 
@@ -6701,6 +6976,10 @@ define("diagnostics/CompatibilityScanner", ["require", "exports", "filesystem/Mi
     }
     class CompatibilityScanner {
         static async scan(project) {
+            if (project.runtimeId === 'gameboy') {
+                const color = project.platform !== 'gameboy';
+                return { status: 'Compatible', technologies: [color ? 'Game Boy Color' : 'Game Boy', 'ROM local', 'Raven Emulator Runtime'], findings: project.metadata?.headerChecksumValid === false ? ['Checksum de cabecera no estándar; se permitirá iniciar con validación defensiva.'] : [], nodeCompat: { enabled:false, adapted:[], deferred:[], unsupported:[] }, scan: { reachableFiles:1, packageJsonPresent:false } };
+            }
             const technologies = new Set(['HTML']);
             const findings = new Set();
             const adaptedNode = new Set();
@@ -6917,6 +7196,13 @@ define("importer/ProjectValidator", ["require", "exports", "filesystem/PathResol
     class ProjectValidator {
         static async validate(project) {
             const issues = [];
+            if (project.runtimeId === 'gameboy') {
+                const entry = project.files.get(project.entryPoint);
+                if (!entry || !entry.size) return [{ level: 'error', message: 'La ROM no está disponible.' }];
+                if (project.metadata?.logoValid === false) issues.push({ level: 'warning', message: 'El logo de cabecera no coincide con una ROM comercial estándar. Puede ser homebrew o una ROM modificada.' });
+                if (project.metadata?.headerChecksumValid === false) issues.push({ level: 'warning', message: 'El checksum de cabecera no coincide. Raven intentará ejecutarla, pero el archivo podría estar modificado o dañado.' });
+                return issues;
+            }
             const entry = project.files.get(project.entryPoint);
             if (!entry) return [{ level: 'error', message: 'El archivo de inicio no existe en el VFS.' }];
             if (!entry.size) issues.push({ level: 'error', message: 'El archivo de inicio está vacío.' });
@@ -6976,9 +7262,11 @@ define("importer/FileImporter", ["require", "exports"], function (require, expor
     class FileImporter {
         static isZip(file) { return file.name.toLowerCase().endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-zip-compressed'; }
         static isHtml(file) { return /\.html?$/i.test(file.name) || file.type === 'text/html'; }
+        static isGameBoy(file) { return /\.(?:gb|gbc)$/i.test(file.name); }
         static validateZip(file) { if (!this.isZip(file)) throw new Error('El archivo seleccionado no es un ZIP válido.'); if (!file.size) throw new Error('El ZIP está vacío.'); }
-        static validateHtml(file) { if (!this.isHtml(file)) throw new Error('Selecciona un archivo .html, .htm o .zip.'); if (!file.size) throw new Error('El HTML está vacío.'); }
-        static validate(file) { if (this.isZip(file)) return this.validateZip(file); if (this.isHtml(file)) return this.validateHtml(file); throw new Error('Formato no compatible. Selecciona un archivo .html, .htm o .zip.'); }
+        static validateHtml(file) { if (!this.isHtml(file)) throw new Error('Selecciona un archivo HTML válido.'); if (!file.size) throw new Error('El HTML está vacío.'); }
+        static validateGameBoy(file) { if (!this.isGameBoy(file)) throw new Error('Selecciona una ROM .gb o .gbc.'); if (file.size < 0x150) throw new Error('La ROM es demasiado pequeña para contener una cabecera Game Boy válida.'); if (file.size > 16 * 1024 * 1024) throw new Error('La ROM excede el límite de seguridad de 16 MB para este runtime.'); }
+        static validate(file) { if (this.isZip(file)) return this.validateZip(file); if (this.isHtml(file)) return this.validateHtml(file); if (this.isGameBoy(file)) return this.validateGameBoy(file); throw new Error('Formato no compatible. Usa HTML, ZIP, GB o GBC.'); }
     }
     exports.FileImporter = FileImporter;
 });
@@ -7072,6 +7360,29 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
                     try { packageJson = JSON.parse(await packageCandidates[0].blob.text()); }
                     catch {}
                 }
+                let configMeta = null;
+                const configCandidates = [...files.values()].filter(f => !/\/node_modules\//i.test(f.path) && /(^|\/)(app|application|project|metadata|version)(?:[._-]config)?\.json$/i.test(f.path)).sort((a,b) => {
+                    const aa = a.path.startsWith(baseDir) ? 0 : 1, bb = b.path.startsWith(baseDir) ? 0 : 1;
+                    return aa-bb || PathResolver_js_3.PathResolver.depth(a.path)-PathResolver_js_3.PathResolver.depth(b.path);
+                });
+                for (const candidate of configCandidates.slice(0, 8)) {
+                    try {
+                        const value = JSON.parse(await candidate.blob.text());
+                        const version = cleanMeta(value?.version || value?.appVersion || value?.gameVersion || value?.build?.version);
+                        const id = cleanMeta(value?.id || value?.appId || value?.applicationId || value?.slug);
+                        const name = cleanMeta(value?.name || value?.appName || value?.title);
+                        if (version || id || name) { configMeta = { version, id, name }; break; }
+                    } catch {}
+                }
+                const detectSourceVersion = source => {
+                    const s = String(source || '').slice(0, 2 * 1024 * 1024);
+                    const patterns = [
+                        /(?:APP|GAME|BUILD|CLIENT)[_-]?VERSION\s*[:=]\s*['"]v?([0-9]+(?:\.[0-9A-Za-z-]+){1,4})['"]/i,
+                        /\bversion\s*[:=]\s*['"]v?([0-9]+\.[0-9]+(?:\.[0-9A-Za-z-]+)?)['"]/i
+                    ];
+                    for (const pattern of patterns) { const m = s.match(pattern); if (m?.[1]) return m[1]; }
+                    return '';
+                };
                 const entryFile = files.get(detected.entryPoint);
                 if (entryFile) {
                     const text = await entryFile.blob.text();
@@ -7103,10 +7414,10 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
                         const shortName = cleanMeta(manifest.short_name);
                         inferredName = manifestName || shortName || cleanMeta(packageJson?.name) || title || inferredName;
                         metadata = {
-                            id: cleanMeta(manifest.id) || cleanMeta(packageJson?.id) || cleanMeta(packageJson?.appId) || htmlId || null,
+                            id: cleanMeta(manifest.id) || cleanMeta(packageJson?.id) || cleanMeta(packageJson?.appId) || cleanMeta(configMeta?.id) || htmlId || null,
                             name: manifestName || cleanMeta(packageJson?.name) || null,
                             shortName: shortName || null,
-                            version: cleanMeta(manifest.version) || cleanMeta(packageJson?.version) || htmlVersion || null,
+                            version: cleanMeta(manifest.version) || cleanMeta(packageJson?.version) || cleanMeta(configMeta?.version) || htmlVersion || detectSourceVersion(text) || null,
                             orientation: typeof manifest.orientation === 'string' ? manifest.orientation : null,
                             display: typeof manifest.display === 'string' ? manifest.display : null,
                             themeColor: typeof manifest.theme_color === 'string' ? manifest.theme_color : null,
@@ -7115,10 +7426,10 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
                     } else {
                         inferredName = cleanMeta(packageJson?.name) || title || inferredName;
                         metadata = {
-                            id: cleanMeta(packageJson?.id) || cleanMeta(packageJson?.appId) || htmlId || null,
+                            id: cleanMeta(packageJson?.id) || cleanMeta(packageJson?.appId) || cleanMeta(configMeta?.id) || htmlId || null,
                             name: cleanMeta(packageJson?.name) || null,
                             shortName: cleanMeta(doc.querySelector('meta[name="application-name"]')?.getAttribute('content')) || null,
-                            version: cleanMeta(packageJson?.version) || htmlVersion || null,
+                            version: cleanMeta(packageJson?.version) || cleanMeta(configMeta?.version) || htmlVersion || detectSourceVersion(text) || null,
                             orientation: null,
                             display: null,
                             themeColor: cleanMeta(doc.querySelector('meta[name="theme-color"]')?.getAttribute('content')) || null,
@@ -7129,10 +7440,10 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
                 if (!metadata && packageJson) {
                     inferredName = cleanMeta(packageJson?.name) || inferredName;
                     metadata = {
-                        id: cleanMeta(packageJson?.id) || cleanMeta(packageJson?.appId) || null,
+                        id: cleanMeta(packageJson?.id) || cleanMeta(packageJson?.appId) || cleanMeta(configMeta?.id) || null,
                         name: cleanMeta(packageJson?.name) || null,
                         shortName: null,
-                        version: cleanMeta(packageJson?.version) || null,
+                        version: cleanMeta(packageJson?.version) || cleanMeta(configMeta?.version) || null,
                         orientation: null,
                         display: null,
                         themeColor: null,
@@ -7164,11 +7475,16 @@ define("importer/HtmlImporter", ["require", "exports", "filesystem/MimeResolver"
             const doc = new DOMParser().parseFromString(sourceText, 'text/html');
             const title = (doc.querySelector('title')?.textContent || '').trim();
             const meta = name => (doc.querySelector(`meta[name="${name}"]`)?.getAttribute('content') || '').trim();
+            const versionFromSource = (() => {
+                const s = sourceText.slice(0, 2 * 1024 * 1024);
+                for (const pattern of [/(?:APP|GAME|BUILD|CLIENT)[_-]?VERSION\s*[:=]\s*['"]v?([0-9]+(?:\.[0-9A-Za-z-]+){1,4})['"]/i,/\bversion\s*[:=]\s*['"]v?([0-9]+\.[0-9]+(?:\.[0-9A-Za-z-]+)?)['"]/i]) { const m=s.match(pattern); if(m?.[1]) return m[1]; }
+                return null;
+            })();
             const metadata = {
                 id: meta('raven:app-id') || meta('application-id') || meta('app-id') || null,
                 name: meta('application-name') || null,
                 shortName: null,
-                version: meta('app-version') || meta('version') || null,
+                version: meta('app-version') || meta('version') || versionFromSource || null,
                 orientation: null,
                 display: null,
                 themeColor: meta('theme-color') || null,
@@ -7189,16 +7505,54 @@ define("importer/HtmlImporter", ["require", "exports", "filesystem/MimeResolver"
     }
     exports.HtmlImporter = HtmlImporter;
 });
-define("importer/ProjectImporter", ["require", "exports", "importer/FileImporter", "importer/ZipImporter", "importer/HtmlImporter"], function (require, exports, FileImporter_js_3, ZipImporter_js_2, HtmlImporter_js_1) {
+
+define("importer/GameBoyImporter", ["require", "exports", "importer/FileImporter", "filesystem/PathResolver"], function (require, exports, FileImporter_js_gb, PathResolver_js_gb) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.GameBoyImporter = void 0;
+    const NINTENDO_LOGO = [0xCE,0xED,0x66,0x66,0xCC,0x0D,0x00,0x0B,0x03,0x73,0x00,0x83,0x00,0x0C,0x00,0x0D,0x00,0x08,0x11,0x1F,0x88,0x89,0x00,0x0E,0xDC,0xCC,0x6E,0xE6,0xDD,0xDD,0xD9,0x99,0xBB,0xBB,0x67,0x63,0x6E,0x0E,0xEC,0xCC,0xDD,0xDC,0x99,0x9F,0xBB,0xB9,0x33,0x3E];
+    const ROM_BANKS = {0x00:2,0x01:4,0x02:8,0x03:16,0x04:32,0x05:64,0x06:128,0x07:256,0x08:512,0x52:72,0x53:80,0x54:96};
+    const RAM_BYTES = {0x00:0,0x01:2048,0x02:8192,0x03:32768,0x04:131072,0x05:65536};
+    const cartNames={0x00:'ROM',0x01:'MBC1',0x02:'MBC1+RAM',0x03:'MBC1+RAM+BATTERY',0x05:'MBC2',0x06:'MBC2+BATTERY',0x08:'ROM+RAM',0x09:'ROM+RAM+BATTERY',0x0F:'MBC3+TIMER+BATTERY',0x10:'MBC3+TIMER+RAM+BATTERY',0x11:'MBC3',0x12:'MBC3+RAM',0x13:'MBC3+RAM+BATTERY',0x19:'MBC5',0x1A:'MBC5+RAM',0x1B:'MBC5+RAM+BATTERY',0x1C:'MBC5+RUMBLE',0x1D:'MBC5+RUMBLE+RAM',0x1E:'MBC5+RUMBLE+RAM+BATTERY'};
+    function cleanTitle(bytes,cgb){const end=cgb?0x143:0x144;let s='';for(let i=0x134;i<end;i++){const b=bytes[i];if(!b)break;if(b>=32&&b<127)s+=String.fromCharCode(b)}return s.trim()}
+    function hex(v,n=2){return Number(v||0).toString(16).toUpperCase().padStart(n,'0')}
+    function inspect(bytes,fileName){
+        const cgbFlag=bytes[0x143], mode=cgbFlag===0xC0?'cgb':cgbFlag===0x80?'dual':'gb';
+        const title=cleanTitle(bytes,mode!=='gb')||fileName.replace(/\.(?:gb|gbc)$/i,'').trim()||'Game Boy';
+        let header=0;for(let i=0x134;i<=0x14C;i++)header=(header-bytes[i]-1)&0xFF;
+        let logo=true;for(let i=0;i<NINTENDO_LOGO.length;i++)if(bytes[0x104+i]!==NINTENDO_LOGO[i]){logo=false;break}
+        const romBanks=ROM_BANKS[bytes[0x148]]||0, expected=romBanks*0x4000;
+        const globalChecksum=(bytes[0x14E]<<8)|bytes[0x14F];
+        const identity=[title.toLowerCase().replace(/[^a-z0-9]+/g,'-'),hex(bytes[0x14A]),hex(bytes[0x147]),hex(globalChecksum,4)].join('-');
+        return {title,cgbFlag,mode,logoValid:logo,headerChecksumValid:header===bytes[0x14D],headerChecksum:bytes[0x14D],globalChecksum,cartridgeType:bytes[0x147],cartridgeName:cartNames[bytes[0x147]]||`Tipo 0x${hex(bytes[0x147])}`,romSizeCode:bytes[0x148],ramSizeCode:bytes[0x149],romBanks,expectedRomBytes:expected,ramBytes:RAM_BYTES[bytes[0x149]]??0,destinationCode:bytes[0x14A],oldLicensee:bytes[0x14B],versionByte:bytes[0x14C],identity};
+    }
+    class GameBoyImporter {
+        async import(file){
+            FileImporter_js_gb.FileImporter.validateGameBoy(file);
+            const ab=await file.arrayBuffer(), bytes=new Uint8Array(ab), info=inspect(bytes,file.name);
+            if(info.expectedRomBytes && bytes.length < info.expectedRomBytes) throw new Error(`ROM incompleta: la cabecera declara ${info.expectedRomBytes} bytes y el archivo contiene ${bytes.length}.`);
+            const ext=info.mode==='cgb'||/\.gbc$/i.test(file.name)?'gbc':'gb';
+            const path=`/cartridge.${ext}`;
+            const blob=new Blob([ab],{type:'application/octet-stream'}),files=new Map();
+            files.set(path,{path,name:PathResolver_js_gb.PathResolver.basename(path),mimeType:'application/octet-stream',size:blob.size,blob});
+            return {id:crypto.randomUUID(),name:info.title,entryPoint:path,entryCandidates:[path],files,createdAt:Date.now(),source:ext,size:blob.size,runtimeId:'gameboy',platform:info.mode==='cgb'?'gameboy-color':info.mode==='dual'?'gameboy-color-compatible':'gameboy',consoleProfile:info.mode==='gb'?'gameboy':'gameboy-color',metadata:{id:`gb-${info.identity}`,name:info.title,shortName:info.title,version:null,platform:info.mode,cartridgeType:info.cartridgeType,cartridgeName:info.cartridgeName,cgbFlag:info.cgbFlag,logoValid:info.logoValid,headerChecksumValid:info.headerChecksumValid,globalChecksum:info.globalChecksum,romBanks:info.romBanks,ramBytes:info.ramBytes,versionByte:info.versionByte,compatibilityWarnings:[...(info.logoValid?[]:['Nintendo logo/header no estándar']),...(info.headerChecksumValid?[]:['Header checksum no coincide'])]}};
+        }
+        static inspect=inspect;
+    }
+    exports.GameBoyImporter=GameBoyImporter;
+});
+define("importer/ProjectImporter", ["require", "exports", "importer/FileImporter", "importer/ZipImporter", "importer/HtmlImporter", "importer/GameBoyImporter"], function (require, exports, FileImporter_js_3, ZipImporter_js_2, HtmlImporter_js_1, GameBoyImporter_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ProjectImporter = void 0;
     class ProjectImporter {
         zip = new ZipImporter_js_2.ZipImporter();
         html = new HtmlImporter_js_1.HtmlImporter();
+        gameboy = new GameBoyImporter_js_1.GameBoyImporter();
         async import(file) {
             FileImporter_js_3.FileImporter.validate(file);
             if (FileImporter_js_3.FileImporter.isZip(file)) return this.zip.import(file);
+            if (FileImporter_js_3.FileImporter.isGameBoy(file)) return this.gameboy.import(file);
             return this.html.import(file);
         }
     }
@@ -7277,7 +7631,7 @@ define("ui/importer/AnalysisView", ["require", "exports", "utils/dom", "utils/fo
             facts.append(f);
         };
         fact('Formato', String(o.project.source || '').toUpperCase());
-        fact('Versión', String(o.project.metadata?.version || o.project.storedVersion || '—'));
+        fact('Versión', String(o.project.metadata?.version || o.project.storedVersion || 'Sin declarar'));
         fact('Tamaño', (0, format_js_1.formatBytes)(o.project.size));
         fact('Archivos', String(o.project.files.size));
         if (o.project.entryCandidates.length > 1) {
@@ -7332,6 +7686,7 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
         if (item.coverCustom)
             add('Restablecer carátula', () => actions.resetCover(item));
         add('Actualizar archivo', () => actions.update(item));
+        add('Historial de versiones', () => actions.history?.(item));
         add('Eliminar de biblioteca', () => actions.remove(item), true);
         menu.addEventListener('pointerdown', e => e.stopPropagation());
         menu.addEventListener('click', e => e.stopPropagation());
@@ -7353,6 +7708,8 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
             openMenu = null;
             if (outsideHandler) {
                 document.removeEventListener('pointerdown', outsideHandler, true);
+                document.removeEventListener('touchstart', outsideHandler, true);
+                document.removeEventListener('click', outsideHandler, true);
                 outsideHandler = null;
             }
         };
@@ -7375,14 +7732,18 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
             menu.style.right = 'auto';
             menu.style.bottom = 'auto';
             outsideHandler = e => {
-                if (openMenu && e.target instanceof Node && !openMenu.contains(e.target) && e.target !== anchor)
-                    closeMenu();
+                if (!openMenu || !(e.target instanceof Node)) return;
+                if (!openMenu.contains(e.target) && !anchor.contains?.(e.target)) closeMenu();
             };
-            setTimeout(() => document.addEventListener('pointerdown', outsideHandler, true), 0);
+            setTimeout(() => {
+                document.addEventListener('pointerdown', outsideHandler, true);
+                document.addEventListener('touchstart', outsideHandler, { capture:true, passive:true });
+                document.addEventListener('click', outsideHandler, true);
+            }, 0);
         };
         if (!items.length) {
             const empty = (0, dom_js_3.el)('div', 'empty-state');
-            empty.append((0, dom_js_3.el)('p', 'empty-title', 'Tu biblioteca local está vacía'), (0, dom_js_3.el)('p', 'empty-copy', 'Importa un HTML autocontenido o un proyecto ZIP. Todo se analiza y ejecuta localmente en el dispositivo.'));
+            empty.append((0, dom_js_3.el)('p', 'empty-title', 'Tu biblioteca local está vacía'), (0, dom_js_3.el)('p', 'empty-copy', 'Importa un HTML, ZIP o una ROM GB/GBC. Todo se analiza y ejecuta localmente en el dispositivo.'));
             content.append(empty);
         }
         else {
@@ -7423,12 +7784,12 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
                     const coverWrap = (0, dom_js_3.el)('div', 'library-card-cover-wrap');
                     coverWrap.append(cover);
                     const info = (0, dom_js_3.el)('div', 'library-card-info');
-                    info.append((0, dom_js_3.el)('div', 'library-card-name', item.displayName), (0, dom_js_3.el)('div', 'library-card-meta', `${String(item.source || '').toUpperCase()} · ${item.version || '—'}`));
+                    info.append((0, dom_js_3.el)('div', 'library-card-name', item.displayName), (0, dom_js_3.el)('div', 'library-card-meta', `${String(item.source || '').toUpperCase()} · ${item.version || 'Sin declarar'}`));
                     host.append(coverWrap, info, more);
                 }
                 else {
                     const info = (0, dom_js_3.el)('div', 'library-info');
-                    info.append((0, dom_js_3.el)('div', 'library-name', item.displayName), (0, dom_js_3.el)('div', 'library-meta', `${String(item.source || '').toUpperCase()} · ${item.version || '—'} · ${(0, format_js_2.formatBytes)(item.size || 0)}`));
+                    info.append((0, dom_js_3.el)('div', 'library-name', item.displayName), (0, dom_js_3.el)('div', 'library-meta', `${String(item.source || '').toUpperCase()} · ${item.version || 'Sin declarar'} · ${(0, format_js_2.formatBytes)(item.size || 0)}`));
                     const coverShell = (0, dom_js_3.el)('div', 'library-cover-shell');
                     coverShell.append(cover);
                     host.append(coverShell, info, more);
@@ -7442,7 +7803,7 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
             e.setAttribute('role', 'alert');
             content.append(e);
         }
-        root.append(header, content, (0, dom_js_3.button)('+', 'import-fab', onImport, 'Importar HTML o ZIP'));
+        root.append(header, content, (0, dom_js_3.button)('+', 'import-fab', onImport, 'Importar app, juego o ROM'));
         root.addEventListener('remove', closeMenu, { once: true });
         return root;
     }
@@ -7585,10 +7946,31 @@ define("ui/library/DetailView", ["require", "exports", "utils/dom", "utils/forma
         document.querySelector('meta[name="theme-color"]')?.setAttribute('content', `rgb(${theme.r}, ${theme.g}, ${theme.b})`);
     }
     function makeMenu(app, actions, anchor) {
-        document.querySelector('.detail-menu')?.remove();
+        document.querySelectorAll('.detail-menu,.library-menu').forEach(node => node.remove());
         const menu = (0, dom_js_detail.el)('div', 'detail-menu');
+        let closed = false;
+        const cleanup = () => {
+            if (closed) return;
+            closed = true;
+            menu.remove();
+            document.removeEventListener('pointerdown', outside, true);
+            document.removeEventListener('touchstart', outside, true);
+            document.removeEventListener('click', outside, true);
+            document.removeEventListener('keydown', keyboard, true);
+            window.removeEventListener('resize', cleanup, true);
+            window.removeEventListener('orientationchange', cleanup, true);
+            document.removeEventListener('visibilitychange', visibility, true);
+        };
+        const outside = e => {
+            if (!(e.target instanceof Node)) return;
+            if (!menu.contains(e.target) && !anchor.contains?.(e.target)) cleanup();
+        };
+        const keyboard = e => { if (e.key === 'Escape') cleanup(); };
+        const visibility = () => { if (document.hidden) cleanup(); };
         const add = (label, fn, destructive = false) => {
-            const b = (0, dom_js_detail.button)(label, `detail-menu-item${destructive ? ' destructive' : ''}`, e => { e.stopPropagation(); menu.remove(); fn(); });
+            const b = (0, dom_js_detail.button)(label, `detail-menu-item${destructive ? ' destructive' : ''}`, e => {
+                e.preventDefault(); e.stopPropagation(); cleanup(); fn();
+            });
             menu.append(b);
         };
         add('Renombrar en biblioteca', () => actions.rename(app));
@@ -7597,6 +7979,7 @@ define("ui/library/DetailView", ["require", "exports", "utils/dom", "utils/forma
         if (app.coverCustom) add('Restablecer carátula', () => actions.resetCover(app));
         if (app.bannerCustom) add('Restablecer portada', () => actions.resetBanner(app));
         add('Actualizar archivo', () => actions.update(app));
+        add('Historial de versiones', () => actions.history?.(app));
         add('Eliminar de biblioteca', () => actions.remove(app), true);
         document.body.append(menu);
         const w = Math.min(280, Math.max(180, innerWidth - 24));
@@ -7606,8 +7989,15 @@ define("ui/library/DetailView", ["require", "exports", "utils/dom", "utils/forma
         let top = r.bottom + 8;
         if (top + h > innerHeight - margin) top = Math.max(margin, r.top - h - 8);
         menu.style.left = `${left}px`; menu.style.top = `${top}px`;
-        const outside = e => { if (e.target instanceof Node && !menu.contains(e.target) && e.target !== anchor) { menu.remove(); document.removeEventListener('pointerdown', outside, true); } };
-        setTimeout(() => document.addEventListener('pointerdown', outside, true), 0);
+        setTimeout(() => {
+            document.addEventListener('pointerdown', outside, true);
+            document.addEventListener('touchstart', outside, { capture:true, passive:true });
+            document.addEventListener('click', outside, true);
+            document.addEventListener('keydown', keyboard, true);
+            window.addEventListener('resize', cleanup, true);
+            window.addEventListener('orientationchange', cleanup, true);
+            document.addEventListener('visibilitychange', visibility, true);
+        }, 0);
     }
     function renderDetail(app, actions) {
         const root = (0, dom_js_detail.el)('main', 'detail-screen');
@@ -7621,16 +8011,24 @@ define("ui/library/DetailView", ["require", "exports", "utils/dom", "utils/forma
         if (heroBlob) {
             const hero = (0, dom_js_detail.el)('div', 'detail-hero');
             const u = URL.createObjectURL(heroBlob); urls.push(u);
-            const backdrop = document.createElement('img'); backdrop.className = 'detail-hero-backdrop'; backdrop.src = u; backdrop.alt = '';
+            root.style.setProperty('--detail-banner-image', `url("${u}")`);
             const blurLeft = document.createElement('img'); blurLeft.className = 'detail-hero-blur detail-hero-blur-left'; blurLeft.src = u; blurLeft.alt = '';
             const blurBottom = document.createElement('img'); blurBottom.className = 'detail-hero-blur detail-hero-blur-bottom'; blurBottom.src = u; blurBottom.alt = '';
             const img = document.createElement('img'); img.className = 'detail-hero-media'; img.src = u; img.alt = '';
-            img.addEventListener('load', () => {
-                if (!img.naturalWidth || !img.naturalHeight) return;
-                const ratio = img.naturalWidth / img.naturalHeight;
-                hero.classList.toggle('detail-hero-narrow', ratio < 1.45);
-            }, { once: true });
-            hero.append(backdrop, blurLeft, blurBottom, img);
+            const storedPosition = app.bannerPosition || app.coverPosition || null;
+            const x = Number(storedPosition?.x);
+            const y = Number(storedPosition?.y);
+            if (Number.isFinite(x)) {
+                const px = `${Math.min(100, Math.max(0, x))}%`;
+                hero.style.setProperty('--cover-x', px);
+                root.style.setProperty('--cover-x', px);
+            }
+            if (Number.isFinite(y)) {
+                const py = `${Math.min(100, Math.max(0, y))}%`;
+                hero.style.setProperty('--cover-y', py);
+                root.style.setProperty('--cover-y', py);
+            }
+            hero.append(blurLeft, blurBottom, img);
             const transition = (0, dom_js_detail.el)('div', 'detail-cover-transition');
             body.append(hero, transition);
         } else {
@@ -7658,7 +8056,7 @@ define("ui/library/DetailView", ["require", "exports", "utils/dom", "utils/forma
             facts.append(f);
         };
         fact('Formato', String(app.source || '').toUpperCase() || 'LOCAL');
-        fact('Versión', String(app.version || '—'));
+        fact('Versión', String(app.version || 'Sin declarar'));
         fact('Tamaño', (0, format_js_detail.formatBytes)(app.size || 0));
         fact('Aperturas', String(app.openCount || 0));
         section.append(facts);
@@ -7739,14 +8137,28 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
         aliasConfigPromise = null;
         disposed = false;
         webRoot = '/';
-        importMap = { imports: {} };
+        importMap = { imports: {}, scopes: {} };
         importMapBase = '/index.html';
         constructor(vfs, errors, webRoot = '/') { this.vfs = vfs; this.errors = errors; this.webRoot = PathResolver_js_4.PathResolver.dirname(PathResolver_js_4.PathResolver.normalizeAbsolute(`${webRoot}index.html`)); }
         getObjectUrl(path) { return this.vfs.createObjectUrl(path); }
         setImportMap(value, baseFile) {
-            const imports = value && typeof value === 'object' && value.imports && typeof value.imports === 'object' ? value.imports : {};
-            this.importMap = { imports: { ...imports } };
             this.importMapBase = baseFile || this.importMapBase;
+            const imports = value && typeof value === 'object' && value.imports && typeof value.imports === 'object' ? value.imports : {};
+            const rawScopes = value && typeof value === 'object' && value.scopes && typeof value.scopes === 'object' ? value.scopes : {};
+            const scopes = {};
+            for (const [scope, mappings] of Object.entries(rawScopes)) {
+                if (!mappings || typeof mappings !== 'object') continue;
+                let key = String(scope || '').trim();
+                if (!key) continue;
+                if (!PathResolver_js_4.PathResolver.isExternal(key)) {
+                    try {
+                        key = key.startsWith('/') ? PathResolver_js_4.PathResolver.normalizeAbsolute(key) : PathResolver_js_4.PathResolver.resolve(this.importMapBase, key);
+                    } catch { continue; }
+                }
+                if (!key.endsWith('/')) key += '/';
+                scopes[key] = { ...mappings };
+            }
+            this.importMap = { imports: { ...imports }, scopes };
         }
         resolvePath(fromFile, reference) {
             const value = String(reference ?? '').trim();
@@ -7756,17 +8168,30 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
             if (pathname.startsWith('/')) return PathResolver_js_4.PathResolver.normalizeAbsolute(`${this.webRoot}${pathname.slice(1)}`);
             return PathResolver_js_4.PathResolver.resolve(fromFile, value);
         }
-        importMapTarget(specifier) {
-            const imports = this.importMap?.imports ?? {};
-            if (Object.prototype.hasOwnProperty.call(imports, specifier)) return typeof imports[specifier] === 'string' ? imports[specifier] : null;
+        specifierMapTarget(map, specifier) {
+            if (!map || typeof map !== 'object') return null;
+            if (Object.prototype.hasOwnProperty.call(map, specifier)) return typeof map[specifier] === 'string' ? map[specifier] : null;
             let best = '';
-            for (const key of Object.keys(imports)) if (key.endsWith('/') && specifier.startsWith(key) && key.length > best.length) best = key;
+            for (const key of Object.keys(map)) if (key.endsWith('/') && specifier.startsWith(key) && key.length > best.length) best = key;
             if (!best) return null;
-            const target = imports[best];
+            const target = map[best];
             return typeof target === 'string' ? `${target}${specifier.slice(best.length)}` : null;
         }
-        async resolveImportMapModule(specifier, stack = []) {
-            const mapped = this.importMapTarget(specifier);
+        importMapTarget(specifier, fromFile = this.importMapBase) {
+            const scopes = this.importMap?.scopes ?? {};
+            let bestScope = '';
+            for (const scope of Object.keys(scopes)) {
+                if (PathResolver_js_4.PathResolver.isExternal(scope)) continue;
+                if (fromFile.startsWith(scope) && scope.length > bestScope.length) bestScope = scope;
+            }
+            if (bestScope) {
+                const scoped = this.specifierMapTarget(scopes[bestScope], specifier);
+                if (scoped) return scoped;
+            }
+            return this.specifierMapTarget(this.importMap?.imports ?? {}, specifier);
+        }
+        async resolveImportMapModule(specifier, fromFile = this.importMapBase, stack = []) {
+            const mapped = this.importMapTarget(specifier, fromFile);
             if (!mapped) return null;
             if (/^https?:\/\//i.test(mapped)) return this.resolveRemoteModule(mapped, []);
             if (PathResolver_js_4.PathResolver.isExternal(mapped)) return mapped;
@@ -7974,6 +8399,45 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
             for (const item of names) lines.push(`export const ${item}=m[${JSON.stringify(item)}];`);
             const url = this.createGenerated(new Blob([lines.join('\n')], { type: 'text/javascript;charset=utf-8' }));
             this.nodeModuleCache.set(name, url); return url;
+        }
+        async resolvePackageImport(fromFile, specifier, stack = []) {
+            if (!specifier.startsWith('#')) return null;
+            let folder = PathResolver_js_4.PathResolver.dirname(fromFile);
+            for (;;) {
+                const pkgPath = PathResolver_js_4.PathResolver.normalizeAbsolute(`${folder}package.json`);
+                if (this.vfs.has(pkgPath)) {
+                    let pkg = null;
+                    try { pkg = JSON.parse(await this.vfs.text(pkgPath)); } catch {}
+                    const imports = pkg?.imports;
+                    if (imports && typeof imports === 'object') {
+                        let target = null;
+                        if (Object.prototype.hasOwnProperty.call(imports, specifier)) target = this.pickPackageTarget(imports[specifier]);
+                        if (!target) {
+                            for (const [pattern, value] of Object.entries(imports)) {
+                                if (!pattern.includes('*')) continue;
+                                const [prefix, suffix] = pattern.split('*');
+                                if (!specifier.startsWith(prefix) || !specifier.endsWith(suffix)) continue;
+                                const middle = specifier.slice(prefix.length, specifier.length - suffix.length);
+                                const picked = this.pickPackageTarget(value);
+                                if (picked) { target = picked.replaceAll('*', middle); break; }
+                            }
+                        }
+                        if (typeof target === 'string') {
+                            if (/^https?:\/\//i.test(target)) return this.resolveRemoteModule(target, []);
+                            if (PathResolver_js_4.PathResolver.isExternal(target)) return target;
+                            if (!target.startsWith('.') && !target.startsWith('/')) return this.resolvePackageModule(fromFile, target, stack);
+                            const base = target.startsWith('/') ? PathResolver_js_4.PathResolver.normalizeAbsolute(`${this.webRoot}${target.slice(1)}`) : PathResolver_js_4.PathResolver.resolve(pkgPath, target);
+                            const hit = this.tryFileVariants(base);
+                            if (hit) return this.resolveModuleTarget(hit, target, stack);
+                            this.errors.error(`package.json#imports apunta a un módulo inexistente: ${target}`, { source: pkgPath, technical: specifier });
+                            return null;
+                        }
+                    }
+                }
+                if (folder === '/') break;
+                folder = PathResolver_js_4.PathResolver.dirname(folder.slice(0, -1));
+            }
+            return null;
         }
         async resolvePackageModule(fromFile, specifier, stack) {
             const suffix = PathResolver_js_4.PathResolver.splitReference(specifier).suffix;
@@ -8251,10 +8715,10 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
                 else if (node.type === 'ImportExpression' && isNode(node.source) && node.source.type === 'Literal') literal = node.source;
                 if (!literal || typeof literal.value !== 'string') return;
                 const specifier = literal.value;
-                const mapped = this.importMapTarget(specifier);
+                const mapped = this.importMapTarget(specifier, path);
                 if (mapped) {
                     pending.push((async () => {
-                        const target = await this.resolveImportMapModule(specifier, stack);
+                        const target = await this.resolveImportMapModule(specifier, path, stack);
                         if (!target) return null;
                         const quote = source.slice(literal.start, literal.start + 1), q = quote === '"' || quote === "'" ? quote : '"';
                         return { start: literal.start, end: literal.end, value: `${q}${target}${q}` };
@@ -8264,6 +8728,15 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
                 if (isNodeBuiltin(specifier)) {
                     pending.push((async () => {
                         const target = await this.resolveNodeBuiltinModule(specifier);
+                        const quote = source.slice(literal.start, literal.start + 1), q = quote === '"' || quote === "'" ? quote : '"';
+                        return { start: literal.start, end: literal.end, value: `${q}${target}${q}` };
+                    })());
+                    return;
+                }
+                if (specifier.startsWith('#')) {
+                    pending.push((async () => {
+                        const target = await this.resolvePackageImport(path, specifier, stack);
+                        if (!target) { this.errors.error(`No se resolvió el alias de paquete ${specifier}.`, { source:path }); return null; }
                         const quote = source.slice(literal.start, literal.start + 1), q = quote === '"' || quote === "'" ? quote : '"';
                         return { start: literal.start, end: literal.end, value: `${q}${target}${q}` };
                     })());
@@ -8281,7 +8754,8 @@ define("filesystem/AssetResolver", ["require", "exports", "filesystem/MimeResolv
                 }
                 if (!specifier.startsWith('.') && !specifier.startsWith('/')) {
                     pending.push((async () => {
-                        const alias = await this.resolveAliasModule(path, specifier, stack);
+                        const packageImport = specifier.startsWith('#') ? await this.resolvePackageImport(path, specifier, stack) : null;
+                        const alias = packageImport || await this.resolveAliasModule(path, specifier, stack);
                         const target = alias || await this.resolvePackageModule(path, specifier, stack);
                         if (!target) return null;
                         const quote = source.slice(literal.start, literal.start + 1), q = quote === '"' || quote === "'" ? quote : '"';
@@ -8376,7 +8850,22 @@ define("runtime/RuntimeBridge", ["require", "exports", "runtime/messages"], func
                 case 'runtime-error':
                     this.errors.error(str(p.message, 'Error de JavaScript dentro del proyecto.'), { technical: str(p.technical, ''), file: str(p.file, ''), source: 'runtime' });
                     break;
+                case 'storage-local-save':
+                    Promise.resolve(this.handlers.onLocalStorageSave?.(p.data && typeof p.data === 'object' ? p.data : {})).catch(() => {});
+                    break;
+                case 'storage-idb-load':
+                    Promise.resolve(this.handlers.onIdbLoad?.(str(p.name, 'default'), Number(p.version) || 0)).then(data => this.reply('storage-idb-response', { requestId: p.requestId, data: data || null })).catch(error => this.reply('storage-idb-response', { requestId: p.requestId, error: String(error) }));
+                    break;
+                case 'storage-idb-save':
+                    Promise.resolve(this.handlers.onIdbSave?.(str(p.name, 'default'), p.data)).catch(() => {});
+                    break;
+                case 'storage-idb-delete':
+                    Promise.resolve(this.handlers.onIdbDelete?.(str(p.name, 'default'))).catch(() => {});
+                    break;
             }
+        }
+        reply(type, payload) {
+            try { this.iframe.contentWindow?.postMessage({ channel: messages_js_1.RUNTIME_CHANNEL, type, payload }, '*'); } catch {}
         }
     }
     exports.RuntimeBridge = RuntimeBridge;
@@ -8450,25 +8939,52 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
             await this.prepareImportMaps(doc, entry);
             this.nodeData = await this.buildNodeData(doc);
             const envData = await this.buildImportMetaEnv();
+            const runtimeStorage = await this.options.loadRuntimeLocalStorage?.() || {};
             if (source.includes('local-runtime:synthetic-entry')) this.errors.info('Se genero una entrada HTML temporal para ejecutar el proyecto fuente.', { source: entry });
-            const bootstrap = doc.createElement('script'); bootstrap.dataset.localRuntimeBootstrap = 'true'; bootstrap.textContent = this.bootstrap(this.nodeData, envData); doc.head.insertBefore(bootstrap, doc.head.firstChild);
+            const bootstrap = doc.createElement('script'); bootstrap.dataset.localRuntimeBootstrap = 'true'; bootstrap.textContent = this.bootstrap(this.nodeData, envData, runtimeStorage); doc.head.insertBefore(bootstrap, doc.head.firstChild);
             await this.rewriteStyles(doc, entry); await this.rewriteLinks(doc, entry); await this.rewriteScripts(doc, entry); await this.rewriteAssets(doc, entry);
             return `<!doctype html>\n${doc.documentElement.outerHTML}`;
         }
         async prepareImportMaps(doc, entry) {
-            const merged = { imports: {} };
+            const merged = { imports: {}, scopes: {} };
             let count = 0;
+            const mergeMap = parsed => {
+                if (parsed?.imports && typeof parsed.imports === 'object') Object.assign(merged.imports, parsed.imports);
+                if (parsed?.scopes && typeof parsed.scopes === 'object') {
+                    for (const [scope, mappings] of Object.entries(parsed.scopes)) {
+                        if (!mappings || typeof mappings !== 'object') continue;
+                        merged.scopes[scope] = { ...(merged.scopes[scope] || {}), ...mappings };
+                    }
+                }
+            };
             for (const script of [...doc.querySelectorAll('script[type="importmap"]')]) {
                 const src = script.getAttribute('src');
-                if (src) { this.errors.warn('Import map externo no se incrusta todavía; conserva el archivo dentro del ZIP como import map inline.', { source: entry, technical: src }); continue; }
                 try {
-                    const parsed = JSON.parse(script.textContent || '{}');
-                    if (parsed?.imports && typeof parsed.imports === 'object') Object.assign(merged.imports, parsed.imports);
+                    let raw = script.textContent || '{}';
+                    if (src) {
+                        if (PathResolver_js_5.PathResolver.isExternal(src)) {
+                            this.errors.warn('Import map remoto bloqueado por el modo local.', { source: entry, technical: src });
+                            script.remove();
+                            continue;
+                        }
+                        const mapPath = this.resolver.resolvePath(entry, src);
+                        if (!mapPath || !this.vfs.has(mapPath)) {
+                            this.errors.error('No se encontró el archivo de import map local.', { source: entry, technical: src });
+                            script.remove();
+                            continue;
+                        }
+                        raw = await this.vfs.text(mapPath);
+                    }
+                    mergeMap(JSON.parse(raw));
                     count++;
                     script.remove();
-                } catch (error) { this.errors.error('Import map inválido.', { source: entry, technical: String(error) }); }
+                } catch (error) { this.errors.error('Import map inválido.', { source: entry, technical: String(error) }); script.remove(); }
             }
-            if (count) { this.resolver.setImportMap(merged, entry); this.errors.info(`Import map local preparado (${Object.keys(merged.imports).length} entradas).`, { source: entry }); }
+            if (count) {
+                this.resolver.setImportMap(merged, entry);
+                const scopeCount = Object.keys(merged.scopes).length;
+                this.errors.info(`Import map local preparado (${Object.keys(merged.imports).length} entradas, ${scopeCount} scopes).`, { source: entry });
+            }
         }
         async buildNodeData(doc) {
             const sources = {}, sizes = {};
@@ -8608,15 +9124,32 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
         }
         remoteHost(url) { try { return new URL(url).host; } catch { return String(url); } }
         safeResolve(from, reference) { try { return this.resolver.resolvePath(from, reference); } catch (error) { this.errors.error('Ruta inválida bloqueada por el runtime.', { source: from, technical: String(error) }); return null; } }
-        bootstrap(nodeData, envData = { MODE:'production', DEV:false, PROD:true, SSR:false, BASE_URL:'/' }) {
+        bootstrap(nodeData, envData = { MODE:'production', DEV:false, PROD:true, SSR:false, BASE_URL:'/' }, runtimeStorage = {}) {
             const manifest = {}; for (const file of this.vfs.list()) manifest[file.path] = this.resolver.getObjectUrl(file.path);
             const reverse = Object.fromEntries(Object.entries(manifest).map(([path,url]) => [url,path]));
             const entryDir = PathResolver_js_5.PathResolver.dirname(this.project.entryPoint), entry = this.project.entryPoint;
             const scriptJson = value => JSON.stringify(value).replace(/&/g, '\\u0026').replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
             return `(()=>{'use strict';
-const C='local-web-runtime/v1',M=${scriptJson(manifest)},R=${scriptJson(reverse)},D=${scriptJson(entryDir)},ENTRY=${scriptJson(entry)},S=${scriptJson(nodeData.sources)},SZ=${scriptJson(nodeData.sizes)},NODE_NEEDED=${scriptJson(nodeData.needed)},ENV=${scriptJson(envData)};
+const C='local-web-runtime/v1',M=${scriptJson(manifest)},R=${scriptJson(reverse)},D=${scriptJson(entryDir)},ENTRY=${scriptJson(entry)},S=${scriptJson(nodeData.sources)},SZ=${scriptJson(nodeData.sizes)},NODE_NEEDED=${scriptJson(nodeData.needed)},ENV=${scriptJson(envData)},LSTORE=${scriptJson(runtimeStorage)};
 globalThis.__LWR_IMPORT_META_ENV__=Object.freeze(ENV);
 const send=(type,payload)=>parent.postMessage({channel:C,type,payload},'*');
+const __lwrClone=v=>{try{return structuredClone(v)}catch{return v}};
+const __lwrLocal=Object.assign({},LSTORE&&typeof LSTORE==='object'?LSTORE:{});
+const __lwrStorage=Object.freeze({get length(){return Object.keys(__lwrLocal).length},key:i=>Object.keys(__lwrLocal)[Number(i)]??null,getItem:k=>Object.prototype.hasOwnProperty.call(__lwrLocal,String(k))?String(__lwrLocal[String(k)]):null,setItem:(k,v)=>{__lwrLocal[String(k)]=String(v);send('storage-local-save',{data:{...__lwrLocal}})},removeItem:k=>{delete __lwrLocal[String(k)];send('storage-local-save',{data:{...__lwrLocal}})},clear:()=>{for(const k of Object.keys(__lwrLocal))delete __lwrLocal[k];send('storage-local-save',{data:{}})}});
+try{Object.defineProperty(globalThis,'localStorage',{configurable:true,value:__lwrStorage})}catch{}
+const __lwrSessionData={};const __lwrSession=Object.freeze({get length(){return Object.keys(__lwrSessionData).length},key:i=>Object.keys(__lwrSessionData)[Number(i)]??null,getItem:k=>Object.prototype.hasOwnProperty.call(__lwrSessionData,String(k))?String(__lwrSessionData[String(k)]):null,setItem:(k,v)=>{__lwrSessionData[String(k)]=String(v)},removeItem:k=>{delete __lwrSessionData[String(k)]},clear:()=>{for(const k of Object.keys(__lwrSessionData))delete __lwrSessionData[k]}});try{Object.defineProperty(globalThis,'sessionStorage',{configurable:true,value:__lwrSession})}catch{}
+let __lwrIdbSeq=1;const __lwrIdbPending=new Map();
+addEventListener('message',e=>{const m=e.data;if(!m||m.channel!==C||m.type!=='storage-idb-response')return;const p=m.payload||{},entry=__lwrIdbPending.get(p.requestId);if(!entry)return;__lwrIdbPending.delete(p.requestId);p.error?entry.reject(new Error(p.error)):entry.resolve(p.data||null)});
+const __lwrParentRequest=(type,payload)=>new Promise((resolve,reject)=>{const requestId='idb-'+(__lwrIdbSeq++);__lwrIdbPending.set(requestId,{resolve,reject});send(type,{...payload,requestId});setTimeout(()=>{const p=__lwrIdbPending.get(requestId);if(p){__lwrIdbPending.delete(requestId);reject(new Error('Tiempo de espera agotado para almacenamiento persistente.'))}},8000)});
+const __lwrEq=(a,b)=>{try{return JSON.stringify(a)===JSON.stringify(b)}catch{return a===b}};const __lwrPath=(v,p)=>String(p||'').split('.').filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],v);
+class __LwrReq{result=undefined;error=null;onsuccess=null;onerror=null;onupgradeneeded=null;transaction=null}
+class __LwrNames{constructor(db){this.db=db}contains(n){return !!this.db.data.stores[String(n)]}item(i){return Object.keys(this.db.data.stores)[i]??null}get length(){return Object.keys(this.db.data.stores).length}[Symbol.iterator](){return Object.keys(this.db.data.stores)[Symbol.iterator]()}}
+class __LwrIndex{constructor(store,name){this.store=store;this.name=name}getAll(range){return this.store.tx._request(()=>{const def=this.store.def.indexes[this.name];if(!def)throw new Error('Index not found: '+this.name);return this.store.def.records.filter(r=>!range||__lwrEq(__lwrPath(r.value,def.keyPath),range.value)).map(r=>__lwrClone(r.value))})}getAllKeys(range){return this.store.tx._request(()=>{const def=this.store.def.indexes[this.name];if(!def)throw new Error('Index not found: '+this.name);return this.store.def.records.filter(r=>!range||__lwrEq(__lwrPath(r.value,def.keyPath),range.value)).map(r=>__lwrClone(r.key))})}get(range){return this.store.tx._request(()=>{const def=this.store.def.indexes[this.name];const row=this.store.def.records.find(r=>!range||__lwrEq(__lwrPath(r.value,def.keyPath),range.value));return row?__lwrClone(row.value):undefined})}}
+class __LwrStore{constructor(db,tx,name){this.db=db;this.tx=tx;this.name=name;this.def=db.data.stores[name];this.keyPath=this.def.keyPath;this.autoIncrement=!!this.def.autoIncrement;this.indexNames={contains:n=>!!this.def.indexes[String(n)],item:i=>Object.keys(this.def.indexes)[i]??null,get length(){return Object.keys(this.def.indexes).length}}}createIndex(name,keyPath,opt={}){this.def.indexes[String(name)]={keyPath,unique:!!opt.unique};return new __LwrIndex(this,String(name))}index(name){return new __LwrIndex(this,String(name))}_key(value,key){let k=key;if(k===undefined&&this.def.keyPath)k=__lwrPath(value,this.def.keyPath);if(k===undefined&&this.def.autoIncrement){this.def.counter=(this.def.counter||0)+1;k=this.def.counter;if(this.def.keyPath&&value&&typeof value==='object')value[this.def.keyPath]=k}if(k===undefined)throw new Error('DataError: key required');return k}get(key){return this.tx._request(()=>{const row=this.def.records.find(r=>__lwrEq(r.key,key));return row?__lwrClone(row.value):undefined})}getAll(range){return this.tx._request(()=>this.def.records.filter(r=>!range||__lwrEq(r.key,range.value)).map(r=>__lwrClone(r.value)))}getAllKeys(range){return this.tx._request(()=>this.def.records.filter(r=>!range||__lwrEq(r.key,range.value)).map(r=>__lwrClone(r.key)))}put(value,key){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');const cloned=__lwrClone(value),k=this._key(cloned,key),idx=this.def.records.findIndex(r=>__lwrEq(r.key,k));const row={key:__lwrClone(k),value:cloned};idx>=0?this.def.records.splice(idx,1,row):this.def.records.push(row);return __lwrClone(k)})}add(value,key){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');const cloned=__lwrClone(value),k=this._key(cloned,key);if(this.def.records.some(r=>__lwrEq(r.key,k)))throw new Error('ConstraintError');this.def.records.push({key:__lwrClone(k),value:cloned});return __lwrClone(k)})}delete(key){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');this.def.records=this.def.records.filter(r=>!__lwrEq(r.key,key));return undefined})}clear(){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');this.def.records=[]})}}
+class __LwrTx{constructor(db,names,mode='readonly'){this.db=db;this.names=Array.isArray(names)?names:[names];this.mode=mode;this.error=null;this.oncomplete=null;this.onerror=null;this.onabort=null;this.pending=0;this.finished=false;queueMicrotask(()=>this._finish())}objectStore(name){name=String(name);if(!this.names.includes(name)&&this.mode!=='versionchange')throw new Error('NotFoundError');if(!this.db.data.stores[name])throw new Error('NotFoundError');return new __LwrStore(this.db,this,name)}_request(fn){const r=new __LwrReq();this.pending++;queueMicrotask(()=>{try{r.result=fn();r.onsuccess?.({target:r})}catch(e){r.error=e;this.error=e;r.onerror?.({target:r});this.onerror?.({target:this})}finally{this.pending--;this._finish()}});return r}_finish(){if(this.finished||this.pending>0)return;this.finished=true;if(this.mode!=='readonly')this.db._flush();queueMicrotask(()=>this.oncomplete?.({target:this}))}abort(){if(this.finished)return;this.finished=true;this.onabort?.({target:this})}}
+class __LwrDB{constructor(name,data){this.name=name;this.data=data&&typeof data==='object'?data:{version:0,stores:{}};this.data.stores=this.data.stores||{};this.version=Number(this.data.version)||0;this.objectStoreNames=new __LwrNames(this);this.onversionchange=null}createObjectStore(name,opt={}){name=String(name);if(this.data.stores[name])throw new Error('ConstraintError');this.data.stores[name]={keyPath:opt.keyPath??null,autoIncrement:!!opt.autoIncrement,counter:0,indexes:{},records:[]};return new __LwrStore(this,{mode:'versionchange',_request:fn=>{const r=new __LwrReq();try{r.result=fn();queueMicrotask(()=>r.onsuccess?.({target:r}))}catch(e){r.error=e;queueMicrotask(()=>r.onerror?.({target:r}))}return r}},name)}deleteObjectStore(name){delete this.data.stores[String(name)]}transaction(names,mode='readonly'){return new __LwrTx(this,names,mode)}close(){}_flush(){this.data.version=this.version;send('storage-idb-save',{name:this.name,data:this.data})}}
+const __lwrIndexedDB={open:(name,version)=>{const r=new __LwrReq();__lwrParentRequest('storage-idb-load',{name:String(name),version:Number(version)||0}).then(raw=>{const data=raw&&typeof raw==='object'?raw:{version:0,stores:{}};const oldVersion=Number(data.version)||0,target=Number(version)||oldVersion||1;if(version&&target<oldVersion){r.error=new Error('VersionError');r.onerror?.({target:r});return}const db=new __LwrDB(String(name),data);r.result=db;if(target>oldVersion){db.version=target;db.data.version=target;r.transaction=new __LwrTx(db,Object.keys(db.data.stores),'versionchange');try{r.onupgradeneeded?.({target:r,oldVersion,newVersion:target})}catch(e){r.error=e;r.onerror?.({target:r});return}db._flush()}queueMicrotask(()=>r.onsuccess?.({target:r}))}).catch(e=>{r.error=e;r.onerror?.({target:r})});return r},deleteDatabase:name=>{const r=new __LwrReq();send('storage-idb-delete',{name:String(name)});queueMicrotask(()=>r.onsuccess?.({target:r}));return r},databases:async()=>[]};
+try{Object.defineProperty(globalThis,'indexedDB',{configurable:true,value:__lwrIndexedDB});Object.defineProperty(globalThis,'IDBKeyRange',{configurable:true,value:{only:value=>({value})}})}catch{}
 const stopDefault=e=>{try{e.preventDefault()}catch{}};
 for(const n of ['gesturestart','gesturechange','gestureend','contextmenu','dragstart','selectstart'])addEventListener(n,stopDefault,{capture:true,passive:false});
 addEventListener('dblclick',stopDefault,{capture:true,passive:false});
@@ -8669,7 +9202,7 @@ const patch=(proto,key)=>{const d=Object.getOwnPropertyDescriptor(proto,key);if(
 const NativeAudio=window.Audio;window.Audio=function(src){const a=new NativeAudio();if(src)a.src=map(src)||src;return a};window.Audio.prototype=NativeAudio.prototype;
 if(typeof Worker==='function'){const NativeWorker=Worker;globalThis.Worker=function(url,opt){const raw=url instanceof URL?url.href:String(url),u=map(raw);return new NativeWorker(u||raw,opt)};globalThis.Worker.prototype=NativeWorker.prototype}
 if(typeof SharedWorker==='function'){const NativeSharedWorker=SharedWorker;globalThis.SharedWorker=function(url,opt){const raw=url instanceof URL?url.href:String(url),u=map(raw);return new NativeSharedWorker(u||raw,opt)};globalThis.SharedWorker.prototype=NativeSharedWorker.prototype}
-const F=fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==='string'){const u=map(input);if(u)input=u}else if(input instanceof Request){const u=map(input.url);if(u)input=new Request(u,input)}return F(input,init)};const O=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){const u=typeof url==='string'?map(url):null;return O.call(this,method,u||url,...rest)};
+const F=fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==='string'){const u=map(input);if(u)input=u}else if(input instanceof Request){const u=map(input.url);if(u)input=new Request(u,input)}return F(input,init)};if(WebAssembly?.instantiateStreaming){const nativeInstantiateStreaming=WebAssembly.instantiateStreaming.bind(WebAssembly);WebAssembly.instantiateStreaming=async(source,imports)=>{try{return await nativeInstantiateStreaming(source,imports)}catch{const response=await Promise.resolve(source);return WebAssembly.instantiate(await response.arrayBuffer(),imports)}}}const O=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){const u=typeof url==='string'?map(url):null;return O.call(this,method,u||url,...rest)};
 const P=HTMLMediaElement.prototype.play,B=new Set();HTMLMediaElement.prototype.play=function(...a){const r=P.apply(this,a);if(r&&typeof r.catch==='function')return r.catch(e=>{if(e?.name==='NotAllowedError'){B.add(this);send('audio-blocked')}throw e});return r};const unlock=()=>{for(const m of [...B])P.call(m).then(()=>B.delete(m)).catch(()=>{})};addEventListener('pointerdown',unlock,{capture:true});addEventListener('touchstart',unlock,{capture:true});
 addEventListener('error',e=>{const t=e.target;if(t&&t!==window&&t instanceof Element){const u=t.getAttribute('src')||t.getAttribute('href')||t.getAttribute('data')||'';send('resource-error',{tag:t.tagName.toLowerCase(),url:u,path:R[split(u).path]||u||'recurso desconocido'});return}send('runtime-error',{message:e.message||'Error de JavaScript',file:e.filename||'',technical:[e.filename,e.lineno,e.colno].filter(Boolean).join(':')})},true);addEventListener('unhandledrejection',e=>{const r=e.reason;send('runtime-error',{message:r?.message||'Promise rechazada sin manejar',technical:r?.stack||String(r??'')})});addEventListener('DOMContentLoaded',()=>send('runtime-ready'),{once:true});
 window.LocalRuntime=Object.freeze({requestFullscreen:()=>send('request-fullscreen'),requestOrientation:o=>send('request-orientation',{orientation:o}),close:()=>send('close-project'),restart:()=>send('restart-project'),nodeCompat:NodeCompat})})();`;
@@ -8757,29 +9290,276 @@ define("runtime/InputCompatibility", ["require", "exports"], function (require, 
     }
     exports.InputCompatibility = InputCompatibility;
 });
-define("runtime/RuntimeManager", ["require", "exports", "runtime/HtmlRuntime"], function (require, exports, HtmlRuntime_js_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.RuntimeManager = void 0;
-    class RuntimeManager {
-        project;
-        errors;
-        options;
-        runtime = null;
-        host = null;
-        constructor(project, errors, options = {}) {
-            this.project = project;
-            this.errors = errors;
-            this.options = options;
-        }
-        async mount(host) { this.host = host; await this.create(); }
-        async restart() { this.runtime?.dispose(); this.runtime = null; this.errors.info('Runtime reiniciado.'); await this.create(); }
-        getFrame() { return this.runtime?.getFrame() ?? null; }
-        dispose() { this.runtime?.dispose(); this.runtime = null; this.host?.replaceChildren(); this.host = null; }
-        async create() { if (!this.host)
-            throw new Error('No existe host para el runtime.'); this.runtime = new HtmlRuntime_js_1.HtmlRuntime(this.project, this.errors, this.options); await this.runtime.mount(this.host); }
+
+define("runtime/universal/InputManager", ["require", "exports"], function(require,exports){
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.InputManager=void 0;
+const ACTIONS=['UP','DOWN','LEFT','RIGHT','A','B','START','SELECT'];
+class InputManager{
+ constructor(onChange){this.onChange=onChange;this.active=new Map(ACTIONS.map(a=>[a,new Set()]));this.cleanup=[];this.gpState=new Map();this.raf=0;this.physical=false}
+ set(action,source,down){const set=this.active.get(action);if(!set)return;const before=set.size>0;if(down)set.add(source);else set.delete(source);const after=set.size>0;if(before!==after)this.onChange?.(action,after)}
+ releaseSource(prefix){for(const [a,set] of this.active){const before=set.size>0;for(const s of [...set])if(String(s).startsWith(prefix))set.delete(s);if(before!==(set.size>0))this.onChange?.(a,set.size>0)}}
+ keyboard(){const map={ArrowUp:'UP',ArrowDown:'DOWN',ArrowLeft:'LEFT',ArrowRight:'RIGHT',KeyX:'A',KeyZ:'B',Enter:'START',ShiftLeft:'SELECT',ShiftRight:'SELECT'};const down=e=>{const a=map[e.code];if(!a)return;this.physical=true;e.preventDefault();this.set(a,`kbd:${e.code}`,true)},up=e=>{const a=map[e.code];if(!a)return;e.preventDefault();this.set(a,`kbd:${e.code}`,false)};window.addEventListener('keydown',down,{passive:false});window.addEventListener('keyup',up,{passive:false});this.cleanup.push(()=>window.removeEventListener('keydown',down),()=>window.removeEventListener('keyup',up))}
+ gamepads(){const poll=()=>{const pads=navigator.getGamepads?.()||[];const seen=new Set();for(const p of pads){if(!p)continue;seen.add(p.index);const source=`gp:${p.index}:`;const axisX=p.axes?.[0]||0,axisY=p.axes?.[1]||0;const states={LEFT:(p.buttons?.[14]?.pressed||axisX<-.45),RIGHT:(p.buttons?.[15]?.pressed||axisX>.45),UP:(p.buttons?.[12]?.pressed||axisY<-.45),DOWN:(p.buttons?.[13]?.pressed||axisY>.45),A:!!p.buttons?.[0]?.pressed,B:!!p.buttons?.[1]?.pressed,SELECT:!!p.buttons?.[8]?.pressed,START:!!p.buttons?.[9]?.pressed};for(const a of ACTIONS){this.set(a,source+a,!!states[a]);if(states[a])this.physical=true}}for(const idx of [...this.gpState.keys()])if(!seen.has(idx)){this.releaseSource(`gp:${idx}:`);this.gpState.delete(idx)}for(const idx of seen)this.gpState.set(idx,true);this.raf=requestAnimationFrame(poll)};this.raf=requestAnimationFrame(poll)}
+ start(){this.keyboard();this.gamepads()}
+ dispose(){if(this.raf)cancelAnimationFrame(this.raf);for(const fn of this.cleanup.splice(0))try{fn()}catch{};for(const a of ACTIONS){const s=this.active.get(a);if(s?.size){s.clear();this.onChange?.(a,false)}}}
+}
+exports.InputManager=InputManager;
+});
+
+define("runtime/gameboy/RavenGBEngine", ["require", "exports"], function(require,exports){
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.RavenGBEngine=void 0;
+const u8=v=>v&255,u16=v=>v&65535,s8=v=>(v&128)?v-256:v;const Z=128,N=64,H=32,C=16;
+const RAM_SIZES={0:0,1:0x800,2:0x2000,3:0x8000,4:0x20000,5:0x10000};
+class RavenGBEngine{
+ constructor(canvas,rom,{smooth=false,audio=true}={}){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.rom=rom;this.smooth=smooth;this.audioEnabled=audio;this.image=this.ctx.createImageData(160,144);this.frame=this.image.data;this.onFrame=null;this.onError=null;this.reset()}
+ reset(){
+  const r=this.rom;
+  if(!r||r.length<0x150)throw new Error('ROM Game Boy inválida.');
+  this.cgbFlag=r[0x143];this.cgb=this.cgbFlag===0x80||this.cgbFlag===0xC0;
+  this.cart=r[0x147];
+  this.mbc=(this.cart>=1&&this.cart<=3)?1:(this.cart===5||this.cart===6)?2:(this.cart>=0x0F&&this.cart<=0x13)?3:(this.cart>=0x19&&this.cart<=0x1E)?5:0;
+  this.battery=[3,6,9,0x0F,0x10,0x13,0x1B,0x1E].includes(this.cart);
+  this.hasRTC=this.cart===0x0F||this.cart===0x10;this.hasRumble=this.cart>=0x1C&&this.cart<=0x1E;
+  this.romBanks=Math.max(1,Math.ceil(r.length/0x4000));
+  this.vram=new Uint8Array(0x4000);this.wram=new Uint8Array(0x8000);
+  this.eram=new Uint8Array(this.mbc===2?512:(RAM_SIZES[r[0x149]]||0));
+  this.oam=new Uint8Array(0xA0);this.hram=new Uint8Array(0x7F);this.io=new Uint8Array(0x80);
+  this.bgPal=new Uint8Array(64);this.objPal=new Uint8Array(64);this._bgColor=new Uint8Array(160*144);
+  if(![0x00,0x01,0x02,0x03,0x05,0x06,0x08,0x09,0x0F,0x10,0x11,0x12,0x13,0x19,0x1A,0x1B,0x1C,0x1D,0x1E].includes(this.cart))throw new Error(`Tipo de cartucho 0x${this.cart.toString(16).toUpperCase().padStart(2,'0')} todavía no es compatible.`);
+  if(this.cgb){this.A=0x11;this.F=0x80;this.B=0;this.C=0;this.D=0xFF;this.E=0x56;this.H=0;this.L=0x0D}else{this.A=0x01;this.F=0xB0;this.B=0;this.C=0x13;this.D=0;this.E=0xD8;this.H=0x01;this.L=0x4D}
+  this.SP=0xFFFE;this.PC=0x0100;this.ime=false;this.eiDelay=0;this.halted=false;this.haltBug=false;this.stopped=false;
+  this.romBank=1;this.ramBank=0;this.ramEnabled=this.cart===0x08||this.cart===0x09;this.mbc1Mode=0;this.mbc1Hi=0;this.rtcSel=0;this.rtcLatchWrite=0;
+  this.rtc={sec:0,min:0,hour:0,day:0,halt:false,carry:false,last:Date.now(),latched:null};
+  this.vramBank=0;this.wramBank=1;this.ie=0;this.joy=0xFF;this.joySelect=0x30;
+  this.divCounter=this.cgb?0x267C:0xABCC;this.timerReloadDelay=0;this.ppuCycles=0;this.ly=0;this.ppuMode=2;this.statLine=false;this.frameCounter=0;
+  this.doubleSpeed=false;this.hdmaActive=false;this.hdmaBlocks=0;this.hdmaSource=0;this.hdmaDest=0x8000;this.rumbleOn=false;
+  this.running=false;this.raf=0;this.lastTime=0;this.acc=0;
+  this.io[0x40]=0x91;this.io[0x41]=0x82;this.io[0x42]=0;this.io[0x43]=0;this.io[0x44]=0;this.io[0x45]=0;this.io[0x47]=0xFC;this.io[0x48]=0xFF;this.io[0x49]=0xFF;this.io[0x4A]=0;this.io[0x4B]=0;
+  this.io[0x0F]=0xE1;this.io[0x05]=0;this.io[0x06]=0;this.io[0x07]=0;this.io[0x4D]=0;this.io[0x55]=0xFF;this.io[0x68]=0;this.io[0x6A]=0;this.io[0x70]=1;this.io[0x26]=0xF1;
+  this.audio?.dispose();this.audio=this.audioEnabled?new RavenAPU(this):null;this._updateSTAT();this.renderFrame();
+ }
+ get AF(){return(this.A<<8)|(this.F&0xF0)}set AF(v){this.A=v>>8;this.F=v&0xF0}get BC(){return(this.B<<8)|this.C}set BC(v){this.B=v>>8;this.C=v&255}get DE(){return(this.D<<8)|this.E}set DE(v){this.D=v>>8;this.E=v&255}get HL(){return(this.H<<8)|this.L}set HL(v){this.H=v>>8;this.L=v&255}
+ rb(i){switch(i){case 0:return this.B;case 1:return this.C;case 2:return this.D;case 3:return this.E;case 4:return this.H;case 5:return this.L;case 6:return this.read(this.HL);default:return this.A}}wb(i,v){v=u8(v);switch(i){case 0:this.B=v;break;case 1:this.C=v;break;case 2:this.D=v;break;case 3:this.E=v;break;case 4:this.H=v;break;case 5:this.L=v;break;case 6:this.write(this.HL,v);break;default:this.A=v}}
+ pair(i){return i===0?this.BC:i===1?this.DE:i===2?this.HL:this.SP}setPair(i,v){v=u16(v);if(i===0)this.BC=v;else if(i===1)this.DE=v;else if(i===2)this.HL=v;else this.SP=v}
+ read(a){
+  a&=65535;
+  if(a<0x4000){let bank=0;if(this.mbc===1&&this.mbc1Mode)bank=(this.mbc1Hi<<5)%this.romBanks;return this.rom[(bank<<14)+a]??255}
+  if(a<0x8000){let bank=this._romBankX();return this.rom[(bank<<14)+(a-0x4000)]??255}
+  if(a<0xA000)return this.vram[(this.vramBank<<13)+(a-0x8000)];
+  if(a<0xC000){if(!this.ramEnabled)return 255;if(this.mbc===2)return (this.eram[(a-0xA000)&511]??15)|0xF0;if(this.mbc===3&&this.rtcSel>=8&&this.rtcSel<=12)return this._rtcRead(this.rtcSel);if(!this.eram.length)return 255;return this.eram[(this._ramBank()*0x2000+(a-0xA000))%this.eram.length]??255}
+  if(a<0xD000)return this.wram[a-0xC000];
+  if(a<0xE000)return this.wram[(this.wramBank*0x1000)+(a-0xD000)];
+  if(a<0xFE00)return this.read(a-0x2000);
+  if(a<0xFEA0)return this.oam[a-0xFE00];
+  if(a<0xFF00)return 255;
+  if(a<0xFF80)return this.readIO(a&0x7F);
+  if(a<0xFFFF)return this.hram[a-0xFF80];
+  return this.ie;
+ }
+ write(a,v){
+  a&=65535;v&=255;
+  if(a<0x8000){this.writeCart(a,v);return}
+  if(a<0xA000){this.vram[(this.vramBank<<13)+(a-0x8000)]=v;return}
+  if(a<0xC000){if(!this.ramEnabled)return;if(this.mbc===2){this.eram[(a-0xA000)&511]=v&15;return}if(this.mbc===3&&this.rtcSel>=8&&this.rtcSel<=12){this._rtcWrite(this.rtcSel,v);return}if(this.eram.length)this.eram[(this._ramBank()*0x2000+(a-0xA000))%this.eram.length]=v;return}
+  if(a<0xD000){this.wram[a-0xC000]=v;return}
+  if(a<0xE000){this.wram[this.wramBank*0x1000+(a-0xD000)]=v;return}
+  if(a<0xFE00){this.write(a-0x2000,v);return}
+  if(a<0xFEA0){this.oam[a-0xFE00]=v;return}
+  if(a<0xFF00)return;
+  if(a<0xFF80){this.writeIO(a&0x7F,v);return}
+  if(a<0xFFFF){this.hram[a-0xFF80]=v;return}
+  this.ie=v;
+ }
+ writeCart(a,v){
+  if(this.mbc===1){
+   if(a<0x2000)this.ramEnabled=(v&15)===10;
+   else if(a<0x4000){let b=v&31;if(!b)b=1;this.romBank=b}
+   else if(a<0x6000){this.mbc1Hi=v&3;this.ramBank=this.mbc1Hi}
+   else this.mbc1Mode=v&1;
+  }else if(this.mbc===2){
+   if(a<0x4000){if(a&0x100)this.romBank=(v&15)||1;else this.ramEnabled=(v&15)===10}
+  }else if(this.mbc===3){
+   if(a<0x2000)this.ramEnabled=(v&15)===10;
+   else if(a<0x4000)this.romBank=(v&0x7F)||1;
+   else if(a<0x6000){this.rtcSel=v;if(v<=3)this.ramBank=v&3}
+   else{const bit=v&1;if(this.rtcLatchWrite===0&&bit===1)this._rtcLatch();this.rtcLatchWrite=bit}
+  }else if(this.mbc===5){
+   if(a<0x2000)this.ramEnabled=(v&15)===10;
+   else if(a<0x3000)this.romBank=(this.romBank&0x100)|v;
+   else if(a<0x4000)this.romBank=(this.romBank&255)|((v&1)<<8);
+   else if(a<0x6000){if(this.hasRumble){this.rumbleOn=!!(v&8);this.ramBank=v&7}else this.ramBank=v&15}
+  }
+ }
+ _romBankX(){let bank=this.romBank||1;if(this.mbc===1){const low=bank&31||1;bank=this.mbc1Mode?low:((this.mbc1Hi<<5)|low);if((bank&31)===0)bank++}bank%=this.romBanks;return bank||Math.min(1,this.romBanks-1)}
+ _ramBank(){return this.mbc===1?(this.mbc1Mode?this.mbc1Hi:0):this.ramBank}
+ _syncRTC(now=Date.now()){
+  const r=this.rtc;if(!this.hasRTC||!r)return;if(r.halt){r.last=now;return}let elapsed=Math.floor((now-r.last)/1000);if(elapsed<=0)return;r.last+=elapsed*1000;
+  let total=r.sec+r.min*60+r.hour*3600+r.day*86400+elapsed;let days=Math.floor(total/86400);let rem=total%86400;if(days>511){r.carry=true;days%=512}r.day=days;r.hour=Math.floor(rem/3600);rem%=3600;r.min=Math.floor(rem/60);r.sec=rem%60;
+ }
+ _rtcSnapshot(){this._syncRTC();const r=this.rtc;return{sec:r.sec,min:r.min,hour:r.hour,day:r.day,halt:!!r.halt,carry:!!r.carry,last:r.last}}
+ _rtcLatch(){const r=this._rtcSnapshot();this.rtc.latched={sec:r.sec,min:r.min,hour:r.hour,day:r.day,halt:r.halt,carry:r.carry}}
+ _rtcRead(sel){this._syncRTC();const r=this.rtc.latched||this.rtc;if(sel===8)return r.sec&63;if(sel===9)return r.min&63;if(sel===10)return r.hour&31;if(sel===11)return r.day&255;if(sel===12)return((r.day>>8)&1)|(r.halt?0x40:0)|(r.carry?0x80:0);return 255}
+ _rtcWrite(sel,v){this._syncRTC();const r=this.rtc;if(sel===8)r.sec=v%60;else if(sel===9)r.min=v%60;else if(sel===10)r.hour=v%24;else if(sel===11)r.day=(r.day&0x100)|v;else if(sel===12){const was=r.halt;r.day=(r.day&255)|((v&1)<<8);r.halt=!!(v&0x40);r.carry=!!(v&0x80);if(was&&!r.halt)r.last=Date.now()}r.latched=null}
+ readIO(i){
+  if(i===0){let low=15;if(!(this.joySelect&0x10))low&=this.joy&15;if(!(this.joySelect&0x20))low&=(this.joy>>4)&15;return 0xC0|this.joySelect|low}
+  if(i===4)return(this.divCounter>>8)&255;if(i===0x44)return this.ly;
+  if(i===0x4D)return(this.doubleSpeed?0x80:0)|(this.io[i]&1)|0x7E;if(i===0x4F)return 0xFE|this.vramBank;
+  if(i===0x55)return this.hdmaActive?((this.hdmaBlocks-1)&0x7F):0xFF;
+  if(i===0x69)return this.bgPal[this.io[0x68]&63];if(i===0x6B)return this.objPal[this.io[0x6A]&63];
+  if(i===0x70)return 0xF8|this.wramBank;return this.io[i]
+ }
+ writeIO(i,v){
+  if(i===0){this.joySelect=v&0x30;return}
+  if(i===4){const old=this._timerSignal();this.divCounter=0;if(old&&!this._timerSignal())this._timerIncrement();return}
+  if(i===5){this.io[5]=v;this.timerReloadDelay=0;return}if(i===6){this.io[6]=v;return}
+  if(i===7){const old=this._timerSignal();this.io[7]=v&7;if(old&&!this._timerSignal())this._timerIncrement();return}
+  if(i===0x0F){this.io[i]=v|0xE0;return}
+  if(i===0x40){const was=!!(this.io[0x40]&0x80);this.io[i]=v;const on=!!(v&0x80);if(was&&!on){this.ly=0;this.ppuCycles=0;this.ppuMode=0;this.io[0x44]=0;this._updateSTAT()}else if(!was&&on){this.ppuCycles=0;this.ppuMode=2;this._updateSTAT()}return}
+  if(i===0x41){this.io[i]=(this.io[i]&7)|(v&0x78)|0x80;this._updateSTAT();return}
+  if(i===0x44){return}if(i===0x45){this.io[i]=v;this._updateSTAT();return}
+  if(i===0x46){for(let x=0;x<0xA0;x++)this.oam[x]=this.read((v<<8)+x);this.io[i]=v;return}
+  if(i===0x4D){this.io[i]=(this.io[i]&0x80)|(v&1);return}
+  if(i===0x4F){this.vramBank=v&1;this.io[i]=v;return}
+  if(i===0x55){this.hdma(v);return}
+  if(i===0x68||i===0x6A){this.io[i]=v;return}
+  if(i===0x69){const idx=this.io[0x68]&63;this.bgPal[idx]=v;if(this.io[0x68]&0x80)this.io[0x68]=0x80|((idx+1)&63);return}
+  if(i===0x6B){const idx=this.io[0x6A]&63;this.objPal[idx]=v;if(this.io[0x6A]&0x80)this.io[0x6A]=0x80|((idx+1)&63);return}
+  if(i===0x70){this.wramBank=(v&7)||1;this.io[i]=v;return}
+  if(i===0x02&&v&0x80){this.io[1]=0xFF;this.io[2]=v&0x7F;this.requestInterrupt(3);return}
+  this.io[i]=v;this.audio?.syncRegister(i,v)
+ }
+ hdma(v){
+  if(this.hdmaActive&&!(v&0x80)){this.hdmaActive=false;this.io[0x55]=0x80|((this.hdmaBlocks-1)&0x7F);return}
+  this.hdmaSource=((this.io[0x51]<<8)|(this.io[0x52]&0xF0))&0xFFF0;this.hdmaDest=0x8000|(((this.io[0x53]&0x1F)<<8)|(this.io[0x54]&0xF0));this.hdmaBlocks=(v&0x7F)+1;
+  if(v&0x80){this.hdmaActive=true;this.io[0x55]=(this.hdmaBlocks-1)&0x7F}else{while(this.hdmaBlocks>0)this._hblankDmaStep();this.io[0x55]=0xFF}
+ }
+ _hblankDmaStep(){if(!this.hdmaBlocks)return;for(let n=0;n<16;n++)this.vram[(this.vramBank<<13)+((this.hdmaDest-0x8000+n)&0x1FFF)]=this.read(this.hdmaSource+n);this.hdmaSource=(this.hdmaSource+16)&0xFFF0;this.hdmaDest=0x8000|((this.hdmaDest-0x8000+16)&0x1FF0);this.hdmaBlocks--;this.io[0x51]=this.hdmaSource>>8;this.io[0x52]=this.hdmaSource&0xF0;this.io[0x53]=(this.hdmaDest>>8)&0x1F;this.io[0x54]=this.hdmaDest&0xF0;if(this.hdmaBlocks<=0){this.hdmaActive=false;this.io[0x55]=0xFF}else this.io[0x55]=(this.hdmaBlocks-1)&0x7F}
+ requestInterrupt(bit){this.io[0x0F]|=1<<bit}
+ button(action,down){const map={RIGHT:0,LEFT:1,UP:2,DOWN:3,A:4,B:5,SELECT:6,START:7},bit=map[action];if(bit===undefined)return;const before=this.joy;if(down)this.joy&=~(1<<bit);else this.joy|=1<<bit;if(down&&before!==this.joy)this.requestInterrupt(4);this.halted=false;this.stopped=false}
+ fetch8(){const v=this.read(this.PC);if(this.haltBug)this.haltBug=false;else this.PC=u16(this.PC+1);return v}fetch16(){const l=this.fetch8(),h=this.fetch8();return l|(h<<8)}push(v){this.SP=u16(this.SP-1);this.write(this.SP,v>>8);this.SP=u16(this.SP-1);this.write(this.SP,v)}pop(){const l=this.read(this.SP);this.SP=u16(this.SP+1);const h=this.read(this.SP);this.SP=u16(this.SP+1);return l|(h<<8)}flag(f){return!!(this.F&f)}setFlag(f,on){this.F=on?(this.F|f):(this.F&~f);this.F&=0xF0}
+ add8(v,carry=0){const a=this.A,r=a+v+carry;this.F=0;this.setFlag(Z,u8(r)===0);this.setFlag(H,((a&15)+(v&15)+carry)>15);this.setFlag(C,r>255);this.A=u8(r)}sub8(v,carry=0,cp=false){const a=this.A,r=a-v-carry;this.F=N;this.setFlag(Z,u8(r)===0);this.setFlag(H,(a&15)<((v&15)+carry));this.setFlag(C,a<v+carry);if(!cp)this.A=u8(r)}and(v){this.A&=v;this.F=H|(this.A?0:Z)}xor(v){this.A^=v;this.F=this.A?0:Z}or(v){this.A|=v;this.F=this.A?0:Z}
+ inc(v){const r=u8(v+1),c=this.F&C;this.F=c;this.setFlag(Z,r===0);this.setFlag(H,(v&15)===15);return r}dec(v){const r=u8(v-1),c=this.F&C;this.F=c|N;this.setFlag(Z,r===0);this.setFlag(H,(v&15)===0);return r}
+ daa(){let a=this.A,adj=0,c=this.flag(C);if(!this.flag(N)){if(this.flag(H)||(a&15)>9)adj|=6;if(c||a>0x99){adj|=0x60;c=true}a=u8(a+adj)}else{if(this.flag(H))adj|=6;if(c)adj|=0x60;a=u8(a-adj)}this.A=a;this.setFlag(Z,a===0);this.setFlag(H,false);this.setFlag(C,c)}
+ cond(i){return i===0?!this.flag(Z):i===1?this.flag(Z):i===2?!this.flag(C):this.flag(C)}
+ step(){const pending=(this.ie&this.io[0x0F]&31);if(pending){this.halted=false;this.stopped=false;if(this.ime){for(let i=0;i<5;i++)if(pending&(1<<i)){this.ime=false;this.io[0x0F]&=~(1<<i);this.push(this.PC);this.PC=0x40+i*8;this.tick(20);return 20}}}if(this.halted||this.stopped){this.tick(4);return 4}const op=this.fetch8(),cy=this.exec(op);if(this.eiDelay>0&&--this.eiDelay===0)this.ime=true;this.tick(cy);return cy}
+ exec(op){if(op>=0x40&&op<=0x7F){if(op===0x76){if(!this.ime&&(this.ie&this.io[0x0F]&31))this.haltBug=true;else this.halted=true;return 4}const d=(op>>3)&7,s=op&7;this.wb(d,this.rb(s));return(d===6||s===6)?8:4}if(op>=0x80&&op<=0xBF){const type=(op>>3)&7,v=this.rb(op&7),mem=(op&7)===6;switch(type){case 0:this.add8(v);break;case 1:this.add8(v,this.flag(C)?1:0);break;case 2:this.sub8(v);break;case 3:this.sub8(v,this.flag(C)?1:0);break;case 4:this.and(v);break;case 5:this.xor(v);break;case 6:this.or(v);break;case 7:this.sub8(v,0,true)}return mem?8:4}if((op&0xC7)===0x04){const r=(op>>3)&7;this.wb(r,this.inc(this.rb(r)));return r===6?12:4}if((op&0xC7)===0x05){const r=(op>>3)&7;this.wb(r,this.dec(this.rb(r)));return r===6?12:4}if((op&0xC7)===0x06){const r=(op>>3)&7;this.wb(r,this.fetch8());return r===6?12:8}if((op&0xCF)===0x01){this.setPair((op>>4)&3,this.fetch16());return 12}if((op&0xCF)===0x03){const i=(op>>4)&3;this.setPair(i,this.pair(i)+1);return 8}if((op&0xCF)===0x0B){const i=(op>>4)&3;this.setPair(i,this.pair(i)-1);return 8}if((op&0xCF)===0x09){const v=this.pair((op>>4)&3),a=this.HL,r=a+v,z=this.F&Z;this.F=z;this.setFlag(H,((a&0xFFF)+(v&0xFFF))>0xFFF);this.setFlag(C,r>65535);this.HL=u16(r);return 8}if((op&0xE7)===0x20){const off=s8(this.fetch8()),cc=(op>>3)&3;if(this.cond(cc)){this.PC=u16(this.PC+off);return 12}return 8}if((op&0xE7)===0xC0){const cc=(op>>3)&3;if(this.cond(cc)){this.PC=this.pop();return 20}return 8}if((op&0xE7)===0xC2){const a=this.fetch16(),cc=(op>>3)&3;if(this.cond(cc)){this.PC=a;return 16}return 12}if((op&0xE7)===0xC4){const a=this.fetch16(),cc=(op>>3)&3;if(this.cond(cc)){this.push(this.PC);this.PC=a;return 24}return 12}if((op&0xCF)===0xC1){const i=(op>>4)&3,v=this.pop();if(i===0)this.BC=v;else if(i===1)this.DE=v;else if(i===2)this.HL=v;else this.AF=v;return 12}if((op&0xCF)===0xC5){const i=(op>>4)&3,v=i===0?this.BC:i===1?this.DE:i===2?this.HL:this.AF;this.push(v);return 16}if((op&0xC7)===0xC7){this.push(this.PC);this.PC=op&0x38;return 16}
+ switch(op){case 0x00:return 4;case 0x02:this.write(this.BC,this.A);return 8;case 0x0A:this.A=this.read(this.BC);return 8;case 0x12:this.write(this.DE,this.A);return 8;case 0x1A:this.A=this.read(this.DE);return 8;case 0x22:this.write(this.HL,this.A);this.HL=u16(this.HL+1);return 8;case 0x2A:this.A=this.read(this.HL);this.HL=u16(this.HL+1);return 8;case 0x32:this.write(this.HL,this.A);this.HL=u16(this.HL-1);return 8;case 0x3A:this.A=this.read(this.HL);this.HL=u16(this.HL-1);return 8;case 0x07:{const c=this.A>>7;this.A=u8((this.A<<1)|c);this.F=c?C:0;return 4}case 0x0F:{const c=this.A&1;this.A=(this.A>>1)|(c<<7);this.F=c?C:0;return 4}case 0x17:{const c=this.flag(C)?1:0,n=this.A>>7;this.A=u8((this.A<<1)|c);this.F=n?C:0;return 4}case 0x1F:{const c=this.flag(C)?1:0,n=this.A&1;this.A=(this.A>>1)|(c<<7);this.F=n?C:0;return 4}case 0x08:{const a=this.fetch16();this.write(a,this.SP);this.write(a+1,this.SP>>8);return 20}case 0x10:this.fetch8();if(this.cgb&&(this.io[0x4D]&1)){this.doubleSpeed=!this.doubleSpeed;this.io[0x4D]=this.doubleSpeed?0x80:0;this.divCounter=0}else this.stopped=true;return 4;case 0x18:this.PC=u16(this.PC+s8(this.fetch8()));return 12;case 0x27:this.daa();return 4;case 0x2F:this.A^=255;this.F=(this.F&(Z|C))|N|H;return 4;case 0x37:this.F=(this.F&Z)|C;return 4;case 0x3F:this.F=(this.F&Z)|(this.flag(C)?0:C);return 4;case 0xC3:this.PC=this.fetch16();return 16;case 0xC9:this.PC=this.pop();return 16;case 0xCD:{const a=this.fetch16();this.push(this.PC);this.PC=a;return 24}case 0xD9:this.PC=this.pop();this.ime=true;return 16;case 0xE0:this.write(0xFF00+this.fetch8(),this.A);return 12;case 0xF0:this.A=this.read(0xFF00+this.fetch8());return 12;case 0xE2:this.write(0xFF00+this.C,this.A);return 8;case 0xF2:this.A=this.read(0xFF00+this.C);return 8;case 0xEA:this.write(this.fetch16(),this.A);return 16;case 0xFA:this.A=this.read(this.fetch16());return 16;case 0xE9:this.PC=this.HL;return 4;case 0xE8:{const n=s8(this.fetch8()),sp=this.SP,r=sp+n;this.F=0;this.setFlag(H,((sp&15)+(n&15))>15);this.setFlag(C,((sp&255)+(n&255))>255);this.SP=u16(r);return 16}case 0xF8:{const n=s8(this.fetch8()),sp=this.SP,r=sp+n;this.F=0;this.setFlag(H,((sp&15)+(n&15))>15);this.setFlag(C,((sp&255)+(n&255))>255);this.HL=u16(r);return 12}case 0xF9:this.SP=this.HL;return 8;case 0xF3:this.ime=false;this.eiDelay=0;return 4;case 0xFB:this.eiDelay=2;return 4;case 0xCB:return this.cb(this.fetch8());case 0xC6:this.add8(this.fetch8());return 8;case 0xCE:this.add8(this.fetch8(),this.flag(C)?1:0);return 8;case 0xD6:this.sub8(this.fetch8());return 8;case 0xDE:this.sub8(this.fetch8(),this.flag(C)?1:0);return 8;case 0xE6:this.and(this.fetch8());return 8;case 0xEE:this.xor(this.fetch8());return 8;case 0xF6:this.or(this.fetch8());return 8;case 0xFE:this.sub8(this.fetch8(),0,true);return 8;default:return 4}}
+ cb(op){const r=op&7,grp=op>>6,bit=(op>>3)&7,v=this.rb(r),mem=r===6;if(grp===1){this.F=(this.F&C)|H;this.setFlag(Z,(v&(1<<bit))===0);return mem?12:8}if(grp===2){this.wb(r,v&~(1<<bit));return mem?16:8}if(grp===3){this.wb(r,v|(1<<bit));return mem?16:8}let n=v,c=0;switch(bit){case 0:c=v>>7;n=u8((v<<1)|c);break;case 1:c=v&1;n=(v>>1)|(c<<7);break;case 2:{const old=this.flag(C)?1:0;c=v>>7;n=u8((v<<1)|old);break}case 3:{const old=this.flag(C)?1:0;c=v&1;n=(v>>1)|(old<<7);break}case 4:c=v>>7;n=u8(v<<1);break;case 5:c=v&1;n=(v>>1)|(v&0x80);break;case 6:n=((v&15)<<4)|(v>>4);break;case 7:c=v&1;n=v>>1;break}this.F=0;this.setFlag(Z,n===0);this.setFlag(C,!!c);this.wb(r,n);return mem?16:8}
+ _timerSignal(counter=this.divCounter,tac=this.io[7]){if(!(tac&4))return 0;const bit=[9,3,5,7][tac&3];return(counter>>bit)&1}
+ _timerIncrement(){if(this.timerReloadDelay)return;if(this.io[5]===255){this.io[5]=0;this.timerReloadDelay=4}else this.io[5]=(this.io[5]+1)&255}
+ _updateSTAT(){const lcd=!!(this.io[0x40]&0x80),coinc=this.ly===this.io[0x45];let mode=lcd?(this.ly>=144?1:this.ppuMode):0;this.io[0x41]=(this.io[0x41]&0xF8)|mode|(coinc?4:0)|0x80;const stat=this.io[0x41];const line=lcd&&(((mode===0)&&!!(stat&0x08))||((mode===1)&&!!(stat&0x10))||((mode===2)&&!!(stat&0x20))||(coinc&&!!(stat&0x40)));if(line&&!this.statLine)this.requestInterrupt(1);this.statLine=line}
+ _tick4(){
+  if(this.timerReloadDelay){this.timerReloadDelay-=4;if(this.timerReloadDelay<=0){this.timerReloadDelay=0;this.io[5]=this.io[6];this.requestInterrupt(2)}}
+  const oldSig=this._timerSignal();this.divCounter=(this.divCounter+4)&0xFFFF;const newSig=this._timerSignal();if(oldSig&&!newSig)this._timerIncrement();
+  if(this.io[0x40]&0x80){const prevMode=this.ppuMode;this.ppuCycles+=this.doubleSpeed?2:4;while(this.ppuCycles>=456){this.ppuCycles-=456;this.ly++;if(this.ly===144){this.requestInterrupt(0);this.renderFrame();this.frameCounter++}if(this.ly>153)this.ly=0;this.io[0x44]=this.ly}this.ppuMode=this.ly>=144?1:(this.ppuCycles<80?2:this.ppuCycles<252?3:0);if(prevMode!==0&&this.ppuMode===0&&this.hdmaActive&&this.ly<144)this._hblankDmaStep();this._updateSTAT()}else{this.ly=0;this.ppuCycles=0;this.ppuMode=0;this.io[0x44]=0;this._updateSTAT()}
+  this.audio?.tick(4)
+ }
+ tick(cycles){for(let c=0;c<cycles;c+=4)this._tick4()}
+ colorDMG(index,pal){const shade=(pal>>(index*2))&3,colors=[[224,248,208],[136,192,112],[52,104,86],[8,24,32]];return colors[shade]}
+ colorCGB(data,pal,index){const off=pal*8+index*2,v=data[off]|(data[off+1]<<8);const r=(v&31)*255/31,g=((v>>5)&31)*255/31,b=((v>>10)&31)*255/31;return[r|0,g|0,b|0]}
+ tilePixel(tile,bank,x,y){const base=bank*0x2000+tile*16+y*2,lo=this.vram[base],hi=this.vram[base+1],bit=7-x;return((hi>>bit)&1)*2+((lo>>bit)&1)}
+ renderFrame(){if(!(this.io[0x40]&0x80)){this.frame.fill(0);this.ctx.putImageData(this.image,0,0);return}const lcdc=this.io[0x40],scx=this.io[0x43],scy=this.io[0x42],wx=this.io[0x4B]-7,wy=this.io[0x4A],bgOn=this.cgb||(lcdc&1);for(let y=0;y<144;y++){for(let x=0;x<160;x++){let color=0,pal=0,pri=false;if(bgOn){const win=(lcdc&0x20)&&y>=wy&&x>=wx;const px=win?x-wx:(x+scx)&255,py=win?y-wy:(y+scy)&255,mapBase=(win?(lcdc&0x40):(lcdc&0x08))?0x1C00:0x1800,map=mapBase+((py>>3)*32)+(px>>3),num=this.vram[map],attr=this.cgb?this.vram[0x2000+map]:0;let tile=num;if(!(lcdc&0x10)&&num<128)tile=256+num;let tx=px&7,ty=py&7;if(attr&0x20)tx=7-tx;if(attr&0x40)ty=7-ty;color=this.tilePixel(tile,(attr>>3)&1,tx,ty);pal=attr&7;pri=!!(attr&0x80)}let rgb=this.cgb?this.colorCGB(this.bgPal,pal,color):this.colorDMG(color,this.io[0x47]);const i=(y*160+x)*4;this.frame[i]=rgb[0];this.frame[i+1]=rgb[1];this.frame[i+2]=rgb[2];this.frame[i+3]=255;this._bgColor||(this._bgColor=new Uint8Array(160*144));this._bgColor[y*160+x]=color|(pri?0x80:0)} }if(lcdc&2){const h=(lcdc&4)?16:8;for(let s=39;s>=0;s--){const oy=this.oam[s*4]-16,ox=this.oam[s*4+1]-8,tile0=this.oam[s*4+2],attr=this.oam[s*4+3];for(let py=0;py<h;py++){const sy=oy+py;if(sy<0||sy>=144)continue;let ty=(attr&0x40)?h-1-py:py,tile=tile0;if(h===16){tile&=0xFE;if(ty>=8){tile++;ty-=8}}for(let px=0;px<8;px++){const sx=ox+px;if(sx<0||sx>=160)continue;const tx=(attr&0x20)?7-px:px,col=this.tilePixel(tile,this.cgb?((attr>>3)&1):0,tx,ty);if(!col)continue;const bg=this._bgColor[sy*160+sx],bgCol=bg&3,bgPri=!!(bg&0x80);if(this.cgb){if((lcdc&1)&&((attr&0x80&&bgCol)|| (bgPri&&bgCol)))continue}else if((attr&0x80)&&bgCol)continue;const pal=this.cgb?(attr&7):((attr&0x10)?this.io[0x49]:this.io[0x48]),rgb=this.cgb?this.colorCGB(this.objPal,pal,col):this.colorDMG(col,pal),i=(sy*160+sx)*4;this.frame[i]=rgb[0];this.frame[i+1]=rgb[1];this.frame[i+2]=rgb[2]}}}}this.ctx.imageSmoothingEnabled=!!this.smooth;this.ctx.putImageData(this.image,0,0);this.onFrame?.()}
+ run(){if(this.running)return;this.running=true;this.audio?.resume();this.lastTime=performance.now();const loop=now=>{if(!this.running)return;let dt=Math.min(50,now-this.lastTime);this.lastTime=now;const hz=this.doubleSpeed?8388.608:4194.304;this.acc+=dt*hz;let budget=Math.min(this.acc,this.doubleSpeed?280896:140448);while(budget>0){const c=this.step();budget-=c;this.acc-=c}this.raf=requestAnimationFrame(loop)};this.raf=requestAnimationFrame(loop)}
+ pause(){this.running=false;if(this.raf)cancelAnimationFrame(this.raf);this.raf=0;this.audio?.pause()}
+ resume(){this.run()}
+ stop(){this.pause();this.audio?.dispose()}
+ setSmooth(v){this.smooth=!!v;this.ctx.imageSmoothingEnabled=!!v}
+ exportSRAM(){return this.eram.slice()}
+ importSRAM(data){if(!data||!this.eram.length)return;const a=data instanceof Uint8Array?data:new Uint8Array(data);this.eram.set(a.subarray(0,this.eram.length))}
+ exportPersistent(){return{v:2,sram:this.eram.slice(),rtc:this.hasRTC?this._rtcSnapshot():null}}
+ importPersistent(data){if(!data)return;if(data.sram)this.importSRAM(data.sram);else if(data.bytes)this.importSRAM(data.bytes);if(this.hasRTC&&data.rtc){const r=data.rtc;this.rtc={sec:r.sec|0,min:r.min|0,hour:r.hour|0,day:(r.day|0)&511,halt:!!r.halt,carry:!!r.carry,last:Number(r.last)||Date.now(),latched:null};this._syncRTC()}}
+ saveState(){return{v:2,regs:[this.A,this.F,this.B,this.C,this.D,this.E,this.H,this.L,this.SP,this.PC,this.ime?1:0,this.halted?1:0,this.haltBug?1:0,this.stopped?1:0,this.doubleSpeed?1:0,this.eiDelay|0],cart:[this.romBank,this.ramBank,this.ramEnabled?1:0,this.mbc1Mode,this.mbc1Hi,this.rtcSel,this.rtcLatchWrite,this.vramBank,this.wramBank,this.ie,this.joy,this.joySelect,this.rumbleOn?1:0],vram:this.vram.slice(),wram:this.wram.slice(),eram:this.eram.slice(),oam:this.oam.slice(),hram:this.hram.slice(),io:this.io.slice(),bgPal:this.bgPal.slice(),objPal:this.objPal.slice(),tim:[this.divCounter,this.timerReloadDelay,this.ppuCycles,this.ly,this.ppuMode,this.statLine?1:0],rtc:this.hasRTC?this._rtcSnapshot():null,hdma:[this.hdmaActive?1:0,this.hdmaBlocks,this.hdmaSource,this.hdmaDest]}}
+ loadState(s){
+  if(!s||(s.v!==1&&s.v!==2))throw new Error('Estado incompatible.');
+  [this.A,this.F,this.B,this.C,this.D,this.E,this.H,this.L,this.SP,this.PC]=s.regs;this.ime=!!s.regs[10];this.halted=!!s.regs[11];this.haltBug=!!s.regs[12];this.stopped=!!s.regs[13];this.doubleSpeed=!!s.regs[14];this.eiDelay=s.regs[15]|0;
+  [this.romBank,this.ramBank]=s.cart;this.ramEnabled=!!s.cart[2];this.mbc1Mode=s.cart[3]|0;this.mbc1Hi=s.cart[4]|0;this.rtcSel=s.cart[5]|0;this.rtcLatchWrite=s.v===2?(s.cart[6]|0):0;const off=s.v===2?7:6;this.vramBank=s.cart[off]|0;this.wramBank=s.cart[off+1]|0;this.ie=s.cart[off+2]|0;this.joy=s.cart[off+3]|0;this.joySelect=s.cart[off+4]|0;this.rumbleOn=!!s.cart[off+5];
+  this.vram.set(s.vram);this.wram.set(s.wram);if(this.eram.length&&s.eram)this.eram.set(new Uint8Array(s.eram).subarray(0,this.eram.length));this.oam.set(s.oam);this.hram.set(s.hram);this.io.set(s.io);this.bgPal.set(s.bgPal);this.objPal.set(s.objPal);
+  if(s.v===2){[this.divCounter,this.timerReloadDelay,this.ppuCycles,this.ly,this.ppuMode]=s.tim;this.statLine=!!s.tim[5];if(this.hasRTC&&s.rtc){const r=s.rtc;this.rtc={sec:r.sec|0,min:r.min|0,hour:r.hour|0,day:(r.day|0)&511,halt:!!r.halt,carry:!!r.carry,last:Number(r.last)||Date.now(),latched:null};this._syncRTC()}if(s.hdma){this.hdmaActive=!!s.hdma[0];this.hdmaBlocks=s.hdma[1]|0;this.hdmaSource=s.hdma[2]|0;this.hdmaDest=s.hdma[3]|0}}
+  else{this.divCounter=s.tim?.[0]||0;this.timerReloadDelay=0;this.ppuCycles=s.tim?.[2]||0;this.ly=s.tim?.[3]||0;this.ppuMode=this.ly>=144?1:(this.ppuCycles<80?2:this.ppuCycles<252?3:0);this.statLine=false}
+  this.io[0x44]=this.ly;this._updateSTAT();this.renderFrame()
+ }
+
+}
+class RavenAPU{
+ constructor(gb){this.gb=gb;this.ctx=null;this.nodes=[];this.cyc=0;try{const A=window.AudioContext||window.webkitAudioContext;if(A){this.ctx=new A();this.master=this.ctx.createGain();this.master.gain.value=.12;this.master.connect(this.ctx.destination);this.sq1=this._osc('square');this.sq2=this._osc('square');this.wave=this._osc('triangle');this.noise=this._noise()}}catch{this.ctx=null}}
+ _osc(type){if(!this.ctx)return null;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=type;o.frequency.value=440;g.gain.value=0;o.connect(g);g.connect(this.master);o.start();this.nodes.push([o,g]);return[o,g]}
+ _noise(){if(!this.ctx)return null;const len=Math.max(1,this.ctx.sampleRate),buf=this.ctx.createBuffer(1,len,this.ctx.sampleRate),d=buf.getChannelData(0);let lfsr=0x7FFF;for(let i=0;i<len;i++){const bit=(lfsr^(lfsr>>1))&1;lfsr=(lfsr>>1)|(bit<<14);d[i]=(lfsr&1)?-.7:.7}const s=this.ctx.createBufferSource(),g=this.ctx.createGain();s.buffer=buf;s.loop=true;g.gain.value=0;s.connect(g);g.connect(this.master);s.start();this.nodes.push([s,g]);return[s,g]}
+ syncRegister(){}
+ _set(node,freq,gain){if(!node||!this.ctx)return;const[o,g]=node,t=this.ctx.currentTime;if(o.frequency)o.frequency.setTargetAtTime(Math.max(20,Math.min(16000,freq||20)),t,.006);g.gain.setTargetAtTime(Math.max(0,Math.min(.25,gain||0)),t,.006)}
+ tick(c){this.cyc+=c;if(this.cyc<4096)return;this.cyc=0;if(!this.ctx)return;const io=this.gb.io,master=(io[0x26]&0x80)!==0;if(!master){for(const[,g]of this.nodes)g.gain.setTargetAtTime(0,this.ctx.currentTime,.004);return}const route=io[0x25],vol=io[0x24],mix=((vol&7)+((vol>>4)&7)+2)/16;
+  const f1=((io[0x14]&7)<<8)|io[0x13],f2=((io[0x19]&7)<<8)|io[0x18],fw=((io[0x1E]&7)<<8)|io[0x1D];
+  this._set(this.sq1,131072/Math.max(1,2048-f1),((io[0x12]>>4)&15)/15*.18*mix*((route&0x11)?1:0));
+  this._set(this.sq2,131072/Math.max(1,2048-f2),((io[0x17]>>4)&15)/15*.18*mix*((route&0x22)?1:0));
+  const waveLevel=[0,1,.5,.25][(io[0x1C]>>5)&3]||0;this._set(this.wave,65536/Math.max(1,2048-fw),(io[0x1A]&0x80)?waveLevel*.12*mix*((route&0x44)?1:0):0);
+  if(this.noise){const nr43=io[0x22],shift=nr43>>4,div=nr43&7,rate=524288/Math.max(1,(div?div:0.5)*Math.pow(2,shift+1)),env=(io[0x21]>>4)&15;const[s,g]=this.noise;if(s.playbackRate)s.playbackRate.setTargetAtTime(Math.max(.05,Math.min(8,rate/8000)),this.ctx.currentTime,.01);g.gain.setTargetAtTime(((route&0x88)?env/15*.11*mix:0),this.ctx.currentTime,.006)}
+ }
+ resume(){this.ctx?.resume?.().catch(()=>{})}pause(){this.ctx?.suspend?.().catch(()=>{})}
+ dispose(){for(const[o,g]of this.nodes){try{o.stop()}catch{};try{o.disconnect();g.disconnect()}catch{}}this.nodes=[];try{this.master?.disconnect()}catch{};try{this.ctx?.close?.()}catch{};this.ctx=null}
+}
+exports.RavenGBEngine=RavenGBEngine;
+});
+
+define("runtime/console/ConsoleProfiles", ["require", "exports"], function(require,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.ConsoleProfiles=void 0;exports.ConsoleProfiles={gameboy:{id:'gameboy',name:'Game Boy',orientation:'portrait',displays:[{id:'main',width:160,height:144,pixelPerfect:true}],controls:['UP','DOWN','LEFT','RIGHT','A','B','START','SELECT']},'gameboy-color':{id:'gameboy-color',name:'Game Boy Color',orientation:'portrait',displays:[{id:'main',width:160,height:144,pixelPerfect:true}],controls:['UP','DOWN','LEFT','RIGHT','A','B','START','SELECT']}}});
+
+define("runtime/console/GameBoyConsoleUI", ["require", "exports", "utils/dom"], function(require,exports,dom){
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.GameBoyConsoleUI=void 0;
+class GameBoyConsoleUI{
+ constructor(profile,input,{smooth=false}={}){this.profile=profile;this.input=input;this.pointerMap=new Map();this.root=dom.el('div',`console-runtime${smooth?' smooth':''}`);this.shell=dom.el('div',`console-shell${profile.id==='gameboy-color'?' gbc':''}`);const bezel=dom.el('div','console-screen-bezel');this.canvas=document.createElement('canvas');this.canvas.width=160;this.canvas.height=144;this.canvas.className='console-screen';bezel.append(this.canvas);const brand=dom.el('div','console-brandline');brand.append(dom.el('span','',profile.name),dom.el('span','','Raven Runtime'));const controls=dom.el('div','console-controls');this.dpad=dom.el('div','console-dpad');this.dpad.append(dom.el('div','console-dpad-center'),...['up','down','left','right'].map(p=>dom.el('span',`console-dpad-mark ${p}`,p==='up'?'▲':p==='down'?'▼':p==='left'?'◀':'▶')));this.bindDpad();const acts=dom.el('div','console-actions');this.b=dom.button('B','console-action',()=>{});this.a=dom.button('A','console-action',()=>{});this.bindButton(this.a,'A');this.bindButton(this.b,'B');acts.append(this.b,this.a);const sys=dom.el('div','console-system-controls');this.select=dom.button('SELECT','console-system-button',()=>{});this.start=dom.button('START','console-system-button',()=>{});this.bindButton(this.select,'SELECT');this.bindButton(this.start,'START');sys.append(this.select,this.start);controls.append(this.dpad,acts,sys);const status=dom.el('div','console-status');status.append(dom.el('span','console-status-dot'),dom.el('span','','POWER'));this.shell.append(bezel,brand,controls,status);this.root.append(this.shell)}
+ bindButton(el,action){const press=e=>{e.preventDefault();el.setPointerCapture?.(e.pointerId);const src=`touch:${e.pointerId}:${action}`;this.pointerMap.set(e.pointerId,[action,src]);this.input.set(action,src,true);el.classList.add('pressed')},release=e=>{const p=this.pointerMap.get(e.pointerId);if(p){this.input.set(p[0],p[1],false);this.pointerMap.delete(e.pointerId)}el.classList.remove('pressed')};el.addEventListener('pointerdown',press);for(const n of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(n,release)}
+ dpadActions(e){const r=this.dpad.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5,dead=.12,out=[];if(x<-dead)out.push('LEFT');if(x>dead)out.push('RIGHT');if(y<-dead)out.push('UP');if(y>dead)out.push('DOWN');return out}
+ bindDpad(){const update=e=>{e.preventDefault();const key=`touch:${e.pointerId}:dpad`,old=this.pointerMap.get(e.pointerId)?.[0]||[],next=this.dpadActions(e);for(const a of old)if(!next.includes(a))this.input.set(a,`${key}:${a}`,false);for(const a of next)if(!old.includes(a))this.input.set(a,`${key}:${a}`,true);this.pointerMap.set(e.pointerId,[next,key]);this.paintDpad()},end=e=>{const row=this.pointerMap.get(e.pointerId);if(row){for(const a of row[0])this.input.set(a,`${row[1]}:${a}`,false);this.pointerMap.delete(e.pointerId)}this.paintDpad()};this.dpad.addEventListener('pointerdown',e=>{this.dpad.setPointerCapture?.(e.pointerId);update(e)});this.dpad.addEventListener('pointermove',e=>{if(this.pointerMap.has(e.pointerId))update(e)});for(const n of ['pointerup','pointercancel','lostpointercapture'])this.dpad.addEventListener(n,end)}
+ paintDpad(){for(const a of ['UP','DOWN','LEFT','RIGHT']){let on=false;for(const row of this.pointerMap.values()){const list=Array.isArray(row[0])?row[0]:[row[0]];if(list.includes(a)){on=true;break}}this.dpad.dataset[a.toLowerCase()]=on?'1':'0'}}
+ setSmooth(v){this.root.classList.toggle('smooth',!!v)}toggleFocus(){this.root.classList.toggle('display-focus');return this.root.classList.contains('display-focus')}toggleTouch(){this.root.classList.toggle('touch-hidden');return this.root.classList.contains('touch-hidden')}dispose(){for(const [id,row] of this.pointerMap){const list=Array.isArray(row[0])?row[0]:[row[0]];for(const a of list)this.input.set(a,`touch:${id}:${a}`,false)}this.pointerMap.clear();this.root.remove()}
+}
+exports.GameBoyConsoleUI=GameBoyConsoleUI;
+});
+
+
+define("runtime/WebRuntimeAdapter", ["require", "exports", "runtime/HtmlRuntime"], function(require,exports,HtmlRuntime_js_adapter){
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.WebRuntimeAdapter=void 0;
+class WebRuntimeAdapter{constructor(project,errors,options={}){this.project=project;this.inner=new HtmlRuntime_js_adapter.HtmlRuntime(project,errors,options)}mount(host){return this.inner.mount(host)}start(){}pause(){}resume(){}stop(){this.inner.dispose()}reset(){}saveState(){return null}loadState(){}getFrame(){return this.inner.getFrame()}getKind(){return'web'}getMetadata(){return this.project.metadata||{}}getInputProfile(){return{type:'native-web'}}getDisplayConfiguration(){return{type:'responsive'}}getConsoleProfile(){return null}dispose(){this.inner.dispose()}}
+exports.WebRuntimeAdapter=WebRuntimeAdapter;
+});
+
+define("runtime/console/ConsoleUIManager", ["require", "exports", "runtime/console/ConsoleProfiles", "runtime/console/GameBoyConsoleUI"], function(require,exports,Profiles_js_mgr,GameBoyUI_js_mgr){
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.ConsoleUIManager=void 0;
+class ConsoleUIManager{constructor(){this.factories=new Map();this.register('gameboy',(profile,input,options)=>new GameBoyUI_js_mgr.GameBoyConsoleUI(profile,input,options));this.register('gameboy-color',(profile,input,options)=>new GameBoyUI_js_mgr.GameBoyConsoleUI(profile,input,options))}register(profileId,factory){this.factories.set(profileId,factory);return this}create(profileId,input,options={}){const profile=Profiles_js_mgr.ConsoleProfiles[profileId];if(!profile)throw new Error(`ConsoleProfile no registrado: ${profileId}`);const factory=this.factories.get(profileId);if(!factory)throw new Error(`Console UI no registrada: ${profileId}`);return factory(profile,input,options)}getProfile(id){return Profiles_js_mgr.ConsoleProfiles[id]||null}}
+exports.ConsoleUIManager=ConsoleUIManager;
+});
+define("runtime/GameBoyRuntime", ["require", "exports", "runtime/gameboy/RavenGBEngine", "runtime/universal/InputManager", "runtime/console/ConsoleUIManager"], function(require,exports,Engine_js,Input_js,ConsoleUIManager_js){
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.GameBoyRuntime=void 0;
+class GameBoyRuntime{
+ constructor(project,errors,options={}){this.project=project;this.errors=errors;this.options=options;this.consoleUI=new ConsoleUIManager_js.ConsoleUIManager();this.engine=null;this.input=null;this.ui=null;this.host=null;this.paused=false;this.smooth=false;this.disposed=false;this.saveTimer=0;this.romKey=`gb-${project.libraryId||project.id||'app'}-${project.sourceHash||project.metadata?.globalChecksum||'rom'}`}
+ async mount(host){this.host=host;const file=this.project.files.get(this.project.entryPoint);if(!file)throw new Error('No se encontró la ROM.');const rom=new Uint8Array(await file.blob.arrayBuffer());const profileId=this.project.consoleProfile||'gameboy',profile=this.consoleUI.getProfile(profileId)||this.consoleUI.getProfile('gameboy');this.input=new Input_js.InputManager((a,d)=>this.engine?.button(a,d));this.ui=this.consoleUI.create(profile.id,this.input,{smooth:this.smooth});host.replaceChildren(this.ui.root);try{this.engine=new Engine_js.RavenGBEngine(this.ui.canvas,rom,{smooth:this.smooth,audio:true});const saved2=await this.options.onIdbLoad?.(this.romKey+'|save',2);if(saved2)this.engine.importPersistent(saved2);else{const legacy=await this.options.onIdbLoad?.(this.romKey+'|sram',1);if(legacy?.bytes)this.engine.importSRAM(legacy.bytes)}this.input.start();this.engine.run();this.saveTimer=setInterval(()=>void this.persistSRAM(),5000);const wake=()=>this.engine?.audio?.resume?.();this.ui.root.addEventListener('pointerdown',wake,{once:true});this.options.onReady?.();this.errors.info(`${profile.name} Runtime iniciado.`)}catch(error){this.disposeCore();this.showError(error);throw error}}
+ showError(error){if(!this.host)return;const box=document.createElement('div');box.className='console-runtime-error';const h=document.createElement('h2');h.textContent='Game could not be started';const p=document.createElement('p');p.textContent=error instanceof Error?error.message:String(error);box.append(h,p);this.host.replaceChildren(box);this.errors.error('No se pudo iniciar la ROM.',{technical:String(error),source:'GameBoyRuntime'})}
+ async persistSRAM(){if(!this.engine)return;try{const data=this.engine.exportPersistent();if(data?.sram?.length||data?.rtc)await this.options.onIdbSave?.(this.romKey+'|save',{...data,version:2,updatedAt:Date.now()})}catch(e){this.errors.warn('No se pudo guardar la RAM/RTC del cartucho.',{technical:String(e)})}}
+ async saveState(){if(!this.engine)return;await this.options.onIdbSave?.(this.romKey+'|state',{version:1,state:this.engine.saveState(),updatedAt:Date.now()});this.errors.info('Estado de Game Boy guardado.')}
+ async loadState(){const row=await this.options.onIdbLoad?.(this.romKey+'|state',1);if(!row?.state)throw new Error('Todavía no existe un estado guardado para esta ROM.');this.engine?.loadState(row.state);this.errors.info('Estado de Game Boy restaurado.')}
+ pause(){this.engine?.pause();this.paused=true}resume(){this.engine?.resume();this.paused=false}togglePause(){this.paused?this.resume():this.pause();return this.paused}reset(){const data=this.engine?.exportPersistent();this.engine?.reset();if(data)this.engine?.importPersistent(data);this.engine?.run();this.paused=false}toggleFocus(){return this.ui?.toggleFocus()}toggleTouch(){return this.ui?.toggleTouch()}toggleSmooth(){this.smooth=!this.smooth;this.ui?.setSmooth(this.smooth);this.engine?.setSmooth(this.smooth);return this.smooth}getFrame(){return null}getKind(){return'console'}getMetadata(){return this.project.metadata||{}}getInputProfile(){return{actions:['UP','DOWN','LEFT','RIGHT','A','B','START','SELECT'],keyboard:{UP:'ArrowUp',DOWN:'ArrowDown',LEFT:'ArrowLeft',RIGHT:'ArrowRight',A:'KeyX',B:'KeyZ',START:'Enter',SELECT:'ShiftLeft'}}}getDisplayConfiguration(){return{width:160,height:144,pixelPerfect:!this.smooth,smoothing:this.smooth}}getConsoleProfile(){return this.project.consoleProfile||'gameboy'}
+ async dispose(){if(this.disposed)return;this.disposed=true;if(this.saveTimer)clearInterval(this.saveTimer);this.saveTimer=0;await this.persistSRAM();this.disposeCore();this.host?.replaceChildren();this.host=null}
+ disposeCore(){try{this.engine?.stop()}catch{};this.engine=null;try{this.input?.dispose()}catch{};this.input=null;try{this.ui?.dispose()}catch{};this.ui=null}
+}
+exports.GameBoyRuntime=GameBoyRuntime;
+});
+
+define("runtime/RuntimeRegistry", ["require", "exports"], function(require,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.RuntimeRegistry=void 0;class RuntimeRegistry{constructor(){this.items=[]}register(def){if(!def?.id||typeof def.create!=='function'||typeof def.canOpen!=='function')throw new Error('Definición de runtime inválida.');this.items=this.items.filter(x=>x.id!==def.id);this.items.push(def);return this}resolve(project){const hit=this.items.find(x=>{try{return x.canOpen(project)}catch{return false}});if(!hit)throw new Error(`No existe un runtime registrado para ${project?.source||'este formato'}.`);return hit}list(){return[...this.items]}}exports.RuntimeRegistry=RuntimeRegistry;});
+define("runtime/RuntimeManager", ["require", "exports", "runtime/WebRuntimeAdapter", "runtime/GameBoyRuntime", "runtime/RuntimeRegistry"], function (require, exports, WebRuntimeAdapter_js_1, GameBoyRuntime_js_1, RuntimeRegistry_js_1) {
+    "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.RuntimeManager=void 0;
+    const registry=new RuntimeRegistry_js_1.RuntimeRegistry();
+    registry.register({id:'gameboy',canOpen:p=>p?.runtimeId==='gameboy'||p?.source==='gb'||p?.source==='gbc',create:(p,e,o)=>new GameBoyRuntime_js_1.GameBoyRuntime(p,e,o)});
+    registry.register({id:'web',canOpen:p=>!p?.runtimeId||p.runtimeId==='web'||p.source==='html'||p.source==='zip',create:(p,e,o)=>new WebRuntimeAdapter_js_1.WebRuntimeAdapter(p,e,o)});
+    class RuntimeManager{
+        project;errors;options;runtime=null;host=null;definition=null;
+        constructor(project,errors,options={}){this.project=project;this.errors=errors;this.options=options}
+        async mount(host){this.host=host;await this.create()}
+        async restart(){if(this.runtime?.dispose)await this.runtime.dispose();this.runtime=null;this.errors.info('Runtime reiniciado.');await this.create()}
+        getFrame(){return this.runtime?.getFrame?.()??null}getKind(){return this.runtime?.getKind?.()||this.definition?.id||'web'}isConsole(){return this.getKind()==='console'}
+        start(){return this.runtime?.start?.()}pause(){return this.runtime?.pause?.()}resume(){return this.runtime?.resume?.()}stop(){return this.runtime?.stop?.()}reset(){return this.runtime?.reset?.()}getMetadata(){return this.runtime?.getMetadata?.()||{}}getInputProfile(){return this.runtime?.getInputProfile?.()||null}getDisplayConfiguration(){return this.runtime?.getDisplayConfiguration?.()||null}getConsoleProfile(){return this.runtime?.getConsoleProfile?.()||null}togglePause(){return this.runtime?.togglePause?.()}toggleFocus(){return this.runtime?.toggleFocus?.()}toggleTouch(){return this.runtime?.toggleTouch?.()}toggleSmooth(){return this.runtime?.toggleSmooth?.()}saveState(){return this.runtime?.saveState?.()}loadState(){return this.runtime?.loadState?.()}
+        async dispose(){if(this.runtime?.dispose)await this.runtime.dispose();this.runtime=null;this.host?.replaceChildren();this.host=null}
+        async create(){if(!this.host)throw new Error('No existe host para el runtime.');this.definition=registry.resolve(this.project);this.runtime=this.definition.create(this.project,this.errors,this.options);await this.runtime.mount(this.host)}
+        static register(def){registry.register(def)}static runtimes(){return registry.list()}
     }
-    exports.RuntimeManager = RuntimeManager;
+    exports.RuntimeManager=RuntimeManager;
 });
 define("ui/dialogs/Dialogs", ["require", "exports", "utils/dom", "utils/format"], function (require, exports, dom_js_4, format_js_2) {
     "use strict";
@@ -8788,7 +9568,7 @@ define("ui/dialogs/Dialogs", ["require", "exports", "utils/dom", "utils/format"]
     exports.diagnosticsDialog = diagnosticsDialog;
     function shell(title, onClose) { const backdrop = (0, dom_js_4.el)('div', 'sheet-backdrop'), sheet = (0, dom_js_4.el)('section', 'bottom-sheet'), head = (0, dom_js_4.el)('header', 'sheet-header'), body = (0, dom_js_4.el)('div', 'sheet-body'); head.append((0, dom_js_4.el)('h2', 'sheet-title', title), (0, dom_js_4.button)('Cerrar', 'text-button', onClose)); sheet.append(head, body); backdrop.append(sheet); backdrop.addEventListener('click', e => { if (e.target === backdrop)
         onClose(); }); return { backdrop, body }; }
-    function infoDialog(project, onClose) { const { backdrop, body } = shell('Información', onClose); for (const [k, v] of [['Nombre', project.name], ['Inicio', project.entryPoint], ['Archivos', String(project.files.size)], ['Tamaño', (0, format_js_2.formatBytes)(project.size)]]) {
+    function infoDialog(project, onClose) { const { backdrop, body } = shell('Información', onClose); for (const [k, v] of [['Nombre', project.name], ['Runtime', project.runtimeId === 'gameboy' ? 'Game Boy' : 'Web'], ['Plataforma', project.platform || project.source], ['Inicio', project.entryPoint], ['Archivos', String(project.files.size)], ['Tamaño', (0, format_js_2.formatBytes)(project.size)]]) {
         const r = (0, dom_js_4.el)('div', 'analysis-row');
         r.append((0, dom_js_4.el)('span', 'analysis-label', k), (0, dom_js_4.el)('span', 'analysis-value', v));
         body.append(r);
@@ -8812,9 +9592,9 @@ define("ui/runtime/RuntimeView", ["require", "exports", "diagnostics/ErrorCollec
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RuntimeView = void 0;
     class RuntimeView {
-        project; onClose; element; host; loading; errors = new ErrorCollector_js_1.ErrorCollector(); manager; input; menu = null; dialog = null; entries = []; unsubscribe; readyTimer = null;
-        constructor(project, onClose) {
-            this.project = project; this.onClose = onClose;
+        project; onClose; storage; element; host; loading; errors = new ErrorCollector_js_1.ErrorCollector(); manager; input; menu = null; dialog = null; entries = []; unsubscribe; readyTimer = null;
+        constructor(project, onClose, storage = null) {
+            this.project = project; this.onClose = onClose; this.storage = storage;
             const root = (0, dom_js_5.el)('main', 'runtime-screen'), bar = (0, dom_js_5.el)('header', 'runtime-toolbar'), menuBtn = (0, dom_js_5.button)('⋯', 'icon-button', () => this.toggleMenu(menuBtn), 'Menú');
             bar.append((0, dom_js_5.button)('←', 'icon-button', onClose, 'Cerrar'), (0, dom_js_5.el)('div', 'runtime-title', project.name), menuBtn);
             this.host = (0, dom_js_5.el)('section', 'runtime-host');
@@ -8822,7 +9602,8 @@ define("ui/runtime/RuntimeView", ["require", "exports", "diagnostics/ErrorCollec
             this.loading.append((0, dom_js_5.el)('div', 'runtime-transition-spinner'), (0, dom_js_5.el)('div', 'runtime-transition-label', 'Abriendo…'));
             root.append(bar, this.host, this.loading); this.element = root;
             this.input = new InputCompatibility_js_1.InputCompatibility(() => this.manager?.getFrame() || null);
-            this.manager = new RuntimeManager_js_1.RuntimeManager(project, this.errors, { onClose, onRestart: () => void this.restart(), onReady: () => this.markReady(), onRequestFullscreen: () => void this.fullscreen(), onRequestOrientation: o => void this.orientation(o), onAudioBlocked: () => this.audioHint(), onFrameCreated: frame => this.input.attachFrame(frame) });
+            const appId = project.libraryId || null;
+            this.manager = new RuntimeManager_js_1.RuntimeManager(project, this.errors, { onClose, onRestart: () => void this.restart(), onReady: () => this.markReady(), onRequestFullscreen: () => void this.fullscreen(), onRequestOrientation: o => void this.orientation(o), onAudioBlocked: () => this.audioHint(), onFrameCreated: frame => this.input.attachFrame(frame), loadRuntimeLocalStorage: () => appId && this.storage ? this.storage.getRuntimeLocalStorage(appId) : {}, onLocalStorageSave: data => appId && this.storage ? this.storage.setRuntimeLocalStorage(appId, data) : undefined, onIdbLoad: (name, version) => appId && this.storage ? this.storage.getRuntimeDatabase(appId, name, version) : null, onIdbSave: (name, data) => appId && this.storage ? this.storage.setRuntimeDatabase(appId, name, data) : undefined, onIdbDelete: name => appId && this.storage ? this.storage.deleteRuntimeDatabase(appId, name) : undefined });
             this.input.start();
             this.unsubscribe = this.errors.subscribe(e => this.entries = e);
         }
@@ -8830,7 +9611,7 @@ define("ui/runtime/RuntimeView", ["require", "exports", "diagnostics/ErrorCollec
         showLoading() { if (this.readyTimer) clearTimeout(this.readyTimer); this.loading.style.visibility='visible'; this.loading.classList.remove('runtime-transition-ready'); }
         markReady() { if (this.readyTimer) { clearTimeout(this.readyTimer); this.readyTimer = null; } requestAnimationFrame(() => requestAnimationFrame(() => { this.loading.classList.add('runtime-transition-ready'); setTimeout(() => { if (this.loading.classList.contains('runtime-transition-ready')) this.loading.style.visibility='hidden'; }, 320); })); }
         dispose() { if (this.readyTimer) clearTimeout(this.readyTimer); this.menu?.remove(); this.dialog?.remove(); this.input.dispose(); this.manager.dispose(); this.unsubscribe(); }
-        toggleMenu(anchor) { if (this.menu) { this.menu.remove(); this.menu=null; return; } const m=(0,dom_js_5.el)('div','runtime-menu'); const action=(label,fn,destructive=false)=>(0,dom_js_5.button)(label,`runtime-menu-item${destructive?' destructive':''}`,()=>{m.remove();this.menu=null;fn();}); m.append(action('Reiniciar',()=>void this.restart()),action('Pantalla completa',()=>void this.fullscreen()),action('Rotar orientación',()=>void this.toggleOrientation()),action('Información',()=>this.openInfo()),action('Errores',()=>this.openErrors()),action('Cerrar proyecto',this.onClose,true)); anchor.parentElement?.append(m); this.menu=m; }
+        toggleMenu(anchor) { if (this.menu) { this.menu.remove(); this.menu=null; return; } const m=(0,dom_js_5.el)('div','runtime-menu'); const action=(label,fn,destructive=false)=>(0,dom_js_5.button)(label,`runtime-menu-item${destructive?' destructive':''}`,()=>{m.remove();this.menu=null;try{const r=fn();if(r&&typeof r.catch==='function')r.catch(e=>this.errors.error(e instanceof Error?e.message:String(e)))}catch(e){this.errors.error(e instanceof Error?e.message:String(e))}}); if(this.manager.isConsole()){m.append(action('Pausar / Reanudar',()=>this.manager.togglePause()),action('Guardar estado',()=>this.manager.saveState()),action('Cargar estado',()=>this.manager.loadState()),action('Console / Display',()=>this.manager.toggleFocus()),action('Mostrar / ocultar controles',()=>this.manager.toggleTouch()),action('Pixel Perfect / Suave',()=>this.manager.toggleSmooth()));} m.append(action('Reiniciar',()=>void this.restart()),action('Pantalla completa',()=>void this.fullscreen()),action('Rotar orientación',()=>void this.toggleOrientation()),action('Información',()=>this.openInfo()),action('Errores',()=>this.openErrors()),action('Cerrar proyecto',this.onClose,true)); anchor.parentElement?.append(m); this.menu=m; }
         async restart() { try { this.loading.style.visibility='visible'; this.showLoading(); await this.manager.restart(); this.input.attachFrame(this.manager.getFrame()); this.input.focusFrame(); this.readyTimer=setTimeout(()=>this.markReady(),8000); } catch(e) { this.errors.error('No se pudo reiniciar.',{technical:String(e)}); this.markReady(); } }
         async fullscreen() {
             const doc = document;
@@ -8907,26 +9688,33 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
         constructor(root) {
             this.root = root;
             try { const mode = localStorage.getItem('local-runtime-launcher-view'); if (mode === 'grid' || mode === 'list') this.launcherViewMode = mode; } catch {}
-            this.input = document.createElement('input'); this.input.type='file'; this.input.accept='.html,.htm,.zip,text/html,application/zip,application/x-zip-compressed'; this.input.hidden=true; this.input.addEventListener('change',()=>void this.fileSelected()); document.body.append(this.input);
+            this.input = document.createElement('input'); this.input.type='file'; this.input.accept='.html,.htm,.zip,.gb,.gbc,text/html,application/zip,application/x-zip-compressed,application/octet-stream'; this.input.hidden=true; this.input.addEventListener('change',()=>void this.fileSelected()); document.body.append(this.input);
             this.coverInput = document.createElement('input'); this.coverInput.type='file'; this.coverInput.accept='image/*'; this.coverInput.hidden=true; this.coverInput.addEventListener('change',()=>void this.coverSelected()); document.body.append(this.coverInput);
             this.bannerInput = document.createElement('input'); this.bannerInput.type='file'; this.bannerInput.accept='image/*'; this.bannerInput.hidden=true; this.bannerInput.addEventListener('change',()=>void this.bannerSelected()); document.body.append(this.bannerInput);
         }
-        async start(){await this.refreshLibrary();this.render();}
+        async start(){try{await this.storage.consolidateDuplicates();}catch(e){console.warn('[Raven] No se pudo consolidar duplicados.',e)}await this.refreshLibrary();this.render();}
         async refreshLibrary(){try{this.library=await this.storage.list();if(this.detailApp){this.detailApp=await this.storage.get(this.detailApp.id)||null;}}catch(e){this.library=[];this.state.importError=e instanceof Error?e.message:'No se pudo abrir la biblioteca local.';}}
         persistViewMode(){try{localStorage.setItem('local-runtime-launcher-view',this.launcherViewMode);}catch{}}
         toggleView=()=>{this.launcherViewMode=this.launcherViewMode==='grid'?'list':'grid';this.persistViewMode();this.render();};
         dismissSheet=()=>{this.sheet?.remove();this.sheet=null;};
-        async promptName(current){return await new Promise(resolve=>{this.dismissSheet();const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Renombrar en biblioteca';const close=document.createElement('button');close.type='button';close.className='text-button';close.textContent='Cancelar';const body=document.createElement('div');body.className='sheet-body';const copy=document.createElement('p');copy.className='sheet-copy';copy.textContent='Este nombre solo cambia cómo se muestra en tu biblioteca.';const input=document.createElement('input');input.className='sheet-input';input.type='text';input.value=current;input.placeholder='Nombre visible';const actions=document.createElement('div');actions.className='sheet-actions';const cancel=document.createElement('button');cancel.type='button';cancel.className='sheet-button secondary';cancel.textContent='Cancelar';const save=document.createElement('button');save.type='button';save.className='sheet-button primary';save.textContent='Guardar';const done=v=>{this.dismissSheet();resolve(v);};const submit=()=>{const v=input.value.trim();if(!v){input.focus();return;}done(v);};close.addEventListener('click',()=>done(null));cancel.addEventListener('click',()=>done(null));save.addEventListener('click',submit);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit();}});backdrop.addEventListener('click',e=>{if(e.target===backdrop)done(null);});head.append(title,close);actions.append(cancel,save);body.append(copy,input,actions);sheet.append(head,body);backdrop.append(sheet);this.sheet=backdrop;document.body.append(backdrop);setTimeout(()=>input.focus(),30);});}
-        async confirmRemove(name){return await new Promise(resolve=>{this.dismissSheet();const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Eliminar de biblioteca';const close=document.createElement('button');close.type='button';close.className='text-button';close.textContent='Cancelar';const body=document.createElement('div');body.className='sheet-body';const copy=document.createElement('p');copy.className='sheet-copy';copy.textContent=`¿Seguro que quieres eliminar “${name}” de la biblioteca? Esta acción no borra el archivo original fuera del launcher.`;const actions=document.createElement('div');actions.className='sheet-actions';const cancel=document.createElement('button');cancel.type='button';cancel.className='sheet-button secondary';cancel.textContent='Cancelar';const remove=document.createElement('button');remove.type='button';remove.className='sheet-button danger';remove.textContent='Eliminar';const done=v=>{this.dismissSheet();resolve(v);};close.addEventListener('click',()=>done(false));cancel.addEventListener('click',()=>done(false));remove.addEventListener('click',()=>done(true));backdrop.addEventListener('click',e=>{if(e.target===backdrop)done(false);});head.append(title,close);actions.append(cancel,remove);body.append(copy,actions);sheet.append(head,body);backdrop.append(sheet);this.sheet=backdrop;document.body.append(backdrop);});}
+        async promptName(current){return await new Promise(resolve=>{this.dismissSheet();const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Renombrar en biblioteca';const body=document.createElement('div');body.className='sheet-body';const copy=document.createElement('p');copy.className='sheet-copy';copy.textContent='Este nombre solo cambia cómo se muestra en tu biblioteca.';const input=document.createElement('input');input.className='sheet-input';input.type='text';input.value=current;input.placeholder='Nombre visible';const actions=document.createElement('div');actions.className='sheet-actions';const cancel=document.createElement('button');cancel.type='button';cancel.className='sheet-button secondary';cancel.textContent='Cancelar';const save=document.createElement('button');save.type='button';save.className='sheet-button primary';save.textContent='Guardar';const done=v=>{this.dismissSheet();resolve(v);};const submit=()=>{const v=input.value.trim();if(!v){input.focus();return;}done(v);};cancel.addEventListener('click',()=>done(null));save.addEventListener('click',submit);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit();}else if(e.key==='Escape'){e.preventDefault();done(null);}});backdrop.addEventListener('click',e=>{if(e.target===backdrop)done(null);});head.append(title);actions.append(cancel,save);body.append(copy,input,actions);sheet.append(head,body);backdrop.append(sheet);this.sheet=backdrop;document.body.append(backdrop);setTimeout(()=>input.focus(),30);});}
+        async confirmRemove(name){return await new Promise(resolve=>{this.dismissSheet();const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Eliminar de biblioteca';const body=document.createElement('div');body.className='sheet-body';const copy=document.createElement('p');copy.className='sheet-copy';copy.textContent=`¿Seguro que quieres eliminar “${name}” de la biblioteca? Esta acción no borra el archivo original fuera del launcher.`;const actions=document.createElement('div');actions.className='sheet-actions';const cancel=document.createElement('button');cancel.type='button';cancel.className='sheet-button secondary';cancel.textContent='Cancelar';const remove=document.createElement('button');remove.type='button';remove.className='sheet-button danger';remove.textContent='Eliminar';const done=v=>{this.dismissSheet();resolve(v);};cancel.addEventListener('click',()=>done(false));remove.addEventListener('click',()=>done(true));backdrop.addEventListener('click',e=>{if(e.target===backdrop)done(false);});head.append(title);actions.append(cancel,remove);body.append(copy,actions);sheet.append(head,body);backdrop.append(sheet);this.sheet=backdrop;document.body.append(backdrop);});}
         open=()=>{this.updateTargetId=null;this.input.value='';this.input.click();};
         updateFromLibrary=item=>{this.updateTargetId=item.id;this.input.value='';this.input.click();};
-        async hashFile(file){const b=await file.arrayBuffer();try{if(crypto?.subtle?.digest){const h=await crypto.subtle.digest('SHA-256',b);return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('');}}catch{}let h1=2166136261>>>0,h2=0x9e3779b9>>>0;const bytes=new Uint8Array(b);for(let i=0;i<bytes.length;i++){h1^=bytes[i];h1=Math.imul(h1,16777619)>>>0;h2^=(bytes[i]+i)>>>0;h2=Math.imul(h2,2246822519)>>>0;}return`fallback-${bytes.length.toString(16)}-${h1.toString(16).padStart(8,'0')}${h2.toString(16).padStart(8,'0')}`;}
+        async hashFile(file){
+            if(file.size<=32*1024*1024){try{const b=await file.arrayBuffer();if(crypto?.subtle?.digest){const h=await crypto.subtle.digest('SHA-256',b);return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('');}}catch{}}
+            let h1=2166136261>>>0,h2=0x9e3779b9>>>0,total=0,index=0;
+            const consume=bytes=>{for(let i=0;i<bytes.length;i++,index++){h1^=bytes[i];h1=Math.imul(h1,16777619)>>>0;h2^=(bytes[i]+index)>>>0;h2=Math.imul(h2,2246822519)>>>0;}total+=bytes.length;};
+            if(file.stream){const reader=file.stream().getReader();try{for(;;){const{done,value}=await reader.read();if(done)break;if(value)consume(value);}}finally{reader.releaseLock?.();}}
+            else consume(new Uint8Array(await file.arrayBuffer()));
+            return'content-'+total.toString(16)+'-'+h1.toString(16).padStart(8,'0')+h2.toString(16).padStart(8,'0');
+        }
         async fileSelected(){const file=this.input.files?.[0];if(!file)return;this.set({screen:this.router.navigate('importing'),importError:null});try{this.disposeProject();const[project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);project.sourceName=file.name;project.sourceHash=sourceHash;let match=this.updateTargetId?await this.storage.get(this.updateTargetId):await this.storage.findMatch(project,file.name);project.libraryId=match?.id||null;project.libraryMode=match?(this.updateTargetId?'manual-update':(match.sourceHash===sourceHash?'same':'update')):'new';project.libraryName=match?.displayName||project.name;this.sourceMeta={sourceName:file.name,sourceHash,targetId:match?.id||null};this.updateTargetId=null;const[compatibility,validation,previewIconBlob]=await Promise.all([CompatibilityScanner_js_1.CompatibilityScanner.scan(project),ProjectValidator_js_1.ProjectValidator.validate(project),this.storage.detectCover(project)]);project.previewIconBlob=previewIconBlob||null;this.analysisAnimateIn=true;this.set({screen:this.router.navigate('analysis'),project,compatibility,validation});}catch(e){this.updateTargetId=null;this.sourceMeta=null;this.set({...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo importar.'});}}
         async entry(path){const p=this.state.project;if(!p||!p.files.has(path))return;p.entryPoint=path;this.set({validation:await ProjectValidator_js_1.ProjectValidator.validate(p)});}
         async saveImportedProject(){const project=this.state.project;if(!project)throw new Error('No hay un proyecto para guardar.');const app=await this.storage.save(project,{targetId:project.libraryId||this.sourceMeta?.targetId,sourceName:this.sourceMeta?.sourceName||project.sourceName,sourceHash:this.sourceMeta?.sourceHash||project.sourceHash,compatibilityStatus:this.state.compatibility?.status});project.libraryId=app.id;project.libraryName=app.displayName;project.name=app.displayName;project.storedVersion=app.version;project.libraryMode='same';this.sourceMeta={...(this.sourceMeta||{}),targetId:app.id};return app;}
         openImported=async()=>{const project=this.state.project;if(!project||this.transitionBusy)return;try{const app=await this.saveImportedProject();await this.storage.touchOpened(app.id);this.state.importError=null;this.set({screen:this.router.navigate('runtime')});}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo guardar y abrir la app.';this.render();}};
         addImported=async()=>{const project=this.state.project;if(!project||this.transitionBusy)return;try{await this.saveImportedProject();await this.refreshLibrary();this.state.importError=null;await this.transitionPreflightToLibrary();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo añadir a la biblioteca.';this.render();}};
-        async transitionPreflightToLibrary(){if(this.transitionBusy)return;this.transitionBusy=true;const current=this.root.querySelector('.preflight-screen');const oldUrls=[...this.launcherUrls];try{const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);const newUrls=[...(view.__coverUrls||[])];view.classList.add('library-transition-under');if(!current){this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;this.root.replaceChildren(view);return;}current.classList.remove('preflight-enter-up');current.classList.add('preflight-exit-down');this.root.replaceChildren(view,current);this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};await new Promise(resolve=>{let done=false;const finish=()=>{if(done)return;done=true;resolve();};current.addEventListener('animationend',finish,{once:true});setTimeout(finish,520);});current.remove();view.classList.remove('library-transition-under');for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;}finally{this.transitionBusy=false;}}
+        async transitionPreflightToLibrary(){if(this.transitionBusy)return;this.transitionBusy=true;const current=this.root.querySelector('.preflight-screen');const oldUrls=[...this.launcherUrls];try{const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);const newUrls=[...(view.__coverUrls||[])];view.classList.add('library-transition-under');if(!current){this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;this.root.replaceChildren(view);return;}current.classList.remove('preflight-enter-up');current.classList.add('preflight-exit-down');this.root.replaceChildren(view,current);this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};await new Promise(resolve=>{let done=false;const finish=()=>{if(done)return;done=true;resolve();};current.addEventListener('animationend',finish,{once:true});setTimeout(finish,520);});current.remove();view.classList.remove('library-transition-under');for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;}finally{this.transitionBusy=false;}}
         showDetails=async id=>{try{const app=await this.storage.get(id);if(!app)throw new Error('La app ya no existe en la biblioteca.');this.detailApp=app;this.state.importError=null;this.set({screen:this.router.navigate('detail')});}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo abrir la ficha.';this.render();}};
         detailBack=()=>{this.detailApp=null;this.set({screen:this.router.navigate('launcher')});};
         async openLibrary(id){this.set({screen:this.router.navigate('importing'),importError:null});try{this.disposeProject();const project=await this.storage.loadProject(id);await this.storage.touchOpened(id);this.sourceMeta=null;this.detailApp=null;this.set({screen:this.router.navigate('runtime'),project,compatibility:null,validation:[]});}catch(e){await this.refreshLibrary();this.set({...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo abrir la app.'});}}
@@ -8936,14 +9724,15 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
         cover=item=>{this.coverInput.dataset.projectId=item.id;this.coverInput.value='';this.coverInput.click();};
         async coverSelected(){const id=this.coverInput.dataset.projectId,file=this.coverInput.files?.[0];if(!id||!file)return;try{await this.storage.setCover(id,file);await this.refreshLibrary();this.render();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo cambiar la carátula.';this.render();}}
         banner=item=>{this.bannerInput.dataset.projectId=item.id;this.bannerInput.value='';this.bannerInput.click();};
-        async bannerSelected(){const id=this.bannerInput.dataset.projectId,file=this.bannerInput.files?.[0];if(!id||!file)return;try{await this.storage.setBanner(id,file);await this.refreshLibrary();this.render();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo cambiar la portada.';this.render();}}
+        async bannerSelected(){const id=this.bannerInput.dataset.projectId,file=this.bannerInput.files?.[0];if(!id||!file)return;try{await this.storage.setBanner(id,file);await this.refreshLibrary();if(this.detailApp?.id===id)this.detailApp=await this.storage.get(id)||this.detailApp;this.state.importError=null;this.render();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo cambiar la portada.';this.render();}}
         resetCover=async item=>{try{await this.storage.resetCover(item.id);await this.refreshLibrary();this.state.importError=null;this.render();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo restablecer la carátula.';this.render();}};
         resetBanner=async item=>{try{await this.storage.resetBanner(item.id);await this.refreshLibrary();this.state.importError=null;this.render();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo restablecer la portada.';this.render();}};
         remove=async item=>{try{const ok=await this.confirmRemove(item.displayName);if(!ok)return;await this.storage.remove(item.id);if(this.detailApp?.id===item.id)this.detailApp=null;await this.refreshLibrary();this.state.importError=null;this.set({screen:this.router.navigate('launcher')});}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo eliminar de la biblioteca.';this.render();}};
+        versionHistory=async item=>{try{this.dismissSheet();const versions=await this.storage.listVersions(item.id);const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Historial de versiones';const body=document.createElement('div');body.className='sheet-body';const list=document.createElement('div');list.className='version-history-list';const date=v=>{try{return new Intl.DateTimeFormat('es',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v))}catch{return''}};for(const version of versions){const row=document.createElement('div');row.className='version-history-item';const main=document.createElement('div');main.className='version-history-main';const name=document.createElement('div');name.className='version-history-version';name.textContent=version.version||'Versión no declarada';const meta=document.createElement('div');meta.className='version-history-meta';meta.textContent=(version.current?'Instalada ahora':'Guardada')+' · '+date(version.installedAt)+' · '+((version.size||0)/1024/1024).toFixed(2)+' MB';main.append(name,meta);const action=document.createElement('button');action.type='button';action.className='version-history-action';action.textContent=version.current?'Actual':'Volver';action.disabled=!!version.current;if(!version.current)action.addEventListener('click',async()=>{action.disabled=true;action.textContent='Restaurando…';try{await this.storage.rollback(item.id,version.revisionId);await this.refreshLibrary();this.dismissSheet();this.state.importError=null;this.detailApp=await this.storage.get(item.id);this.render();}catch(e){action.disabled=false;action.textContent='Volver';const err=document.createElement('div');err.className='sheet-error';err.textContent=e instanceof Error?e.message:'No se pudo restaurar la versión.';body.append(err)}});row.append(main,action);list.append(row)}body.append(list);const note=document.createElement('p');note.className='version-history-note';note.textContent='Raven guarda copias de las últimas actualizaciones localmente. Volver a una versión no borra los datos guardados de la app o juego.';body.append(note);const actions=document.createElement('div');actions.className='sheet-actions';const close=document.createElement('button');close.type='button';close.className='sheet-button secondary';close.textContent='Cerrar';close.addEventListener('click',()=>this.dismissSheet());actions.append(close);body.append(actions);sheet.append(head,body);backdrop.append(sheet);backdrop.addEventListener('click',e=>{if(e.target===backdrop)this.dismissSheet()});this.sheet=backdrop;document.body.append(backdrop);}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo abrir el historial.';this.render();}};
         disposeProject(){if(this.state.project){new VirtualFileSystem_js_2.VirtualFileSystem(this.state.project).dispose();this.state.project=null;}}
         revokeLauncherUrls(){for(const u of this.launcherUrls)URL.revokeObjectURL(u);this.launcherUrls=[];}
         set(patch){this.state={...this.state,...patch};this.render();}
-        render(){this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close());this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
+        render(){document.querySelectorAll('.library-menu,.detail-menu').forEach(node=>node.remove());this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close(),this.storage);this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
     }
     exports.App=App;
 });
@@ -8965,9 +9754,11 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ProjectStorage = void 0;
     const DB_NAME = 'local-runtime-library';
-    const DB_VERSION = 1;
+    const DB_VERSION = 3;
     const APP_STORE = 'apps';
     const FILE_STORE = 'files';
+    const REVISION_STORE = 'revisions';
+    const RUNTIME_STORE = 'runtimeState';
     const req = request => new Promise((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error || new Error('IndexedDB error')); });
     const txDone = tx => new Promise((resolve, reject) => { tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error || new Error('IndexedDB transaction error')); tx.onabort = () => reject(tx.error || new Error('IndexedDB transaction aborted')); });
     const cleanName = value => String(value || '').trim().replace(/\s+/g, ' ');
@@ -8996,6 +9787,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
         return manifestFiles[0] ? await readJson(manifestFiles[0]) : null;
     }
     async function identityFor(project, sourceName) {
+        if (project.runtimeId === 'gameboy' && project.metadata?.id) return `rom:${normalizeStableId(project.metadata.id)}`;
         const explicitId = normalizeStableId(project.metadata?.id || project.metadata?.appId || project.metadata?.applicationId);
         if (explicitId) return `id:${explicitId}`;
         const pkg = await packageMeta(project);
@@ -9009,6 +9801,25 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
         const fallbackName = normalizeStableId(project.metadata?.name || project.metadata?.shortName || project.name || sourceName || 'app');
         const entryHint = normalizeStableId(PathResolver_js_6.PathResolver.basename(project.entryPoint || '/index.html').replace(/\.[^.]+$/, '')) || 'index';
         return `fallback:${project.source}:${fallbackName || 'app'}:${entryHint}`;
+    }
+    const genericNames = new Set(['app','game','project','index','html-local','proyecto-local','application']);
+    const normalizedAppName = value => normalizeStableId(String(value || '').replace(/(?:^|[-_ ])v?\d+(?:\.\d+){1,4}(?:[-_ ].*)?$/i,'').replace(/[-_](?:build|release|final|update|updated|dist|bundle).*$/i,''));
+    const bigrams = value => { const s=normalizedAppName(value); const out=[]; for(let i=0;i<s.length-1;i++)out.push(s.slice(i,i+2)); return out; };
+    function dice(a,b){a=normalizedAppName(a);b=normalizedAppName(b);if(!a||!b)return 0;if(a===b)return 1;const A=bigrams(a),B=bigrams(b);if(!A.length||!B.length)return 0;const pool=[...B];let hit=0;for(const x of A){const i=pool.indexOf(x);if(i>=0){hit++;pool.splice(i,1)}}return(2*hit)/(A.length+B.length)}
+    function appNamesFromProject(project, sourceName){return [project.metadata?.name,project.metadata?.shortName,project.name,sourceName].filter(Boolean)}
+    function appNamesFromRecord(app){return [app.metadata?.name,app.metadata?.shortName,app.displayName,app.sourceName].filter(Boolean)}
+    function similarityFor(project, app, sourceName){
+        const pn=appNamesFromProject(project,sourceName),an=appNamesFromRecord(app);let nameScore=0;for(const a of pn)for(const b of an)nameScore=Math.max(nameScore,dice(a,b));
+        const pMain=normalizedAppName(project.metadata?.name||project.name),aMain=normalizedAppName(app.metadata?.name||app.displayName);if(pMain&&pMain===aMain&&!genericNames.has(pMain))nameScore=1;
+        const pe=normalizeStableId(PathResolver_js_6.PathResolver.basename(project.entryPoint||'/index.html').replace(/\.[^.]+$/,''))||'index';
+        const ae=normalizeStableId(PathResolver_js_6.PathResolver.basename(app.entryPoint||'/index.html').replace(/\.[^.]+$/,''))||'index';
+        let score=nameScore*.82+(pe===ae?.10:0)+(app.source===project.source?.08:0);if(genericNames.has(pMain)||genericNames.has(aMain))score-=.18;return Math.max(0,Math.min(1,score));
+    }
+    function recordSimilarity(a,b){
+        const an=appNamesFromRecord(a),bn=appNamesFromRecord(b);let ns=0;for(const x of an)for(const y of bn)ns=Math.max(ns,dice(x,y));
+        const am=normalizedAppName(a.metadata?.name||a.displayName),bm=normalizedAppName(b.metadata?.name||b.displayName);if(am&&am===bm&&!genericNames.has(am))ns=1;
+        const ae=normalizeStableId(PathResolver_js_6.PathResolver.basename(a.entryPoint||'/index.html').replace(/\.[^.]+$/,''))||'index';const be=normalizeStableId(PathResolver_js_6.PathResolver.basename(b.entryPoint||'/index.html').replace(/\.[^.]+$/,''))||'index';
+        return ns*.84+(ae===be?.10:0)+(a.source===b.source?.06:0);
     }
     function imageDataUrlToBlob(value) {
         try {
@@ -9032,9 +9843,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
                 const html = await entry.blob.text();
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 const refs = [
-                    ...[...doc.querySelectorAll('link[rel~="apple-touch-icon"],link[rel~="icon"]')].map(n => n.getAttribute('href')),
-                    doc.querySelector('meta[property="og:image"]')?.getAttribute('content'),
-                    doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content')
+                    ...[...doc.querySelectorAll('link[rel~="apple-touch-icon"],link[rel~="icon"]')].map(n => n.getAttribute('href'))
                 ].filter(Boolean);
                 try {
                     const manifestHref = doc.querySelector('link[rel~="manifest"]')?.getAttribute('href');
@@ -9077,16 +9886,16 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             const f = project.files.get(path);
             if (f && /^image\//i.test(f.mimeType || '')) return f.blob;
         }
-        const images = [...project.files.values()].filter(f => /^image\//i.test(f.mimeType || '') && f.size <= 8 * 1024 * 1024);
         const rank = f => {
             const n = f.name.toLowerCase();
             if (/apple-touch-icon/.test(n)) return 0;
             if (/favicon/.test(n)) return 1;
-            if (/(^|[-_])(cover|preview|thumbnail)([-_.]|$)/.test(n)) return 2;
-            if (/(^|[-_])icon([-_.]|$)/.test(n)) return 3;
-            if (/logo/.test(n)) return 4;
-            return 20;
+            if (/(^|[-_])icon([-_.]|$)/.test(n)) return 2;
+            if (/(^|[-_])app[-_]?icon([-_.]|$)/.test(n)) return 2;
+            if (/(^|[-_])logo([-_.]|$)/.test(n)) return 3;
+            return 99;
         };
+        const images = [...project.files.values()].filter(f => /^image\//i.test(f.mimeType || '') && f.size <= 8 * 1024 * 1024 && rank(f) < 99);
         images.sort((a,b) => rank(a)-rank(b) || b.size-a.size);
         return images[0]?.blob || null;
     }
@@ -9131,12 +9940,15 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
         images.sort((a,b) => bannerScore(a)-bannerScore(b) || b.size-a.size);
         return images[0]?.blob || null;
     }
+    const __lwrSafeObject=value=>value&&typeof value==='object'&&!Array.isArray(value)?{...value}:{};
     class ProjectStorage {
         dbPromise = null;
         dbDisabled = false;
         warned = false;
         memoryApps = new Map();
         memoryFiles = new Map();
+        memoryRevisions = new Map();
+        memoryRuntime = new Map();
         warnFallback(reason) {
             if (this.warned) return;
             this.warned = true;
@@ -9166,6 +9978,14 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
                         if (!db.objectStoreNames.contains(FILE_STORE)) {
                             const files = db.createObjectStore(FILE_STORE, { keyPath: 'key' });
                             files.createIndex('projectId', 'projectId', { unique: false });
+                        }
+                        if (!db.objectStoreNames.contains(REVISION_STORE)) {
+                            const revisions = db.createObjectStore(REVISION_STORE, { keyPath: 'key' });
+                            revisions.createIndex('projectId', 'projectId', { unique: false });
+                        }
+                        if (!db.objectStoreNames.contains(RUNTIME_STORE)) {
+                            const runtime = db.createObjectStore(RUNTIME_STORE, { keyPath: 'key' });
+                            runtime.createIndex('projectId', 'projectId', { unique: false });
                         }
                     } catch (error) { this.warnFallback(error); }
                 };
@@ -9199,21 +10019,46 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
         }
         async findMatch(project, sourceName) {
             const all = await this.list();
+            if (!all.length) return null;
             const identityKey = await identityFor(project, sourceName);
             const strong = all.filter(a => a.identityKey === identityKey);
-            if (strong.length === 1) return strong[0];
+            if (strong.length) return strong.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
+            const explicitId = normalizeStableId(project.metadata?.id || project.metadata?.appId || project.metadata?.applicationId);
+            if (explicitId) {
+                const byId = all.filter(a => normalizeStableId(a.metadata?.id || a.metadata?.appId || a.metadata?.applicationId) === explicitId);
+                if (byId.length) return byId.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
+            }
             const exact = all.find(a => a.source === project.source && a.sourceKey === sourceKey(sourceName));
             if (exact) return exact;
-            const importedName = normalizeStableId(project.metadata?.name || project.metadata?.shortName || project.name || sourceName);
-            const importedEntry = normalizeStableId(PathResolver_js_6.PathResolver.basename(project.entryPoint || '/index.html').replace(/\.[^.]+$/, '')) || 'index';
-            const legacy = all.filter(a => {
-                if (a.source !== project.source) return false;
-                const savedName = normalizeStableId(a.metadata?.name || a.metadata?.shortName || a.displayName || a.sourceName);
-                const savedEntry = normalizeStableId(PathResolver_js_6.PathResolver.basename(a.entryPoint || '/index.html').replace(/\.[^.]+$/, '')) || 'index';
-                return !!importedName && savedName === importedName && savedEntry === importedEntry;
-            });
-            return legacy.length === 1 ? legacy[0] : null;
+            const ranked = all.map(app => ({ app, score: similarityFor(project, app, sourceName) })).sort((a,b)=>b.score-a.score);
+            if (ranked[0]?.score >= .87 && (!ranked[1] || ranked[0].score - ranked[1].score >= .06 || ranked[0].score >= .97)) return ranked[0].app;
+            return null;
         }
+        async consolidateDuplicates() {
+            const all = await this.list();
+            const removed = new Set();
+            for (let i=0;i<all.length;i++) {
+                const a=all[i]; if(removed.has(a.id)) continue;
+                for(let j=i+1;j<all.length;j++) {
+                    const b=all[j]; if(removed.has(b.id)) continue;
+                    const sameIdentity=!!a.identityKey&&a.identityKey===b.identityKey;
+                    const explicitA=normalizeStableId(a.metadata?.id||a.metadata?.appId||a.metadata?.applicationId), explicitB=normalizeStableId(b.metadata?.id||b.metadata?.appId||b.metadata?.applicationId);
+                    const sameExplicit=!!explicitA&&explicitA===explicitB;
+                    const verySimilar=recordSimilarity(a,b)>=.97;
+                    if(!sameIdentity&&!sameExplicit&&!verySimilar)continue;
+                    const keep=(a.updatedAt||0)>=(b.updatedAt||0)?a:b, drop=keep===a?b:a;
+                    keep.createdAt=Math.min(keep.createdAt||Date.now(),drop.createdAt||Date.now());
+                    keep.openCount=Math.max(keep.openCount||0,drop.openCount||0);
+                    if(!keep.coverCustom&&drop.coverCustom){keep.coverBlob=drop.coverBlob;keep.coverCustom=true}
+                    if(!keep.bannerCustom&&drop.bannerCustom){keep.bannerBlob=drop.bannerBlob;keep.bannerCustom=true}
+                    if(drop.sourceHash&&drop.sourceHash!==keep.sourceHash)await this.captureRevision(drop,'deduplicated',keep.id);
+                    await this.putApp(keep); await this.moveRuntimeState(drop.id,keep.id); await this.remove(drop.id); removed.add(drop.id);
+                    if(drop===a)break;
+                }
+            }
+            return removed.size;
+        }
+        async putApp(app){const db=await this.open();if(!db){this.memoryApps.set(app.id,app);return;}const tx=db.transaction(APP_STORE,'readwrite');const done=txDone(tx);tx.objectStore(APP_STORE).put(app);await done;}
         async loadProject(id) {
             const db = await this.open();
             if (!db) {
@@ -9224,7 +10069,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
                 for (const f of rows) files.set(f.path, { path: f.path, name: f.name, mimeType: f.mimeType, size: f.size, blob: f.blob });
                 return { id: crypto.randomUUID(), libraryId: app.id, name: app.displayName, sourceName: app.sourceName,
                     entryPoint: app.entryPoint, entryCandidates: app.entryCandidates || [app.entryPoint], files,
-                    createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null };
+                    createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null, runtimeId: app.runtimeId || (app.source==='gb'||app.source==='gbc'?'gameboy':'web'), platform: app.platform || null, consoleProfile: app.consoleProfile || null };
             }
             const tx = db.transaction([APP_STORE, FILE_STORE], 'readonly'); const done = txDone(tx);
             const app = await req(tx.objectStore(APP_STORE).get(id));
@@ -9235,7 +10080,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             for (const f of rows) files.set(f.path, { path: f.path, name: f.name, mimeType: f.mimeType, size: f.size, blob: f.blob });
             return { id: crypto.randomUUID(), libraryId: app.id, name: app.displayName, sourceName: app.sourceName,
                 entryPoint: app.entryPoint, entryCandidates: app.entryCandidates || [app.entryPoint], files,
-                createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null };
+                createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null, runtimeId: app.runtimeId || (app.source==='gb'||app.source==='gbc'?'gameboy':'web'), platform: app.platform || null, consoleProfile: app.consoleProfile || null };
         }
         async save(project, info = {}) {
             const db = await this.open();
@@ -9246,15 +10091,16 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             const sourceName = info.sourceName || project.sourceName || project.name;
             const identityKey = existing?.identityKey || await identityFor(project, sourceName);
             const changed = !existing || !info.sourceHash || existing.sourceHash !== info.sourceHash;
+            if (existing && changed) await this.captureRevision(existing, 'update');
             const id = existing?.id || crypto.randomUUID();
             let coverBlob = existing?.coverBlob || null;
             let coverCustom = !!existing?.coverCustom;
             if (!coverCustom && (changed || !coverBlob)) coverBlob = await autoCover(project);
             let bannerCustom = !!existing?.bannerCustom;
             let bannerBlob = bannerCustom ? (existing?.bannerBlob || null) : null;
-            const version = cleanVersion(project.metadata?.version) || cleanVersion(existing?.version) || null;
+            const version = cleanVersion(project.metadata?.version) || (!changed ? cleanVersion(existing?.version) : null);
             const history = Array.isArray(existing?.updateHistory) ? [...existing.updateHistory] : [];
-            if (existing && changed) history.push({ version, hash: info.sourceHash || null, updatedAt: now, sourceName, size: project.size });
+            if (existing && changed) history.push({ fromVersion: existing.version || null, version, hash: info.sourceHash || null, updatedAt: now, sourceName, size: project.size });
             if (history.length > 30) history.splice(0, history.length - 30);
             const app = {
                 id, displayName: existing?.displayName || cleanName(project.name) || cleanName(project.metadata?.name) || 'App local', sourceName,
@@ -9262,7 +10108,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
                 identityKey, entryPoint: project.entryPoint, entryCandidates: [...project.entryCandidates], size: project.size,
                 createdAt: existing?.createdAt || now, updatedAt: changed ? now : (existing?.updatedAt || now),
                 lastOpenedAt: existing?.lastOpenedAt || 0, openCount: existing?.openCount || 0,
-                version, updateHistory: history, coverBlob, coverCustom, bannerBlob, bannerCustom, metadata: project.metadata || existing?.metadata || null,
+                version, updateHistory: history, coverBlob, coverCustom, bannerBlob, bannerCustom, metadata: project.metadata || existing?.metadata || null, runtimeId: project.runtimeId || existing?.runtimeId || 'web', platform: project.platform || existing?.platform || null, consoleProfile: project.consoleProfile || existing?.consoleProfile || null,
                 compatibilityStatus: info.compatibilityStatus || existing?.compatibilityStatus || null
             };
             if (!db) {
@@ -9279,6 +10125,29 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             }
             apps.put(app); await done; return app;
         }
+        async readStoredFiles(id) {
+            const db=await this.open();
+            if(!db)return (this.memoryFiles.get(id)||[]).map(x=>({...x}));
+            const tx=db.transaction(FILE_STORE,'readonly'),done=txDone(tx);const rows=await req(tx.objectStore(FILE_STORE).index('projectId').getAll(IDBKeyRange.only(id)));await done;return rows;
+        }
+        async captureRevision(app, reason='update', targetId=app?.id) {
+            if(!app||!targetId)return null;const files=await this.readStoredFiles(app.id);if(!files.length)return null;
+            const revisionId=crypto.randomUUID(),record={key:targetId+'|'+revisionId,projectId:targetId,revisionId,reason,createdAt:Date.now(),installedAt:app.updatedAt||app.createdAt||Date.now(),version:app.version||null,sourceHash:app.sourceHash||null,sourceName:app.sourceName,sourceKey:app.sourceKey,source:app.source,entryPoint:app.entryPoint,entryCandidates:app.entryCandidates||[app.entryPoint],size:app.size||0,metadata:app.metadata||null,runtimeId:app.runtimeId||null,platform:app.platform||null,consoleProfile:app.consoleProfile||null,compatibilityStatus:app.compatibilityStatus||null,files:files.map(f=>({path:f.path,name:f.name,mimeType:f.mimeType,size:f.size,blob:f.blob}))};
+            const limit=(app.size||0)>200*1024*1024?2:(app.size||0)>80*1024*1024?4:8;
+            const db=await this.open();if(!db){const list=this.memoryRevisions.get(targetId)||[];list.push(record);if(list.length>limit)list.splice(0,list.length-limit);this.memoryRevisions.set(targetId,list);return record;}
+            const tx=db.transaction(REVISION_STORE,'readwrite'),done=txDone(tx),store=tx.objectStore(REVISION_STORE);store.put(record);const all=await req(store.index('projectId').getAll(IDBKeyRange.only(targetId)));if(all.length>limit){all.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));for(const old of all.slice(0,all.length-limit))store.delete(old.key)}await done;return record;
+        }
+        async listVersions(id){const app=await this.get(id);if(!app)return[];let revisions=[];const db=await this.open();if(!db)revisions=[...(this.memoryRevisions.get(id)||[])];else{const tx=db.transaction(REVISION_STORE,'readonly'),done=txDone(tx);revisions=await req(tx.objectStore(REVISION_STORE).index('projectId').getAll(IDBKeyRange.only(id)));await done;}revisions.sort((a,b)=>(b.installedAt||b.createdAt||0)-(a.installedAt||a.createdAt||0));return[{current:true,revisionId:null,version:app.version||null,installedAt:app.updatedAt||app.createdAt,size:app.size,sourceHash:app.sourceHash,sourceName:app.sourceName},...revisions.map(r=>({current:false,revisionId:r.revisionId,version:r.version||null,installedAt:r.installedAt||r.createdAt,size:r.size,sourceHash:r.sourceHash,sourceName:r.sourceName,reason:r.reason}))];}
+        async rollback(id,revisionId){const app=await this.get(id);if(!app)throw new Error('La app ya no existe.');let revision=null;const db=await this.open();if(!db)revision=(this.memoryRevisions.get(id)||[]).find(r=>r.revisionId===revisionId)||null;else{const tx=db.transaction(REVISION_STORE,'readonly'),done=txDone(tx);revision=await req(tx.objectStore(REVISION_STORE).get(id+'|'+revisionId));await done;}if(!revision)throw new Error('La versión seleccionada ya no está disponible.');await this.captureRevision(app,'rollback-backup');const updated={...app,sourceHash:revision.sourceHash||null,sourceName:revision.sourceName||app.sourceName,sourceKey:revision.sourceKey||sourceKey(revision.sourceName||app.sourceName),source:revision.source||app.source,entryPoint:revision.entryPoint,entryCandidates:revision.entryCandidates||[revision.entryPoint],size:revision.size||0,version:revision.version||null,metadata:revision.metadata||null,runtimeId:revision.runtimeId||app.runtimeId||null,platform:revision.platform||app.platform||null,consoleProfile:revision.consoleProfile||app.consoleProfile||null,compatibilityStatus:revision.compatibilityStatus||app.compatibilityStatus,updatedAt:Date.now()};
+            if(!db){this.memoryApps.set(id,updated);this.memoryFiles.set(id,revision.files.map(f=>({key:id+'|'+f.path,projectId:id,...f})));const list=(this.memoryRevisions.get(id)||[]).filter(r=>r.revisionId!==revisionId);this.memoryRevisions.set(id,list);return updated;}
+            const tx=db.transaction([APP_STORE,FILE_STORE,REVISION_STORE],'readwrite'),done=txDone(tx),files=tx.objectStore(FILE_STORE);const keys=await req(files.index('projectId').getAllKeys(IDBKeyRange.only(id)));for(const key of keys)files.delete(key);for(const f of revision.files)files.put({key:id+'|'+f.path,projectId:id,...f});tx.objectStore(APP_STORE).put(updated);tx.objectStore(REVISION_STORE).delete(id+'|'+revisionId);await done;return updated;
+        }
+        async getRuntimeLocalStorage(projectId){if(!projectId)return{};const key=projectId+'|localStorage',db=await this.open();if(!db)return __lwrSafeObject(this.memoryRuntime.get(key)?.data);const tx=db.transaction(RUNTIME_STORE,'readonly'),done=txDone(tx),row=await req(tx.objectStore(RUNTIME_STORE).get(key));await done;return __lwrSafeObject(row?.data);}
+        async setRuntimeLocalStorage(projectId,data){if(!projectId)return;const key=projectId+'|localStorage',row={key,projectId,kind:'localStorage',updatedAt:Date.now(),data:__lwrSafeObject(data)},db=await this.open();if(!db){this.memoryRuntime.set(key,row);return;}const tx=db.transaction(RUNTIME_STORE,'readwrite'),done=txDone(tx);tx.objectStore(RUNTIME_STORE).put(row);await done;}
+        async getRuntimeDatabase(projectId,name){if(!projectId)return null;const key=projectId+'|idb|'+String(name),db=await this.open();if(!db)return this.memoryRuntime.get(key)?.data||null;const tx=db.transaction(RUNTIME_STORE,'readonly'),done=txDone(tx),row=await req(tx.objectStore(RUNTIME_STORE).get(key));await done;return row?.data||null;}
+        async setRuntimeDatabase(projectId,name,data){if(!projectId)return;const key=projectId+'|idb|'+String(name),row={key,projectId,kind:'indexedDB',name:String(name),updatedAt:Date.now(),data},db=await this.open();if(!db){this.memoryRuntime.set(key,row);return;}const tx=db.transaction(RUNTIME_STORE,'readwrite'),done=txDone(tx);tx.objectStore(RUNTIME_STORE).put(row);await done;}
+        async deleteRuntimeDatabase(projectId,name){if(!projectId)return;const key=projectId+'|idb|'+String(name),db=await this.open();if(!db){this.memoryRuntime.delete(key);return;}const tx=db.transaction(RUNTIME_STORE,'readwrite'),done=txDone(tx);tx.objectStore(RUNTIME_STORE).delete(key);await done;}
+        async moveRuntimeState(fromId,toId){if(!fromId||!toId||fromId===toId)return;const db=await this.open();if(!db){for(const [key,row] of [...this.memoryRuntime]){if(row.projectId!==fromId)continue;const suffix=key.slice(fromId.length),newKey=toId+suffix;if(!this.memoryRuntime.has(newKey))this.memoryRuntime.set(newKey,{...row,key:newKey,projectId:toId});this.memoryRuntime.delete(key)}return;}let fromRows=[],toRows=[];{const tx=db.transaction(RUNTIME_STORE,'readonly'),done=txDone(tx),store=tx.objectStore(RUNTIME_STORE);[fromRows,toRows]=await Promise.all([req(store.index('projectId').getAll(IDBKeyRange.only(fromId))),req(store.index('projectId').getAll(IDBKeyRange.only(toId)))]);await done;}const existingKeys=new Set(toRows.map(r=>r.key));const tx=db.transaction(RUNTIME_STORE,'readwrite'),done=txDone(tx),store=tx.objectStore(RUNTIME_STORE);for(const row of fromRows){const suffix=row.key.slice(fromId.length),newKey=toId+suffix;if(!existingKeys.has(newKey))store.put({...row,key:newKey,projectId:toId});store.delete(row.key)}await done;}
         async detectCover(project) { return await autoCover(project); }
         async touchOpened(id) {
             const app = await this.get(id); if (!app) return;
@@ -9310,7 +10179,11 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
         }
         async setBanner(id, blob) {
             if (!blob || !/^image\//i.test(blob.type || '')) throw new Error('Selecciona una imagen válida.');
-            const app = await this.get(id); if (!app) return; app.bannerBlob = blob; app.bannerCustom = true;
+            const app = await this.get(id); if (!app) return;
+            const preservedCoverBlob = app.coverBlob || null;
+            const preservedCoverCustom = !!app.coverCustom;
+            app.bannerBlob = blob; app.bannerCustom = true;
+            app.coverBlob = preservedCoverBlob; app.coverCustom = preservedCoverCustom;
             const db = await this.open();
             if (!db) { this.memoryApps.set(id, app); return; }
             const tx = db.transaction(APP_STORE, 'readwrite'); const done = txDone(tx); tx.objectStore(APP_STORE).put(app); await done;
@@ -9323,11 +10196,13 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
         }
         async remove(id) {
             const db = await this.open();
-            if (!db) { this.memoryApps.delete(id); this.memoryFiles.delete(id); return; }
-            const tx = db.transaction([APP_STORE, FILE_STORE], 'readwrite'); const done = txDone(tx);
+            if (!db) { this.memoryApps.delete(id); this.memoryFiles.delete(id); this.memoryRevisions.delete(id); for(const [key,row] of [...this.memoryRuntime])if(row.projectId===id)this.memoryRuntime.delete(key); return; }
+            const tx = db.transaction([APP_STORE, FILE_STORE, REVISION_STORE, RUNTIME_STORE], 'readwrite'); const done = txDone(tx);
             tx.objectStore(APP_STORE).delete(id);
-            const files = tx.objectStore(FILE_STORE); const keys = await req(files.index('projectId').getAllKeys(IDBKeyRange.only(id)));
-            for (const key of keys) files.delete(key); await done;
+            const files = tx.objectStore(FILE_STORE); const keys = await req(files.index('projectId').getAllKeys(IDBKeyRange.only(id))); for (const key of keys) files.delete(key);
+            const revisions=tx.objectStore(REVISION_STORE);const revisionKeys=await req(revisions.index('projectId').getAllKeys(IDBKeyRange.only(id)));for(const key of revisionKeys)revisions.delete(key);
+            const runtime=tx.objectStore(RUNTIME_STORE);const runtimeKeys=await req(runtime.index('projectId').getAllKeys(IDBKeyRange.only(id)));for(const key of runtimeKeys)runtime.delete(key);
+            await done;
         }
     }
     exports.ProjectStorage = ProjectStorage;
