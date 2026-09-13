@@ -8,7 +8,7 @@
   <title>Raven</title>
   <meta name="application-name" content="Raven">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.14.5">
+  <meta name="app-version" content="0.14.6">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -662,6 +662,23 @@ main,section,article,header,div{max-width:100%}
 .home-shortcut-note{margin:12px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
 </style>
 
+
+<style id="raven-home-shortcut-v146">
+.runtime-screen.runtime-direct{grid-template-rows:1fr!important}
+.runtime-screen.runtime-direct .runtime-host{grid-row:1;min-height:0}
+body.raven-direct-shortcut .runtime-toolbar,body.raven-direct-shortcut .runtime-menu,body.raven-direct-shortcut .fullscreen-exit{display:none!important}
+.shortcut-setup-screen{position:fixed;inset:0;width:100%;height:100dvh;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));background:radial-gradient(circle at 50% 26%,rgba(88,74,220,.12),transparent 38%),#07070a;overflow:hidden;overscroll-behavior:none}
+.shortcut-setup-card{width:min(420px,100%);display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.shortcut-setup-icon{width:96px;height:96px;border-radius:24px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#242427,#111113);color:#fff;font-size:28px;font-weight:720;box-shadow:0 18px 44px rgba(0,0,0,.28)}
+.shortcut-setup-icon img{width:100%;height:100%;display:block;object-fit:cover}
+.shortcut-setup-card h1{width:100%;margin:20px 0 0;color:#fff;font-size:24px;line-height:1.15;font-weight:680;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.shortcut-setup-copy{margin:12px 0 0;max-width:360px;color:rgba(235,235,242,.68);font-size:13px;line-height:1.55}
+.shortcut-setup-status{width:100%;margin-top:16px;padding:11px 13px;border-radius:14px;background:rgba(255,104,104,.1);color:#ffb0b0;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.shortcut-setup-button{margin-top:22px;min-width:170px;height:46px;padding:0 22px;border:0;border-radius:999px;background:#f5f5f7;color:#111114;font-size:14px;font-weight:650}
+.shortcut-setup-button:active{transform:scale(.98)}
+.shortcut-setup-note{margin:12px 0 0;color:rgba(235,235,242,.46);font-size:11px;line-height:1.45}
+.shortcut-setup-ready{margin-top:22px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08);color:#f1f1f4;font-size:12px}
+</style>
 </head>
 <body>
   <script>(()=>{
@@ -9731,15 +9748,15 @@ define("ui/runtime/RuntimeView", ["require", "exports", "diagnostics/ErrorCollec
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RuntimeView = void 0;
     class RuntimeView {
-        project; onClose; storage; element; host; loading; errors = new ErrorCollector_js_1.ErrorCollector(); manager; input; menu = null; dialog = null; entries = []; unsubscribe; readyTimer = null;
-        constructor(project, onClose, storage = null) {
-            this.project = project; this.onClose = onClose; this.storage = storage;
-            const root = (0, dom_js_5.el)('main', 'runtime-screen'), bar = (0, dom_js_5.el)('header', 'runtime-toolbar'), menuBtn = (0, dom_js_5.button)('⋯', 'icon-button', () => this.toggleMenu(menuBtn), 'Menú');
+        project; onClose; storage; options; directLaunch=false; element; host; loading; errors = new ErrorCollector_js_1.ErrorCollector(); manager; input; menu = null; dialog = null; entries = []; unsubscribe; readyTimer = null;
+        constructor(project, onClose, storage = null, options = {}) {
+            this.project = project; this.onClose = onClose; this.storage = storage; this.options=options||{}; this.directLaunch=!!this.options.directLaunch;
+            const root = (0, dom_js_5.el)('main', this.directLaunch?'runtime-screen runtime-direct':'runtime-screen'), bar = (0, dom_js_5.el)('header', 'runtime-toolbar'), menuBtn = (0, dom_js_5.button)('⋯', 'icon-button', () => this.toggleMenu(menuBtn), 'Menú');
             bar.append((0, dom_js_5.button)('←', 'icon-button', onClose, 'Cerrar'), (0, dom_js_5.el)('div', 'runtime-title', project.name), menuBtn);
             this.host = (0, dom_js_5.el)('section', 'runtime-host');
             this.loading = (0, dom_js_5.el)('div', 'runtime-transition');
             this.loading.append((0, dom_js_5.el)('div', 'runtime-transition-spinner'), (0, dom_js_5.el)('div', 'runtime-transition-label', 'Abriendo…'));
-            root.append(bar, this.host, this.loading); this.element = root;
+            if(this.directLaunch)root.append(this.host,this.loading);else root.append(bar,this.host,this.loading); this.element = root;
             this.input = new InputCompatibility_js_1.InputCompatibility(() => this.manager?.getFrame() || null);
             const appId = project.libraryId || null;
             this.manager = new RuntimeManager_js_1.RuntimeManager(project, this.errors, { onClose, onRestart: () => void this.restart(), onReady: () => this.markReady(), onRequestFullscreen: () => void this.fullscreen(), onRequestOrientation: o => void this.orientation(o), onAudioBlocked: () => this.audioHint(), onFrameCreated: frame => this.input.attachFrame(frame), loadRuntimeLocalStorage: () => appId && this.storage ? this.storage.getRuntimeLocalStorage(appId) : {}, onLocalStorageSave: data => appId && this.storage ? this.storage.setRuntimeLocalStorage(appId, data) : undefined, onIdbLoad: (name, version) => appId && this.storage ? this.storage.getRuntimeDatabase(appId, name, version) : null, onIdbSave: (name, data) => appId && this.storage ? this.storage.setRuntimeDatabase(appId, name, data) : undefined, onIdbDelete: name => appId && this.storage ? this.storage.deleteRuntimeDatabase(appId, name) : undefined });
@@ -9783,7 +9800,7 @@ define("ui/runtime/RuntimeView", ["require", "exports", "diagnostics/ErrorCollec
             }
             this.element.classList.add('runtime-fallback-fullscreen');
             this.input.focusFrame();
-            if (!this.host.querySelector('.fullscreen-exit')) {
+            if (!this.directLaunch && !this.host.querySelector('.fullscreen-exit')) {
                 const b = (0, dom_js_5.button)('Salir', 'fullscreen-exit', () => {
                     this.element.classList.remove('runtime-fallback-fullscreen');
                     b.remove();
@@ -9822,6 +9839,7 @@ define("launcher/HomeShortcutManager", ["require", "exports"], function (require
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HomeShortcutManager = void 0;
     const HOME_PARAM = 'raven_launch';
+    const MODE_PARAM = 'raven_mode';
     let deferredInstallPrompt = null;
     try {
         window.addEventListener('beforeinstallprompt', event => {
@@ -9838,17 +9856,38 @@ define("launcher/HomeShortcutManager", ["require", "exports"], function (require
         originalTouchIcon = null;
         originalFavicon = null;
         createdManifest = null;
-        getLaunchId() {
+        createdHeadNodes = [];
+        getDescriptor() {
             try {
                 const url = new URL(location.href);
-                const value = url.searchParams.get(HOME_PARAM);
-                return value && value.trim() ? value.trim() : null;
+                const appId = String(url.searchParams.get(HOME_PARAM) || '').trim();
+                if (!appId) return null;
+                const hashParams = new URLSearchParams((url.hash || '').replace(/^#/, ''));
+                let iconDataUrl = hashParams.get('raven_icon') || null;
+                if (iconDataUrl && (!/^data:image\//i.test(iconDataUrl) || iconDataUrl.length > 450000)) iconDataUrl = null;
+                const sourceHash = String(url.searchParams.get('raven_hash') || '').trim();
+                return {
+                    appId,
+                    mode: url.searchParams.get(MODE_PARAM) === 'shortcut',
+                    name: String(url.searchParams.get('raven_name') || 'App').trim().slice(0, 100) || 'App',
+                    runtimeId: String(url.searchParams.get('raven_runtime') || '').trim().slice(0, 48) || null,
+                    sourceHash: /^[a-f0-9]{8,128}$/i.test(sourceHash) ? sourceHash : null,
+                    iconDataUrl,
+                    directUrl: url.href
+                };
             } catch { return null; }
         }
-        buildLaunchUrl(appId) {
+        getLaunchId() { return this.getDescriptor()?.appId || null; }
+        buildLaunchUrl(app, iconDataUrl = null) {
             const url = new URL(location.href);
-            url.searchParams.set(HOME_PARAM, String(appId));
+            url.search = '';
             url.hash = '';
+            url.searchParams.set(HOME_PARAM, String(app.id));
+            url.searchParams.set(MODE_PARAM, 'shortcut');
+            url.searchParams.set('raven_name', String(app.displayName || 'App').slice(0, 100));
+            if (app.runtimeId) url.searchParams.set('raven_runtime', String(app.runtimeId).slice(0, 48));
+            if (app.sourceHash) url.searchParams.set('raven_hash', String(app.sourceHash));
+            if (iconDataUrl) url.hash = 'raven_icon=' + encodeURIComponent(iconDataUrl);
             return url.href;
         }
         isInstallableContext() {
@@ -9869,110 +9908,110 @@ define("launcher/HomeShortcutManager", ["require", "exports"], function (require
                 reader.readAsDataURL(blob);
             });
         }
+        async blobToShortcutIcon(blob) {
+            if (!blob) return null;
+            let bitmap = null, img = null, objectUrl = null;
+            try {
+                if (typeof createImageBitmap === 'function') bitmap = await createImageBitmap(blob);
+                else {
+                    objectUrl = URL.createObjectURL(blob);
+                    img = await new Promise((resolve, reject) => {
+                        const el = new Image();
+                        el.onload = () => resolve(el); el.onerror = reject; el.src = objectUrl;
+                    });
+                }
+                const source = bitmap || img;
+                const sw = source.width || source.naturalWidth || 1, sh = source.height || source.naturalHeight || 1;
+                const size = 180, canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size;
+                const ctx = canvas.getContext('2d', { alpha: true }); if (!ctx) throw new Error('Canvas no disponible');
+                const scale = Math.max(size / sw, size / sh), dw = sw * scale, dh = sh * scale;
+                ctx.clearRect(0,0,size,size); ctx.drawImage(source, (size-dw)/2, (size-dh)/2, dw, dh);
+                const png = canvas.toDataURL('image/png');
+                return png && png.startsWith('data:image/png') ? png : await this.blobToDataURL(blob);
+            } catch { return await this.blobToDataURL(blob).catch(() => null); }
+            finally { try { bitmap?.close?.(); } catch {} try { if (objectUrl) URL.revokeObjectURL(objectUrl); } catch {} }
+        }
+        dataURLToBlob(dataUrl) {
+            try {
+                if (!/^data:/i.test(dataUrl || '')) return null;
+                const [head, payload] = String(dataUrl).split(',', 2);
+                const mime = (/^data:([^;,]+)/i.exec(head)?.[1] || 'application/octet-stream');
+                const binary = /;base64/i.test(head) ? atob(payload || '') : decodeURIComponent(payload || '');
+                const bytes = new Uint8Array(binary.length);
+                for (let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i) & 255;
+                return new Blob([bytes], { type: mime });
+            } catch { return null; }
+        }
         findRel(rel) {
             return [...document.querySelectorAll('link[rel]')].find(link => String(link.getAttribute('rel') || '').toLowerCase().split(/\s+/).includes(rel)) || null;
         }
+        ensureMeta(name, content) {
+            let node = document.querySelector(`meta[name="${name}"]`);
+            if (!node) { node = document.createElement('meta'); node.name = name; document.head.append(node); this.createdHeadNodes.push(node); }
+            node.setAttribute('content', content); return node;
+        }
+        applyDescriptor(desc) {
+            if (!desc) return;
+            if (this.originalTitle === null) this.originalTitle = document.title;
+            document.title = String(desc.name || 'App');
+            const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+            if (!this.originalAppleTitle && appleTitle) this.originalAppleTitle = { node: appleTitle, content: appleTitle.getAttribute('content') };
+            this.ensureMeta('apple-mobile-web-app-capable', 'yes');
+            this.ensureMeta('apple-mobile-web-app-status-bar-style', 'black-translucent');
+            const titleMeta = appleTitle || this.ensureMeta('apple-mobile-web-app-title', String(desc.name || 'App'));
+            titleMeta.setAttribute('content', String(desc.name || 'App'));
+            let touch = this.findRel('apple-touch-icon');
+            if (!touch) { touch = document.createElement('link'); touch.rel='apple-touch-icon'; document.head.append(touch); this.createdHeadNodes.push(touch); }
+            if (!this.originalTouchIcon && touch) this.originalTouchIcon = { node: touch, href: touch.getAttribute('href') };
+            if (desc.iconDataUrl) touch.setAttribute('href', desc.iconDataUrl);
+            let favicon = this.findRel('icon');
+            if (!favicon) { favicon=document.createElement('link'); favicon.rel='icon'; document.head.append(favicon); this.createdHeadNodes.push(favicon); }
+            if (!this.originalFavicon && favicon) this.originalFavicon = { node:favicon, href:favicon.getAttribute('href'), type:favicon.getAttribute('type'), sizes:favicon.getAttribute('sizes') };
+            if (desc.iconDataUrl) { favicon.setAttribute('href', desc.iconDataUrl); favicon.setAttribute('type','image/png'); favicon.removeAttribute('sizes'); }
+            try {
+                this.createdManifest?.remove(); if (this.manifestUrl) URL.revokeObjectURL(this.manifestUrl);
+                const manifest = {
+                    id: desc.directUrl ? desc.directUrl.split('#')[0] : location.href.split('#')[0],
+                    name: String(desc.name || 'App'), short_name: String(desc.name || 'App').slice(0,24),
+                    start_url: desc.directUrl || location.href, display: 'standalone', orientation: 'any',
+                    background_color:'#000000', theme_color:'#000000',
+                    icons: desc.iconDataUrl ? [{ src: desc.iconDataUrl, sizes:'180x180', type:'image/png', purpose:'any' }] : []
+                };
+                const blob = new Blob([JSON.stringify(manifest)], { type:'application/manifest+json' });
+                this.manifestUrl = URL.createObjectURL(blob);
+                const link = document.createElement('link'); link.rel='manifest'; link.href=this.manifestUrl; link.dataset.ravenHomeShortcut='1';
+                document.head.append(link); this.createdManifest = link;
+            } catch {}
+        }
         async prepare(app) {
             this.restore();
-            const directUrl = this.buildLaunchUrl(app.id);
-            const iconDataUrl = app.coverBlob ? await this.blobToDataURL(app.coverBlob).catch(() => null) : null;
+            const iconDataUrl = app.coverBlob ? await this.blobToShortcutIcon(app.coverBlob).catch(() => null) : null;
+            const directUrl = this.buildLaunchUrl(app, iconDataUrl);
             this.originalUrl = location.href;
-            this.originalTitle = document.title;
-            const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
-            this.originalAppleTitle = appleTitle ? { node: appleTitle, content: appleTitle.getAttribute('content') } : null;
-            if (appleTitle) appleTitle.setAttribute('content', String(app.displayName || 'Raven'));
-            document.title = String(app.displayName || 'Raven');
-            const touch = this.findRel('apple-touch-icon');
-            if (touch) this.originalTouchIcon = { node: touch, href: touch.getAttribute('href') };
-            if (touch && iconDataUrl) touch.setAttribute('href', iconDataUrl);
-            const favicon = this.findRel('icon');
-            if (favicon) this.originalFavicon = { node: favicon, href: favicon.getAttribute('href'), type: favicon.getAttribute('type'), sizes: favicon.getAttribute('sizes') };
-            if (favicon && iconDataUrl) {
-                favicon.setAttribute('href', iconDataUrl);
-                if (app.coverBlob?.type) favicon.setAttribute('type', app.coverBlob.type);
-                favicon.removeAttribute('sizes');
-            }
-            if (this.isInstallableContext()) {
-                const manifest = {
-                    id: `./?${HOME_PARAM}=${encodeURIComponent(String(app.id))}`,
-                    name: String(app.displayName || 'Raven'),
-                    short_name: String(app.displayName || 'Raven').slice(0, 24),
-                    start_url: directUrl,
-                    display: 'standalone',
-                    orientation: 'any',
-                    background_color: '#07070a',
-                    theme_color: '#07070a',
-                    icons: iconDataUrl ? [{ src: iconDataUrl, sizes: '512x512', type: app.coverBlob?.type || 'image/png', purpose: 'any maskable' }] : []
-                };
-                try {
-                    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-                    this.manifestUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('link');
-                    link.rel = 'manifest';
-                    link.href = this.manifestUrl;
-                    link.dataset.ravenHomeShortcut = '1';
-                    document.head.append(link);
-                    this.createdManifest = link;
-                } catch {}
-            }
+            const desc = { appId: app.id, mode:true, name:String(app.displayName || 'App'), runtimeId:app.runtimeId || null, sourceHash:app.sourceHash || null, iconDataUrl, directUrl };
+            this.applyDescriptor(desc);
             try { history.replaceState({ ...(history.state || {}), ravenHomeShortcut: app.id }, '', directUrl); } catch {}
-            this.prepared = { appId: app.id, directUrl, iconPrepared: !!iconDataUrl, installable: this.isInstallableContext(), nested: this.isNestedOrEphemeral(), standalone: this.isStandalone() };
+            this.prepared = { ...desc, iconPrepared: !!iconDataUrl, installable:this.isInstallableContext(), nested:this.isNestedOrEphemeral(), standalone:this.isStandalone() };
             return this.prepared;
         }
         restore() {
             try { if (this.originalTitle !== null) document.title = this.originalTitle; } catch {}
             try { if (this.originalAppleTitle?.node) this.originalAppleTitle.node.setAttribute('content', this.originalAppleTitle.content || 'Raven'); } catch {}
-            try {
-                if (this.originalTouchIcon?.node) {
-                    if (this.originalTouchIcon.href === null) this.originalTouchIcon.node.removeAttribute('href');
-                    else this.originalTouchIcon.node.setAttribute('href', this.originalTouchIcon.href);
-                }
-            } catch {}
-            try {
-                if (this.originalFavicon?.node) {
-                    const f = this.originalFavicon;
-                    if (f.href === null) f.node.removeAttribute('href'); else f.node.setAttribute('href', f.href);
-                    if (f.type === null) f.node.removeAttribute('type'); else f.node.setAttribute('type', f.type);
-                    if (f.sizes === null) f.node.removeAttribute('sizes'); else f.node.setAttribute('sizes', f.sizes);
-                }
-            } catch {}
+            try { if (this.originalTouchIcon?.node) { if (this.originalTouchIcon.href === null) this.originalTouchIcon.node.removeAttribute('href'); else this.originalTouchIcon.node.setAttribute('href', this.originalTouchIcon.href); } } catch {}
+            try { if (this.originalFavicon?.node) { const f=this.originalFavicon; if(f.href===null)f.node.removeAttribute('href');else f.node.setAttribute('href',f.href); if(f.type===null)f.node.removeAttribute('type');else f.node.setAttribute('type',f.type); if(f.sizes===null)f.node.removeAttribute('sizes');else f.node.setAttribute('sizes',f.sizes); } } catch {}
             try { this.createdManifest?.remove(); } catch {}
             try { if (this.manifestUrl) URL.revokeObjectURL(this.manifestUrl); } catch {}
+            try { for (const n of this.createdHeadNodes) n?.remove?.(); } catch {}
             try { if (this.originalUrl) history.replaceState(history.state, '', this.originalUrl); } catch {}
-            this.prepared = null;
-            this.manifestUrl = null;
-            this.originalUrl = null;
-            this.originalTitle = null;
-            this.originalAppleTitle = null;
-            this.originalTouchIcon = null;
-            this.originalFavicon = null;
-            this.createdManifest = null;
+            this.prepared=null;this.manifestUrl=null;this.originalUrl=null;this.originalTitle=null;this.originalAppleTitle=null;this.originalTouchIcon=null;this.originalFavicon=null;this.createdManifest=null;this.createdHeadNodes=[];
         }
         async copy(url) {
-            if (navigator.clipboard?.writeText) {
-                await navigator.clipboard.writeText(url);
-                return true;
-            }
-            const ta = document.createElement('textarea');
-            ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
-            document.body.append(ta); ta.focus(); ta.select();
-            const ok = document.execCommand?.('copy') ?? false;
-            ta.remove();
-            return !!ok;
+            if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(url); return true; }
+            const ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';ta.style.pointerEvents='none';document.body.append(ta);ta.focus();ta.select();const ok=document.execCommand?.('copy')??false;ta.remove();return !!ok;
         }
-        async share(app, url) {
-            if (!navigator.share) return false;
-            await navigator.share({ title: String(app.displayName || 'Raven'), text: `Abrir ${String(app.displayName || 'esta app')} en Raven`, url });
-            return true;
-        }
+        async share(app, url) { if (!navigator.share) return false; await navigator.share({ title:String(app.displayName||'Raven'), text:`Abrir ${String(app.displayName||'esta app')} en Raven`, url }); return true; }
         canPromptInstall() { return !!deferredInstallPrompt; }
-        async promptInstall() {
-            if (!deferredInstallPrompt) return null;
-            const event = deferredInstallPrompt;
-            deferredInstallPrompt = null;
-            await event.prompt();
-            return await event.userChoice.catch(() => null);
-        }
+        async promptInstall() { if(!deferredInstallPrompt)return null;const event=deferredInstallPrompt;deferredInstallPrompt=null;await event.prompt();return await event.userChoice.catch(()=>null); }
     }
     exports.HomeShortcutManager = HomeShortcutManager;
 });
@@ -9981,7 +10020,7 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.App = void 0;
     class App {
-        root; router = new router_js_1.AppRouter(); importer = new ProjectImporter_js_1.ProjectImporter(); storage = new ProjectStorage_js_1.ProjectStorage(); homeShortcuts = new (require("launcher/HomeShortcutManager").HomeShortcutManager)(); homeShortcutCleanup = null;
+        root; router = new router_js_1.AppRouter(); importer = new ProjectImporter_js_1.ProjectImporter(); storage = new ProjectStorage_js_1.ProjectStorage(); homeShortcuts = new (require("launcher/HomeShortcutManager").HomeShortcutManager)(); homeShortcutCleanup = null; shortcutDescriptor = null; directShortcutMode = false; shortcutInput = null; shortcutStatus = null;
         state = { ...state_js_1.initialState }; input; coverInput; bannerInput; runtime = null; library = []; updateTargetId = null; sourceMeta = null; launcherUrls = []; launcherViewMode = 'list'; sheet = null; detailApp = null; analysisAnimateIn = false; transitionBusy = false;
         constructor(root) {
             this.root = root;
@@ -9989,8 +10028,65 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
             this.input = document.createElement('input'); this.input.type='file'; this.input.accept='.html,.htm,.zip,.gb,.gbc,text/html,application/zip,application/x-zip-compressed,application/octet-stream'; this.input.hidden=true; this.input.addEventListener('change',()=>void this.fileSelected()); document.body.append(this.input);
             this.coverInput = document.createElement('input'); this.coverInput.type='file'; this.coverInput.accept='image/*'; this.coverInput.hidden=true; this.coverInput.addEventListener('change',()=>void this.coverSelected()); document.body.append(this.coverInput);
             this.bannerInput = document.createElement('input'); this.bannerInput.type='file'; this.bannerInput.accept='image/*'; this.bannerInput.hidden=true; this.bannerInput.addEventListener('change',()=>void this.bannerSelected()); document.body.append(this.bannerInput);
+            this.shortcutInput = document.createElement('input'); this.shortcutInput.type='file'; this.shortcutInput.accept='.html,.htm,.zip,.gb,.gbc,text/html,application/zip,application/x-zip-compressed,application/octet-stream'; this.shortcutInput.hidden=true; this.shortcutInput.addEventListener('change',()=>void this.shortcutFileSelected()); document.body.append(this.shortcutInput);
         }
-        async start(){try{await this.storage.consolidateDuplicates();}catch(e){console.warn('[Raven] No se pudo consolidar duplicados.',e)}await this.refreshLibrary();const launchId=this.homeShortcuts.getLaunchId();if(launchId){const exists=await this.storage.get(launchId).catch(()=>null);if(exists){await this.launchDirect(launchId);return;}this.state.importError='El acceso directo apunta a una app que ya no está en la biblioteca.';}this.render();}
+        async start(){
+            try{await navigator.storage?.persist?.();}catch{}
+            this.shortcutDescriptor=this.homeShortcuts.getDescriptor();
+            this.directShortcutMode=!!this.shortcutDescriptor?.mode;
+            document.body.classList.toggle('raven-direct-shortcut',this.directShortcutMode);
+            if(this.shortcutDescriptor)this.homeShortcuts.applyDescriptor(this.shortcutDescriptor);
+            try{await this.storage.consolidateDuplicates();}catch(e){console.warn('[Raven] No se pudo consolidar duplicados.',e)}
+            await this.refreshLibrary();
+            const launchId=this.shortcutDescriptor?.appId||this.homeShortcuts.getLaunchId();
+            if(launchId){
+                const exists=await this.storage.get(launchId).catch(()=>null);
+                if(exists){await this.launchDirect(launchId);return;}
+                if(this.directShortcutMode){this.renderShortcutSetup();return;}
+                this.state.importError='El acceso directo apunta a una app que ya no está en la biblioteca.';
+            }
+            this.render();
+        }
+        renderShortcutSetup(message=null){
+            const d=this.shortcutDescriptor;if(!d)return;
+            document.body.classList.add('raven-direct-shortcut');
+            const main=document.createElement('main');main.className='shortcut-setup-screen';
+            const card=document.createElement('section');card.className='shortcut-setup-card';
+            const icon=document.createElement('div');icon.className='shortcut-setup-icon';
+            if(d.iconDataUrl){const img=document.createElement('img');img.src=d.iconDataUrl;img.alt='';icon.append(img)}else{icon.textContent=String(d.name||'A').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase().slice(0,2)||'A'}
+            const title=document.createElement('h1');title.textContent=d.name||'App';
+            const standalone=this.homeShortcuts.isStandalone();
+            const copy=document.createElement('p');copy.className='shortcut-setup-copy';
+            if(standalone) copy.textContent='Este acceso tiene su propio almacenamiento en iOS. Vincula el archivo original una sola vez; después abrirá directamente sin mostrar la interfaz de Raven.';
+            else copy.textContent='El nombre y la carátula ya viajan dentro de este enlace. Usa Compartir → Añadir a pantalla de inicio y deja activado “Abrir como app web”. Al abrir el nuevo icono, vincularás el archivo una sola vez.';
+            card.append(icon,title,copy);
+            const status=document.createElement('div');status.className='shortcut-setup-status';status.textContent=message||'';this.shortcutStatus=status;if(message)card.append(status);
+            if(standalone){
+                const pick=document.createElement('button');pick.type='button';pick.className='shortcut-setup-button';pick.textContent='Vincular archivo';pick.addEventListener('click',()=>{this.shortcutInput.value='';this.shortcutInput.click()});card.append(pick);
+                const note=document.createElement('p');note.className='shortcut-setup-note';note.textContent='Acepta HTML, ZIP, GB y GBC. Raven guardará una copia local privada para este icono.';card.append(note);
+            }else{
+                const ready=document.createElement('div');ready.className='shortcut-setup-ready';ready.textContent='Listo para añadir al inicio';card.append(ready);
+            }
+            main.append(card);this.root.replaceChildren(main);
+        }
+        async shortcutFileSelected(){
+            const d=this.shortcutDescriptor,file=this.shortcutInput?.files?.[0];if(!d||!file)return;
+            try{
+                this.renderShortcutSetup('Vinculando y guardando…');
+                const [project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);
+                project.sourceName=file.name;project.sourceHash=sourceHash;
+                const validation=await ProjectValidator_js_1.ProjectValidator.validate(project);
+                const fatal=validation.find(x=>x.level==='error');if(fatal)throw new Error(fatal.message||'El archivo no es válido.');
+                const compatibility=await CompatibilityScanner_js_1.CompatibilityScanner.scan(project);
+                const coverBlob=d.iconDataUrl?this.homeShortcuts.dataURLToBlob(d.iconDataUrl):null;
+                const app=await this.storage.save(project,{forcedId:d.appId,displayName:d.name,coverBlob,sourceName:file.name,sourceHash,compatibilityStatus:compatibility?.status});
+                project.libraryId=app.id;project.libraryName=app.displayName;project.name=app.displayName;project.storedVersion=app.version;
+                await this.storage.touchOpened(app.id);
+                try{await navigator.storage?.persist?.();}catch{}
+                this.state={...state_js_1.initialState,screen:this.router.navigate('runtime'),project,compatibility:null,validation:[],importError:null};
+                this.render();
+            }catch(e){this.renderShortcutSetup(e instanceof Error?e.message:'No se pudo vincular el archivo.');}
+        }
         async refreshLibrary(){try{this.library=await this.storage.list();if(this.detailApp){this.detailApp=await this.storage.get(this.detailApp.id)||null;}}catch(e){this.library=[];this.state.importError=e instanceof Error?e.message:'No se pudo abrir la biblioteca local.';}}
         persistViewMode(){try{localStorage.setItem('local-runtime-launcher-view',this.launcherViewMode);}catch{}}
         toggleView=()=>{this.launcherViewMode=this.launcherViewMode==='grid'?'list':'grid';this.persistViewMode();this.render();};
@@ -10016,7 +10112,7 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
         showDetails=async id=>{try{const app=await this.storage.get(id);if(!app)throw new Error('La app ya no existe en la biblioteca.');this.detailApp=app;this.state.importError=null;this.set({screen:this.router.navigate('detail')});}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo abrir la ficha.';this.render();}};
         detailBack=()=>{this.detailApp=null;this.set({screen:this.router.navigate('launcher')});};
         async openLibrary(id){this.set({screen:this.router.navigate('importing'),importError:null});try{this.disposeProject();const project=await this.storage.loadProject(id);await this.storage.touchOpened(id);this.sourceMeta=null;this.detailApp=null;this.set({screen:this.router.navigate('runtime'),project,compatibility:null,validation:[]});}catch(e){await this.refreshLibrary();this.set({...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo abrir la app.'});}}
-        close=async()=>{this.dismissSheet();this.runtime?.dispose();this.runtime=null;this.disposeProject();this.sourceMeta=null;await this.refreshLibrary();this.set({...state_js_1.initialState,screen:this.router.navigate('launcher')});};
+        close=async()=>{this.dismissSheet();this.runtime?.dispose();this.runtime=null;this.disposeProject();this.sourceMeta=null;await this.refreshLibrary();if(this.directShortcutMode){this.renderShortcutSetup();return;}this.set({...state_js_1.initialState,screen:this.router.navigate('launcher')});};
         back=async()=>{this.dismissSheet();if(this.transitionBusy)return;await this.refreshLibrary();await this.transitionPreflightToLibrary();};
         rename=async item=>{try{const value=await this.promptName(item.displayName);if(value===null||!value.trim())return;await this.storage.rename(item.id,value);await this.refreshLibrary();this.state.importError=null;this.render();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo renombrar.';this.render();}};
         cover=item=>{this.coverInput.dataset.projectId=item.id;this.coverInput.value='';this.coverInput.click();};
@@ -10037,6 +10133,7 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
                 this.render();
             }catch(e){
                 await this.refreshLibrary();
+                if(this.directShortcutMode){this.renderShortcutSetup(e instanceof Error?e.message:'No se pudo abrir este acceso.');return;}
                 this.state={...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo abrir el acceso directo.'};
                 this.render();
             }
@@ -10060,21 +10157,21 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
                 copy.append(name,sub);preview.append(icon,copy);body.append(preview);
                 const status=document.createElement('div');status.className='home-shortcut-status'+(!prepared.installable?' warning':'');
                 if(prepared.installable){
-                    status.textContent=prepared.standalone?'El destino directo está preparado. Para crear otro icono independiente, abre este enlace en Safari y añádelo a la pantalla de inicio.':'Raven preparó temporalmente el nombre, icono y destino directo de esta app para que el sistema pueda guardarlos.';
+                    status.textContent=prepared.standalone?'El enlace de instalación incluye el nombre, la carátula y el ID de esta app. Ábrelo en Safari para crear el icono independiente.':'El enlace ya contiene el nombre, la carátula y el destino directo; no dependen de la memoria temporal de esta pantalla.';
                 }else{
                     status.textContent='Este Raven se está ejecutando desde un archivo, una URL temporal o dentro de otro Raven. El acceso directo interno funciona, pero iOS no puede crear un icono permanente de pantalla de inicio desde este tipo de URL. Para instalarlo como icono real, abre la misma build de Raven desde una URL HTTP/HTTPS estable.';
                 }
                 body.append(status);
                 const steps=document.createElement('ol');steps.className='home-shortcut-steps';
                 if(prepared.installable){
-                    for(const text of ['Mantén esta pantalla abierta para conservar el nombre, icono y enlace preparados.','En Safari, abre Compartir.','Elige “Añadir a pantalla de inicio” y confirma.','Al tocar ese icono, Raven abrirá directamente esta app o juego con su runtime correspondiente.']){const li=document.createElement('li');li.textContent=text;steps.append(li)}
+                    for(const text of ['Copia o comparte este enlace y ábrelo en Safari. El nombre y la carátula viajan dentro del propio enlace.','En Safari, abre Compartir y elige “Añadir a pantalla de inicio”. Mantén activado “Abrir como app web”.','Abre el nuevo icono. iOS crea un almacenamiento separado para cada web app, así que Raven te pedirá vincular el archivo original una sola vez.','Después de esa vinculación, el icono abrirá directamente la app o juego, sin la Biblioteca ni controles de Raven.']){const li=document.createElement('li');li.textContent=text;steps.append(li)}
                 }else{
                     for(const text of ['El identificador directo de la app ya está creado y seguirá siendo el mismo mientras la entrada exista en tu biblioteca.','Cuando Raven se ejecute desde una URL instalable, vuelve a esta opción.','Añade el acceso desde Safari; no será necesario modificar la app ni el juego.']){const li=document.createElement('li');li.textContent=text;steps.append(li)}
                 }
                 body.append(steps);
                 const url=document.createElement('div');url.className='home-shortcut-url';url.textContent=prepared.directUrl;body.append(url);
                 const actions=document.createElement('div');actions.className='home-shortcut-actions';
-                const copyBtn=document.createElement('button');copyBtn.type='button';copyBtn.className='sheet-button secondary';copyBtn.textContent='Copiar enlace';copyBtn.addEventListener('click',async()=>{try{await this.homeShortcuts.copy(prepared.directUrl);copyBtn.textContent='Copiado';setTimeout(()=>{if(copyBtn.isConnected)copyBtn.textContent='Copiar enlace'},1400)}catch{copyBtn.textContent='No se pudo copiar'}});
+                const copyBtn=document.createElement('button');copyBtn.type='button';copyBtn.className='sheet-button secondary';copyBtn.textContent='Copiar enlace de instalación';copyBtn.addEventListener('click',async()=>{try{await this.homeShortcuts.copy(prepared.directUrl);copyBtn.textContent='Copiado';setTimeout(()=>{if(copyBtn.isConnected)copyBtn.textContent='Copiar enlace de instalación'},1400)}catch{copyBtn.textContent='No se pudo copiar'}});
                 const close=document.createElement('button');close.type='button';close.className='sheet-button primary';close.textContent='Cerrar';close.addEventListener('click',()=>this.dismissSheet());
                 actions.append(copyBtn,close);body.append(actions);
                 if(prepared.installable&&navigator.share){
@@ -10095,7 +10192,7 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
         disposeProject(){if(this.state.project){new VirtualFileSystem_js_2.VirtualFileSystem(this.state.project).dispose();this.state.project=null;}}
         revokeLauncherUrls(){for(const u of this.launcherUrls)URL.revokeObjectURL(u);this.launcherUrls=[];}
         set(patch){this.state={...this.state,...patch};this.render();}
-        render(){document.querySelectorAll('.library-menu,.detail-menu').forEach(node=>node.remove());this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close(),this.storage);this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
+        render(){document.querySelectorAll('.library-menu,.detail-menu').forEach(node=>node.remove());this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close(),this.storage,{directLaunch:this.directShortcutMode});this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
     }
     exports.App=App;
 });
@@ -10459,12 +10556,12 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             const identityKey = existing?.identityKey || await identityFor(project, sourceName);
             const changed = !existing || !info.sourceHash || existing.sourceHash !== info.sourceHash;
             if (existing && changed) await this.captureRevision(existing, 'update');
-            const id = existing?.id || crypto.randomUUID();
+            const id = existing?.id || info.forcedId || crypto.randomUUID();
             // Artwork is identity-level user state. Updating/opening an app must never
             // silently replace or clear the artwork that is already visible in Raven.
             // Auto-detection is only used the first time an entry has no stored cover.
-            let coverBlob = existing?.coverBlob || null;
-            let coverCustom = !!existing?.coverCustom;
+            let coverBlob = existing?.coverBlob || (!existing && info.coverBlob instanceof Blob ? info.coverBlob : null) || null;
+            let coverCustom = !!existing?.coverCustom || (!existing && !!info.coverBlob);
             if (!coverBlob) coverBlob = await autoCover(project);
             let bannerCustom = !!existing?.bannerCustom;
             let bannerBlob = existing?.bannerBlob || null;
@@ -10473,7 +10570,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             if (existing && changed) history.push({ fromVersion: existing.version || null, version, hash: info.sourceHash || null, updatedAt: now, sourceName, size: project.size });
             if (history.length > 30) history.splice(0, history.length - 30);
             const app = {
-                id, displayName: existing?.displayName || cleanName(project.name) || cleanName(project.metadata?.name) || 'App local', sourceName,
+                id, displayName: existing?.displayName || cleanName(info.displayName) || cleanName(project.name) || cleanName(project.metadata?.name) || 'App local', sourceName,
                 sourceKey: sourceKey(sourceName), source: project.source, sourceHash: info.sourceHash || existing?.sourceHash || null,
                 identityKey, entryPoint: project.entryPoint, entryCandidates: [...project.entryCandidates], size: project.size,
                 createdAt: existing?.createdAt || now, updatedAt: changed ? now : (existing?.updatedAt || now),
