@@ -8,7 +8,7 @@
   <title>Raven</title>
   <meta name="application-name" content="Raven">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.14.2">
+  <meta name="app-version" content="0.14.5">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -575,9 +575,106 @@
 }
 </style>
 
+
+<style id="raven-v0.14.5-nested-runtime-storage">
+/* Native-shell behavior: the viewport itself never scrolls or rubber-bands. */
+html,body,#root{
+  width:100%;height:100%;min-width:0;max-width:100%;
+  margin:0;overflow:hidden!important;overscroll-behavior:none!important;
+}
+html,body{position:fixed;inset:0}
+body{
+  -webkit-user-select:none!important;user-select:none!important;
+  -webkit-touch-callout:none!important;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+#root{position:relative;isolation:isolate;max-width:100vw}
+*:not(input):not(textarea){-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
+img,svg{ -webkit-user-drag:none; user-drag:none; }
+button,a,[role="button"]{touch-action:manipulation}
+input,textarea{max-width:100%;min-width:0}
+
+/* Screens occupy a fixed application viewport. Scrolling belongs to explicit content areas only. */
+.launcher-screen,.detail-screen,.preflight-screen,.analysis-screen,.importing-screen,.runtime-screen{
+  width:100%;height:100%;min-height:0!important;max-height:100%;max-width:100%;overflow:hidden;
+}
+.launcher-screen{display:flex;flex-direction:column}
+.launcher-header{flex:0 0 auto;min-width:0}
+.launcher-content{flex:1 1 auto;min-height:0;min-width:0;max-width:100%;overflow:hidden}
+.launcher-content-library{
+  overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:none!important;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none;
+}
+.launcher-content-library::-webkit-scrollbar,.sheet-body::-webkit-scrollbar,.preflight-screen::-webkit-scrollbar,.analysis-screen::-webkit-scrollbar{display:none;width:0;height:0}
+.sheet-body{overscroll-behavior:none!important;scrollbar-width:none}
+
+/* Hard anti-overflow contract: text adapts to Raven, never the other way around. */
+.launcher-screen,.launcher-header,.launcher-content,.library-list,.library-grid,.library-item,.library-card,.library-info,.library-card-info,
+.detail-screen,.detail-body,.detail-panel,.detail-summary,.detail-info,.detail-section,.detail-facts,.detail-fact,
+.preflight-screen,.preflight-body,.preflight-summary,.preflight-title-wrap,.preflight-section,.preflight-facts,.preflight-fact,
+.analysis-screen,.analysis-body,.analysis-row,.entry-group,.bottom-sheet,.sheet-header,.sheet-body,.version-history-item,.version-history-main,
+.runtime-screen,.runtime-toolbar,.runtime-host{min-width:0;max-width:100%}
+.library-list,.library-grid{overflow-x:hidden}
+.library-card{overflow:hidden}
+.library-card-name,.library-name,.library-meta,.library-card-meta,.detail-name,.detail-fact-value,.preflight-name,.preflight-fact-value,
+.project-name,.analysis-value,.sheet-title,.sheet-copy,.version-history-version,.version-history-meta,.diagnostic-message,.diagnostic-source,.runtime-title{
+  max-width:100%;min-width:0;overflow-wrap:anywhere;word-break:break-word;
+}
+.library-name,.library-meta,.library-card-meta,.runtime-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:normal}
+.library-card-name{overflow:hidden!important;word-break:break-word}
+.detail-fact-value{overflow:hidden!important;text-overflow:clip!important}
+.preflight-fact-value{max-width:100%;min-width:0}
+.preflight-entry,.entry-select{width:100%;max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+/* Never expose a horizontal document track, even with pathological filenames/paths. */
+main,section,article,header,div{max-width:100%}
+
+/* Keep Raven stationary while still allowing native-feeling vertical library scrolling. */
+/* Bottom sheets and console surfaces stay inside Raven's viewport. */
+.sheet-backdrop{position:fixed!important;inset:0!important;overflow:hidden}
+.console-runtime{overscroll-behavior:none!important;scrollbar-width:none;overflow-x:hidden!important}
+.console-runtime::-webkit-scrollbar{display:none;width:0;height:0}
+
+/* Long names are content, never layout instructions. Keep compact views bounded. */
+.detail-name,.preflight-name,.project-name{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  overflow:hidden!important;max-height:2.15em;
+}
+.sheet-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+@media (hover:none) and (pointer:coarse){
+  .launcher-content-library{scrollbar-width:none}
+}
+</style>
+
+
+<style id="raven-home-shortcuts">
+.home-shortcut-preview{display:flex;align-items:center;gap:14px;margin:4px 0 16px;padding:12px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);min-width:0}
+.home-shortcut-icon{width:62px;height:62px;flex:0 0 62px;border-radius:15px;overflow:hidden;background:#13131a;display:grid;place-items:center;color:#fff;font-size:18px;font-weight:700}
+.home-shortcut-icon img{width:100%;height:100%;display:block;object-fit:cover}
+.home-shortcut-preview-copy{min-width:0}.home-shortcut-name{font-size:15px;font-weight:680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.home-shortcut-sub{margin-top:4px;color:var(--muted);font-size:11px;line-height:1.4}
+.home-shortcut-status{margin:0 0 14px;padding:11px 12px;border-radius:14px;background:rgba(116,101,255,.09);border:1px solid rgba(130,116,255,.15);font-size:12px;line-height:1.5;color:#d9d5ff}
+.home-shortcut-status.warning{background:rgba(255,180,80,.08);border-color:rgba(255,190,95,.16);color:#f5d8aa}
+.home-shortcut-steps{margin:0;padding-left:20px;color:#d7d7dc;font-size:13px;line-height:1.55}.home-shortcut-steps li+li{margin-top:6px}
+.home-shortcut-url{margin-top:12px;width:100%;padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);color:#aaaab4;font-size:10px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;user-select:none;-webkit-user-select:none}
+.home-shortcut-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.home-shortcut-actions.one{grid-template-columns:1fr}
+.home-shortcut-note{margin:12px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
+</style>
+
 </head>
 <body>
-  <script>(()=>{const p=e=>{try{e.preventDefault()}catch{}};for(const n of ['gesturestart','gesturechange','gestureend','contextmenu','dragstart','selectstart'])addEventListener(n,p,{capture:true,passive:false});addEventListener('dblclick',p,{capture:true,passive:false});let t=0;addEventListener('touchend',e=>{const n=Date.now();if(n-t<330)p(e);t=n},{capture:true,passive:false});})();</script>
+  <script>(()=>{
+    const p=e=>{try{e.preventDefault()}catch{}};
+    for(const n of ['gesturestart','gesturechange','gestureend','contextmenu','dragstart','selectstart'])addEventListener(n,p,{capture:true,passive:false});
+    addEventListener('dblclick',p,{capture:true,passive:false});
+    let lastTouchEnd=0;
+    addEventListener('touchend',e=>{const now=Date.now();if(now-lastTouchEnd<360)p(e);lastTouchEnd=now},{capture:true,passive:false});
+    addEventListener('wheel',e=>{
+      if(!e.ctrlKey&&!e.metaKey)return;
+      p(e);
+    },{capture:true,passive:false});
+  })();</script>
   <div id="root"></div>
   <script>(()=>{
 'use strict';
@@ -7297,7 +7394,7 @@ define("importer/ProjectDetector", ["require", "exports", "filesystem/PathResolv
     }
     exports.ProjectDetector = ProjectDetector;
 });
-define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver", "filesystem/PathResolver", "importer/FileImporter", "importer/ProjectDetector"], function (require, exports, MimeResolver_js_2, PathResolver_js_3, FileImporter_js_1, ProjectDetector_js_1) {
+define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver", "filesystem/PathResolver", "importer/FileImporter", "importer/ProjectDetector", "importer/GameBoyImporter"], function (require, exports, MimeResolver_js_2, PathResolver_js_3, FileImporter_js_1, ProjectDetector_js_1, GameBoyImporter_js_zip) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ZipImporter = void 0;
@@ -7322,6 +7419,30 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
             }
             if (!files.size)
                 throw new Error('El ZIP no contiene archivos utilizables.');
+
+            // Universal archive routing: a ZIP that contains a GB/GBC ROM but no web
+            // entry is a console package, not a broken web project. Keep all archive
+            // assets available (for example an icon) but route the actual ROM through
+            // the Game Boy importer/runtime.
+            const htmlEntries = [...files.keys()].filter(path => /\.html?$/i.test(path));
+            const sourceEntriesForRouting = [...files.keys()].filter(path => /\/(?:src\/)?(?:main|index)\.(?:tsx?|jsx?|mts|cts)$/i.test(path));
+            const romEntries = [...files.values()].filter(f => /\.(?:gb|gbc)$/i.test(f.name || f.path));
+            if (!htmlEntries.length && !sourceEntriesForRouting.length && romEntries.length) {
+                if (romEntries.length > 1)
+                    throw new Error('El ZIP contiene varias ROMs GB/GBC. Por ahora Raven admite una ROM principal por paquete ZIP; importa cada juego por separado.');
+                const romEntry = romEntries[0];
+                const romName = romEntry.name || PathResolver_js_3.PathResolver.basename(romEntry.path);
+                const romFile = new File([romEntry.blob], romName, { type: 'application/octet-stream', lastModified: file.lastModified || Date.now() });
+                const project = await new GameBoyImporter_js_zip.GameBoyImporter().import(romFile);
+                project.files = files;
+                project.entryPoint = romEntry.path;
+                project.entryCandidates = [romEntry.path];
+                project.size = size;
+                project.archiveSourceName = file.name;
+                project.metadata = { ...(project.metadata || {}), packagedInZip: true, romPath: romEntry.path };
+                return project;
+            }
+
             if (![...files.keys()].some(path => /\.html?$/i.test(path))) {
                 const sourceEntries = [...files.keys()].filter(path => /\/(?:src\/)?(?:main|index)\.(?:tsx?|jsx?|mts|cts)$/i.test(path)).sort((a,b) => {
                     const ar = /\/src\/(?:main|index)\./i.test(a) ? 0 : 1, br = /\/src\/(?:main|index)\./i.test(b) ? 0 : 1;
@@ -7687,6 +7808,7 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
             add('Restablecer carátula', () => actions.resetCover(item));
         add('Actualizar archivo', () => actions.update(item));
         add('Historial de versiones', () => actions.history?.(item));
+        add('Añadir al inicio', () => actions.home?.(item));
         add('Eliminar de biblioteca', () => actions.remove(item), true);
         menu.addEventListener('pointerdown', e => e.stopPropagation());
         menu.addEventListener('click', e => e.stopPropagation());
@@ -7980,6 +8102,7 @@ define("ui/library/DetailView", ["require", "exports", "utils/dom", "utils/forma
         if (app.bannerCustom) add('Restablecer portada', () => actions.resetBanner(app));
         add('Actualizar archivo', () => actions.update(app));
         add('Historial de versiones', () => actions.history?.(app));
+        add('Añadir al inicio', () => actions.home?.(app));
         add('Eliminar de biblioteca', () => actions.remove(app), true);
         document.body.append(menu);
         const w = Math.min(280, Math.max(180, innerWidth - 24));
@@ -8856,12 +8979,18 @@ define("runtime/RuntimeBridge", ["require", "exports", "runtime/messages"], func
                 case 'storage-idb-load':
                     Promise.resolve(this.handlers.onIdbLoad?.(str(p.name, 'default'), Number(p.version) || 0)).then(data => this.reply('storage-idb-response', { requestId: p.requestId, data: data || null })).catch(error => this.reply('storage-idb-response', { requestId: p.requestId, error: String(error) }));
                     break;
-                case 'storage-idb-save':
-                    Promise.resolve(this.handlers.onIdbSave?.(str(p.name, 'default'), p.data)).catch(() => {});
+                case 'storage-idb-save': {
+                    const operation = Promise.resolve(this.handlers.onIdbSave?.(str(p.name, 'default'), p.data));
+                    if (p.requestId) operation.then(() => this.reply('storage-idb-response', { requestId: p.requestId, data: { ok: true } })).catch(error => this.reply('storage-idb-response', { requestId: p.requestId, error: String(error) }));
+                    else operation.catch(() => {});
                     break;
-                case 'storage-idb-delete':
-                    Promise.resolve(this.handlers.onIdbDelete?.(str(p.name, 'default'))).catch(() => {});
+                }
+                case 'storage-idb-delete': {
+                    const operation = Promise.resolve(this.handlers.onIdbDelete?.(str(p.name, 'default')));
+                    if (p.requestId) operation.then(() => this.reply('storage-idb-response', { requestId: p.requestId, data: { ok: true } })).catch(error => this.reply('storage-idb-response', { requestId: p.requestId, error: String(error) }));
+                    else operation.catch(() => {});
                     break;
+                }
             }
         }
         reply(type, payload) {
@@ -8893,6 +9022,16 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
     const NODE_TEXT_BUDGET = 32 * 1024 * 1024;
     const TEXT_EXT = new Set(['js','cjs','mjs','ts','mts','cts','jsx','tsx','json','jsonc','txt','md','css','html','htm','xml','csv','glsl','vert','frag','wgsl','yaml','yml']);
     const NODE_HINT = /\brequire\s*\(|\bmodule\.exports\b|\bexports\.[A-Za-z_$]|\bprocess\.|\bBuffer\b|\b__dirname\b|\b__filename\b/;
+    const BROWSER_UMD_HINT = /(?:typeof\s+exports|["']object["']\s*==\s*typeof\s+exports)[\s\S]{0,900}(?:typeof\s+module|["']object["']\s*==\s*typeof\s+module)[\s\S]{0,1800}(?:define\.amd|typeof\s+define|window|self|globalThis)/;
+    const shouldUseNodeCompat = source => {
+        if (typeof source !== 'string' || !NODE_HINT.test(source)) return false;
+        const head = source.slice(0, 24000);
+        // UMD/browser bundles often mention module.exports/require internally but deliberately
+        // publish themselves on window/self when CommonJS is absent. Wrapping them as Node
+        // code hides globals such as JSZip inside a synthetic module scope.
+        if (BROWSER_UMD_HINT.test(head)) return false;
+        return true;
+    };
     class HtmlRuntime {
         project; errors; options; vfs; resolver; iframe = null; bridge = null; disposed = false; nodeData = null; remoteBaseHref = null;
         constructor(project, errors, options = {}) {
@@ -8934,7 +9073,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
             viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
             const shieldStyle = doc.createElement('style');
             shieldStyle.dataset.localRuntimeBrowserShield = 'true';
-            shieldStyle.textContent = 'html,body{overscroll-behavior:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}img,a{-webkit-user-drag:none}';
+            shieldStyle.textContent = 'html,body{overscroll-behavior:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation;max-width:100%;overflow-x:hidden}*{box-sizing:border-box;scrollbar-width:none}*::-webkit-scrollbar{display:none;width:0;height:0}img,a{-webkit-user-drag:none}';
             doc.head.insertBefore(shieldStyle, doc.head.firstChild);
             await this.prepareImportMaps(doc, entry);
             this.nodeData = await this.buildNodeData(doc);
@@ -8997,7 +9136,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
                 const ext = MimeResolver_js_4.MimeResolver.extension(path); if (!['js','cjs','mjs','ts','mts','cts','jsx','tsx'].includes(ext)) return null;
                 try { const text = await file.blob.text(); jsCache.set(path, text); return text; } catch { return null; }
             };
-            let needed = [...doc.querySelectorAll('script:not([type="module"]):not([src])')].some(script => NODE_HINT.test(script.textContent ?? ''));
+            let needed = [...doc.querySelectorAll('script:not([type="module"]):not([src])')].some(script => shouldUseNodeCompat(script.textContent ?? ''));
             const queue = [];
             for (const script of [...doc.querySelectorAll('script[src]')]) {
                 const src = script.getAttribute('src'); if (!src || PathResolver_js_5.PathResolver.isExternal(src)) continue;
@@ -9007,7 +9146,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
             while (queue.length && seen.size < 4096) {
                 const path = queue.shift(); if (!path || seen.has(path)) continue; seen.add(path);
                 const text = await readJs(path); if (text == null) continue;
-                if (NODE_HINT.test(text)) needed = true;
+                if (shouldUseNodeCompat(text)) needed = true;
                 const re = /(?:require\s*\(\s*['"]([^'"]+)['"]\s*\)|(?:import|export)\s+(?:[^'";]*?\s+from\s*)?['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\))/g;
                 for (const m of text.matchAll(re)) {
                     const spec = m[1] || m[2] || m[3] || ''; if (!spec || /^node:/.test(spec)) continue;
@@ -9089,7 +9228,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
                         if (module) script.src = await this.resolver.resolveModuleFile(path);
                         else {
                             const source = this.nodeData?.sources[path];
-                            if (typeof source === 'string' && NODE_HINT.test(source)) {
+                            if (typeof source === 'string' && shouldUseNodeCompat(source)) {
                                 const wrapper = `globalThis.__LWR_NODE__.runEntry(${JSON.stringify(path)});`;
                                 script.src = this.resolver.createGenerated(new Blob([wrapper], { type: 'text/javascript;charset=utf-8' }));
                                 script.dataset.nodeCompat = 'true';
@@ -9100,7 +9239,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
                 } else if (!src && module && script.textContent?.trim()) {
                     try { script.textContent = await this.resolver.rewriteInlineModule(script.textContent, entry); }
                     catch (error) { this.errors.error('No se pudo preparar un módulo inline. Si usa una dependencia web, revisa la conexión o CORS del proveedor.', { technical: String(error), source: entry }); script.remove(); }
-                } else if (!src && !module && script.textContent?.trim() && NODE_HINT.test(script.textContent)) {
+                } else if (!src && !module && script.textContent?.trim() && shouldUseNodeCompat(script.textContent)) {
                     const body = script.textContent;
                     script.textContent = `(()=>{const require=globalThis.__LWR_NODE__.createRequire(${JSON.stringify(entry)});const module={exports:{}};const exports=module.exports;const process=globalThis.__LWR_NODE__.process;const Buffer=globalThis.__LWR_NODE__.Buffer;const __filename=${JSON.stringify(entry)};const __dirname=${JSON.stringify(PathResolver_js_5.PathResolver.dirname(entry).replace(/\/$/, '') || '/')};${body}\n})();`;
                     script.dataset.nodeCompat = 'true';
@@ -9140,15 +9279,15 @@ try{Object.defineProperty(globalThis,'localStorage',{configurable:true,value:__l
 const __lwrSessionData={};const __lwrSession=Object.freeze({get length(){return Object.keys(__lwrSessionData).length},key:i=>Object.keys(__lwrSessionData)[Number(i)]??null,getItem:k=>Object.prototype.hasOwnProperty.call(__lwrSessionData,String(k))?String(__lwrSessionData[String(k)]):null,setItem:(k,v)=>{__lwrSessionData[String(k)]=String(v)},removeItem:k=>{delete __lwrSessionData[String(k)]},clear:()=>{for(const k of Object.keys(__lwrSessionData))delete __lwrSessionData[k]}});try{Object.defineProperty(globalThis,'sessionStorage',{configurable:true,value:__lwrSession})}catch{}
 let __lwrIdbSeq=1;const __lwrIdbPending=new Map();
 addEventListener('message',e=>{const m=e.data;if(!m||m.channel!==C||m.type!=='storage-idb-response')return;const p=m.payload||{},entry=__lwrIdbPending.get(p.requestId);if(!entry)return;__lwrIdbPending.delete(p.requestId);p.error?entry.reject(new Error(p.error)):entry.resolve(p.data||null)});
-const __lwrParentRequest=(type,payload)=>new Promise((resolve,reject)=>{const requestId='idb-'+(__lwrIdbSeq++);__lwrIdbPending.set(requestId,{resolve,reject});send(type,{...payload,requestId});setTimeout(()=>{const p=__lwrIdbPending.get(requestId);if(p){__lwrIdbPending.delete(requestId);reject(new Error('Tiempo de espera agotado para almacenamiento persistente.'))}},8000)});
+const __lwrParentRequest=(type,payload)=>new Promise((resolve,reject)=>{const requestId='idb-'+(__lwrIdbSeq++);__lwrIdbPending.set(requestId,{resolve,reject});send(type,{...payload,requestId});setTimeout(()=>{const p=__lwrIdbPending.get(requestId);if(p){__lwrIdbPending.delete(requestId);reject(new Error('Tiempo de espera agotado para almacenamiento persistente.'))}},20000)});
 const __lwrEq=(a,b)=>{try{return JSON.stringify(a)===JSON.stringify(b)}catch{return a===b}};const __lwrPath=(v,p)=>String(p||'').split('.').filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],v);
 class __LwrReq{result=undefined;error=null;onsuccess=null;onerror=null;onupgradeneeded=null;transaction=null}
 class __LwrNames{constructor(db){this.db=db}contains(n){return !!this.db.data.stores[String(n)]}item(i){return Object.keys(this.db.data.stores)[i]??null}get length(){return Object.keys(this.db.data.stores).length}[Symbol.iterator](){return Object.keys(this.db.data.stores)[Symbol.iterator]()}}
 class __LwrIndex{constructor(store,name){this.store=store;this.name=name}getAll(range){return this.store.tx._request(()=>{const def=this.store.def.indexes[this.name];if(!def)throw new Error('Index not found: '+this.name);return this.store.def.records.filter(r=>!range||__lwrEq(__lwrPath(r.value,def.keyPath),range.value)).map(r=>__lwrClone(r.value))})}getAllKeys(range){return this.store.tx._request(()=>{const def=this.store.def.indexes[this.name];if(!def)throw new Error('Index not found: '+this.name);return this.store.def.records.filter(r=>!range||__lwrEq(__lwrPath(r.value,def.keyPath),range.value)).map(r=>__lwrClone(r.key))})}get(range){return this.store.tx._request(()=>{const def=this.store.def.indexes[this.name];const row=this.store.def.records.find(r=>!range||__lwrEq(__lwrPath(r.value,def.keyPath),range.value));return row?__lwrClone(row.value):undefined})}}
 class __LwrStore{constructor(db,tx,name){this.db=db;this.tx=tx;this.name=name;this.def=db.data.stores[name];this.keyPath=this.def.keyPath;this.autoIncrement=!!this.def.autoIncrement;this.indexNames={contains:n=>!!this.def.indexes[String(n)],item:i=>Object.keys(this.def.indexes)[i]??null,get length(){return Object.keys(this.def.indexes).length}}}createIndex(name,keyPath,opt={}){this.def.indexes[String(name)]={keyPath,unique:!!opt.unique};return new __LwrIndex(this,String(name))}index(name){return new __LwrIndex(this,String(name))}_key(value,key){let k=key;if(k===undefined&&this.def.keyPath)k=__lwrPath(value,this.def.keyPath);if(k===undefined&&this.def.autoIncrement){this.def.counter=(this.def.counter||0)+1;k=this.def.counter;if(this.def.keyPath&&value&&typeof value==='object')value[this.def.keyPath]=k}if(k===undefined)throw new Error('DataError: key required');return k}get(key){return this.tx._request(()=>{const row=this.def.records.find(r=>__lwrEq(r.key,key));return row?__lwrClone(row.value):undefined})}getAll(range){return this.tx._request(()=>this.def.records.filter(r=>!range||__lwrEq(r.key,range.value)).map(r=>__lwrClone(r.value)))}getAllKeys(range){return this.tx._request(()=>this.def.records.filter(r=>!range||__lwrEq(r.key,range.value)).map(r=>__lwrClone(r.key)))}put(value,key){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');const cloned=__lwrClone(value),k=this._key(cloned,key),idx=this.def.records.findIndex(r=>__lwrEq(r.key,k));const row={key:__lwrClone(k),value:cloned};idx>=0?this.def.records.splice(idx,1,row):this.def.records.push(row);return __lwrClone(k)})}add(value,key){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');const cloned=__lwrClone(value),k=this._key(cloned,key);if(this.def.records.some(r=>__lwrEq(r.key,k)))throw new Error('ConstraintError');this.def.records.push({key:__lwrClone(k),value:cloned});return __lwrClone(k)})}delete(key){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');this.def.records=this.def.records.filter(r=>!__lwrEq(r.key,key));return undefined})}clear(){return this.tx._request(()=>{if(this.tx.mode==='readonly')throw new Error('ReadOnlyError');this.def.records=[]})}}
-class __LwrTx{constructor(db,names,mode='readonly'){this.db=db;this.names=Array.isArray(names)?names:[names];this.mode=mode;this.error=null;this.oncomplete=null;this.onerror=null;this.onabort=null;this.pending=0;this.finished=false;queueMicrotask(()=>this._finish())}objectStore(name){name=String(name);if(!this.names.includes(name)&&this.mode!=='versionchange')throw new Error('NotFoundError');if(!this.db.data.stores[name])throw new Error('NotFoundError');return new __LwrStore(this.db,this,name)}_request(fn){const r=new __LwrReq();this.pending++;queueMicrotask(()=>{try{r.result=fn();r.onsuccess?.({target:r})}catch(e){r.error=e;this.error=e;r.onerror?.({target:r});this.onerror?.({target:this})}finally{this.pending--;this._finish()}});return r}_finish(){if(this.finished||this.pending>0)return;this.finished=true;if(this.mode!=='readonly')this.db._flush();queueMicrotask(()=>this.oncomplete?.({target:this}))}abort(){if(this.finished)return;this.finished=true;this.onabort?.({target:this})}}
-class __LwrDB{constructor(name,data){this.name=name;this.data=data&&typeof data==='object'?data:{version:0,stores:{}};this.data.stores=this.data.stores||{};this.version=Number(this.data.version)||0;this.objectStoreNames=new __LwrNames(this);this.onversionchange=null}createObjectStore(name,opt={}){name=String(name);if(this.data.stores[name])throw new Error('ConstraintError');this.data.stores[name]={keyPath:opt.keyPath??null,autoIncrement:!!opt.autoIncrement,counter:0,indexes:{},records:[]};return new __LwrStore(this,{mode:'versionchange',_request:fn=>{const r=new __LwrReq();try{r.result=fn();queueMicrotask(()=>r.onsuccess?.({target:r}))}catch(e){r.error=e;queueMicrotask(()=>r.onerror?.({target:r}))}return r}},name)}deleteObjectStore(name){delete this.data.stores[String(name)]}transaction(names,mode='readonly'){return new __LwrTx(this,names,mode)}close(){}_flush(){this.data.version=this.version;send('storage-idb-save',{name:this.name,data:this.data})}}
-const __lwrIndexedDB={open:(name,version)=>{const r=new __LwrReq();__lwrParentRequest('storage-idb-load',{name:String(name),version:Number(version)||0}).then(raw=>{const data=raw&&typeof raw==='object'?raw:{version:0,stores:{}};const oldVersion=Number(data.version)||0,target=Number(version)||oldVersion||1;if(version&&target<oldVersion){r.error=new Error('VersionError');r.onerror?.({target:r});return}const db=new __LwrDB(String(name),data);r.result=db;if(target>oldVersion){db.version=target;db.data.version=target;r.transaction=new __LwrTx(db,Object.keys(db.data.stores),'versionchange');try{r.onupgradeneeded?.({target:r,oldVersion,newVersion:target})}catch(e){r.error=e;r.onerror?.({target:r});return}db._flush()}queueMicrotask(()=>r.onsuccess?.({target:r}))}).catch(e=>{r.error=e;r.onerror?.({target:r})});return r},deleteDatabase:name=>{const r=new __LwrReq();send('storage-idb-delete',{name:String(name)});queueMicrotask(()=>r.onsuccess?.({target:r}));return r},databases:async()=>[]};
+class __LwrTx{constructor(db,names,mode='readonly'){this.db=db;this.names=Array.isArray(names)?names:[names];this.mode=mode;this.error=null;this.oncomplete=null;this.onerror=null;this.onabort=null;this.pending=0;this.finished=false;this.failed=false;this.finishToken=0;this.finishTimer=0;this._scheduleFinish()}objectStore(name){name=String(name);if(!this.names.includes(name)&&this.mode!=='versionchange')throw new Error('NotFoundError');if(!this.db.data.stores[name])throw new Error('NotFoundError');return new __LwrStore(this.db,this,name)}_request(fn){const r=new __LwrReq();if(this.finished){queueMicrotask(()=>{const e=new Error('TransactionInactiveError');r.error=e;r.onerror?.({target:r})});return r}this.pending++;this.finishToken++;queueMicrotask(()=>{if(this.finished){this.pending=Math.max(0,this.pending-1);return}try{r.result=fn();r.onsuccess?.({target:r})}catch(e){r.error=e;this.error=e;this.failed=true;r.onerror?.({target:r});this.onerror?.({target:this})}finally{this.pending=Math.max(0,this.pending-1);this._scheduleFinish()}});return r}_scheduleFinish(){if(this.finished||this.failed||this.pending>0)return;const token=++this.finishToken;if(this.finishTimer)clearTimeout(this.finishTimer);this.finishTimer=setTimeout(async()=>{this.finishTimer=0;if(this.finished||this.failed||this.pending>0||token!==this.finishToken)return;try{if(this.mode!=='readonly')await this.db._flush();if(this.finished||this.failed||this.pending>0||token!==this.finishToken)return;this.finished=true;this.oncomplete?.({target:this})}catch(e){this.error=e;this.failed=true;this.finished=true;this.onerror?.({target:this})}},0)}abort(){if(this.finished)return;if(this.finishTimer)clearTimeout(this.finishTimer);this.finished=true;this.onabort?.({target:this})}}
+class __LwrDB{constructor(name,data){this.name=name;this.data=data&&typeof data==='object'?data:{version:0,stores:{}};this.data.stores=this.data.stores||{};this.version=Number(this.data.version)||0;this.objectStoreNames=new __LwrNames(this);this.onversionchange=null}createObjectStore(name,opt={}){name=String(name);if(this.data.stores[name])throw new Error('ConstraintError');this.data.stores[name]={keyPath:opt.keyPath??null,autoIncrement:!!opt.autoIncrement,counter:0,indexes:{},records:[]};return new __LwrStore(this,{mode:'versionchange',_request:fn=>{const r=new __LwrReq();try{r.result=fn();queueMicrotask(()=>r.onsuccess?.({target:r}))}catch(e){r.error=e;queueMicrotask(()=>r.onerror?.({target:r}))}return r}},name)}deleteObjectStore(name){delete this.data.stores[String(name)]}transaction(names,mode='readonly'){return new __LwrTx(this,names,mode)}close(){}_flush(){this.data.version=this.version;return __lwrParentRequest('storage-idb-save',{name:this.name,data:__lwrClone(this.data)}).then(()=>undefined)}}
+const __lwrIndexedDB={open:(name,version)=>{const r=new __LwrReq();__lwrParentRequest('storage-idb-load',{name:String(name),version:Number(version)||0}).then(raw=>{const data=raw&&typeof raw==='object'?raw:{version:0,stores:{}};const oldVersion=Number(data.version)||0,target=Number(version)||oldVersion||1;if(version&&target<oldVersion){r.error=new Error('VersionError');r.onerror?.({target:r});return}const db=new __LwrDB(String(name),data);r.result=db;if(target>oldVersion){db.version=target;db.data.version=target;const tx=r.transaction=new __LwrTx(db,Object.keys(db.data.stores),'versionchange');tx.oncomplete=()=>queueMicrotask(()=>r.onsuccess?.({target:r}));tx.onerror=()=>{r.error=tx.error||new Error('IndexedDB upgrade transaction error');r.onerror?.({target:r})};try{r.onupgradeneeded?.({target:r,oldVersion,newVersion:target})}catch(e){tx.abort();r.error=e;r.onerror?.({target:r});return}tx._scheduleFinish()}else queueMicrotask(()=>r.onsuccess?.({target:r}))}).catch(e=>{r.error=e;r.onerror?.({target:r})});return r},deleteDatabase:name=>{const r=new __LwrReq();__lwrParentRequest('storage-idb-delete',{name:String(name)}).then(()=>r.onsuccess?.({target:r})).catch(e=>{r.error=e;r.onerror?.({target:r})});return r},databases:async()=>[]};
 try{Object.defineProperty(globalThis,'indexedDB',{configurable:true,value:__lwrIndexedDB});Object.defineProperty(globalThis,'IDBKeyRange',{configurable:true,value:{only:value=>({value})}})}catch{}
 const stopDefault=e=>{try{e.preventDefault()}catch{}};
 for(const n of ['gesturestart','gesturechange','gestureend','contextmenu','dragstart','selectstart'])addEventListener(n,stopDefault,{capture:true,passive:false});
@@ -9678,12 +9817,171 @@ define("app/router", ["require", "exports"], function (require, exports) {
     }
     exports.AppRouter = AppRouter;
 });
+define("launcher/HomeShortcutManager", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.HomeShortcutManager = void 0;
+    const HOME_PARAM = 'raven_launch';
+    let deferredInstallPrompt = null;
+    try {
+        window.addEventListener('beforeinstallprompt', event => {
+            event.preventDefault();
+            deferredInstallPrompt = event;
+        });
+    } catch {}
+    class HomeShortcutManager {
+        prepared = null;
+        manifestUrl = null;
+        originalUrl = null;
+        originalTitle = null;
+        originalAppleTitle = null;
+        originalTouchIcon = null;
+        originalFavicon = null;
+        createdManifest = null;
+        getLaunchId() {
+            try {
+                const url = new URL(location.href);
+                const value = url.searchParams.get(HOME_PARAM);
+                return value && value.trim() ? value.trim() : null;
+            } catch { return null; }
+        }
+        buildLaunchUrl(appId) {
+            const url = new URL(location.href);
+            url.searchParams.set(HOME_PARAM, String(appId));
+            url.hash = '';
+            return url.href;
+        }
+        isInstallableContext() {
+            try { return location.protocol === 'https:' || location.protocol === 'http:'; } catch { return false; }
+        }
+        isNestedOrEphemeral() {
+            try { return ['blob:','data:','file:'].includes(location.protocol) || window.self !== window.top; } catch { return true; }
+        }
+        isStandalone() {
+            try { return window.matchMedia?.('(display-mode: standalone)')?.matches || navigator.standalone === true; } catch { return false; }
+        }
+        async blobToDataURL(blob) {
+            if (!blob) return null;
+            return await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+                reader.onerror = () => reject(reader.error || new Error('No se pudo preparar el icono.'));
+                reader.readAsDataURL(blob);
+            });
+        }
+        findRel(rel) {
+            return [...document.querySelectorAll('link[rel]')].find(link => String(link.getAttribute('rel') || '').toLowerCase().split(/\s+/).includes(rel)) || null;
+        }
+        async prepare(app) {
+            this.restore();
+            const directUrl = this.buildLaunchUrl(app.id);
+            const iconDataUrl = app.coverBlob ? await this.blobToDataURL(app.coverBlob).catch(() => null) : null;
+            this.originalUrl = location.href;
+            this.originalTitle = document.title;
+            const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+            this.originalAppleTitle = appleTitle ? { node: appleTitle, content: appleTitle.getAttribute('content') } : null;
+            if (appleTitle) appleTitle.setAttribute('content', String(app.displayName || 'Raven'));
+            document.title = String(app.displayName || 'Raven');
+            const touch = this.findRel('apple-touch-icon');
+            if (touch) this.originalTouchIcon = { node: touch, href: touch.getAttribute('href') };
+            if (touch && iconDataUrl) touch.setAttribute('href', iconDataUrl);
+            const favicon = this.findRel('icon');
+            if (favicon) this.originalFavicon = { node: favicon, href: favicon.getAttribute('href'), type: favicon.getAttribute('type'), sizes: favicon.getAttribute('sizes') };
+            if (favicon && iconDataUrl) {
+                favicon.setAttribute('href', iconDataUrl);
+                if (app.coverBlob?.type) favicon.setAttribute('type', app.coverBlob.type);
+                favicon.removeAttribute('sizes');
+            }
+            if (this.isInstallableContext()) {
+                const manifest = {
+                    id: `./?${HOME_PARAM}=${encodeURIComponent(String(app.id))}`,
+                    name: String(app.displayName || 'Raven'),
+                    short_name: String(app.displayName || 'Raven').slice(0, 24),
+                    start_url: directUrl,
+                    display: 'standalone',
+                    orientation: 'any',
+                    background_color: '#07070a',
+                    theme_color: '#07070a',
+                    icons: iconDataUrl ? [{ src: iconDataUrl, sizes: '512x512', type: app.coverBlob?.type || 'image/png', purpose: 'any maskable' }] : []
+                };
+                try {
+                    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+                    this.manifestUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('link');
+                    link.rel = 'manifest';
+                    link.href = this.manifestUrl;
+                    link.dataset.ravenHomeShortcut = '1';
+                    document.head.append(link);
+                    this.createdManifest = link;
+                } catch {}
+            }
+            try { history.replaceState({ ...(history.state || {}), ravenHomeShortcut: app.id }, '', directUrl); } catch {}
+            this.prepared = { appId: app.id, directUrl, iconPrepared: !!iconDataUrl, installable: this.isInstallableContext(), nested: this.isNestedOrEphemeral(), standalone: this.isStandalone() };
+            return this.prepared;
+        }
+        restore() {
+            try { if (this.originalTitle !== null) document.title = this.originalTitle; } catch {}
+            try { if (this.originalAppleTitle?.node) this.originalAppleTitle.node.setAttribute('content', this.originalAppleTitle.content || 'Raven'); } catch {}
+            try {
+                if (this.originalTouchIcon?.node) {
+                    if (this.originalTouchIcon.href === null) this.originalTouchIcon.node.removeAttribute('href');
+                    else this.originalTouchIcon.node.setAttribute('href', this.originalTouchIcon.href);
+                }
+            } catch {}
+            try {
+                if (this.originalFavicon?.node) {
+                    const f = this.originalFavicon;
+                    if (f.href === null) f.node.removeAttribute('href'); else f.node.setAttribute('href', f.href);
+                    if (f.type === null) f.node.removeAttribute('type'); else f.node.setAttribute('type', f.type);
+                    if (f.sizes === null) f.node.removeAttribute('sizes'); else f.node.setAttribute('sizes', f.sizes);
+                }
+            } catch {}
+            try { this.createdManifest?.remove(); } catch {}
+            try { if (this.manifestUrl) URL.revokeObjectURL(this.manifestUrl); } catch {}
+            try { if (this.originalUrl) history.replaceState(history.state, '', this.originalUrl); } catch {}
+            this.prepared = null;
+            this.manifestUrl = null;
+            this.originalUrl = null;
+            this.originalTitle = null;
+            this.originalAppleTitle = null;
+            this.originalTouchIcon = null;
+            this.originalFavicon = null;
+            this.createdManifest = null;
+        }
+        async copy(url) {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(url);
+                return true;
+            }
+            const ta = document.createElement('textarea');
+            ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+            document.body.append(ta); ta.focus(); ta.select();
+            const ok = document.execCommand?.('copy') ?? false;
+            ta.remove();
+            return !!ok;
+        }
+        async share(app, url) {
+            if (!navigator.share) return false;
+            await navigator.share({ title: String(app.displayName || 'Raven'), text: `Abrir ${String(app.displayName || 'esta app')} en Raven`, url });
+            return true;
+        }
+        canPromptInstall() { return !!deferredInstallPrompt; }
+        async promptInstall() {
+            if (!deferredInstallPrompt) return null;
+            const event = deferredInstallPrompt;
+            deferredInstallPrompt = null;
+            await event.prompt();
+            return await event.userChoice.catch(() => null);
+        }
+    }
+    exports.HomeShortcutManager = HomeShortcutManager;
+});
 define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "filesystem/VirtualFileSystem", "importer/ProjectValidator", "importer/ProjectImporter", "ui/importer/AnalysisView", "ui/importer/ImportingView", "ui/launcher/LauncherView", "ui/library/DetailView", "ui/runtime/RuntimeView", "storage/ProjectStorage", "app/router", "app/state"], function (require, exports, CompatibilityScanner_js_1, VirtualFileSystem_js_2, ProjectValidator_js_1, ProjectImporter_js_1, AnalysisView_js_1, ImportingView_js_1, LauncherView_js_1, DetailView_js_1, RuntimeView_js_1, ProjectStorage_js_1, router_js_1, state_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.App = void 0;
     class App {
-        root; router = new router_js_1.AppRouter(); importer = new ProjectImporter_js_1.ProjectImporter(); storage = new ProjectStorage_js_1.ProjectStorage();
+        root; router = new router_js_1.AppRouter(); importer = new ProjectImporter_js_1.ProjectImporter(); storage = new ProjectStorage_js_1.ProjectStorage(); homeShortcuts = new (require("launcher/HomeShortcutManager").HomeShortcutManager)(); homeShortcutCleanup = null;
         state = { ...state_js_1.initialState }; input; coverInput; bannerInput; runtime = null; library = []; updateTargetId = null; sourceMeta = null; launcherUrls = []; launcherViewMode = 'list'; sheet = null; detailApp = null; analysisAnimateIn = false; transitionBusy = false;
         constructor(root) {
             this.root = root;
@@ -9692,11 +9990,11 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
             this.coverInput = document.createElement('input'); this.coverInput.type='file'; this.coverInput.accept='image/*'; this.coverInput.hidden=true; this.coverInput.addEventListener('change',()=>void this.coverSelected()); document.body.append(this.coverInput);
             this.bannerInput = document.createElement('input'); this.bannerInput.type='file'; this.bannerInput.accept='image/*'; this.bannerInput.hidden=true; this.bannerInput.addEventListener('change',()=>void this.bannerSelected()); document.body.append(this.bannerInput);
         }
-        async start(){try{await this.storage.consolidateDuplicates();}catch(e){console.warn('[Raven] No se pudo consolidar duplicados.',e)}await this.refreshLibrary();this.render();}
+        async start(){try{await this.storage.consolidateDuplicates();}catch(e){console.warn('[Raven] No se pudo consolidar duplicados.',e)}await this.refreshLibrary();const launchId=this.homeShortcuts.getLaunchId();if(launchId){const exists=await this.storage.get(launchId).catch(()=>null);if(exists){await this.launchDirect(launchId);return;}this.state.importError='El acceso directo apunta a una app que ya no está en la biblioteca.';}this.render();}
         async refreshLibrary(){try{this.library=await this.storage.list();if(this.detailApp){this.detailApp=await this.storage.get(this.detailApp.id)||null;}}catch(e){this.library=[];this.state.importError=e instanceof Error?e.message:'No se pudo abrir la biblioteca local.';}}
         persistViewMode(){try{localStorage.setItem('local-runtime-launcher-view',this.launcherViewMode);}catch{}}
         toggleView=()=>{this.launcherViewMode=this.launcherViewMode==='grid'?'list':'grid';this.persistViewMode();this.render();};
-        dismissSheet=()=>{this.sheet?.remove();this.sheet=null;};
+        dismissSheet=()=>{this.sheet?.remove();this.sheet=null;try{this.homeShortcutCleanup?.();}catch{}this.homeShortcutCleanup=null;};
         async promptName(current){return await new Promise(resolve=>{this.dismissSheet();const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Renombrar en biblioteca';const body=document.createElement('div');body.className='sheet-body';const copy=document.createElement('p');copy.className='sheet-copy';copy.textContent='Este nombre solo cambia cómo se muestra en tu biblioteca.';const input=document.createElement('input');input.className='sheet-input';input.type='text';input.value=current;input.placeholder='Nombre visible';const actions=document.createElement('div');actions.className='sheet-actions';const cancel=document.createElement('button');cancel.type='button';cancel.className='sheet-button secondary';cancel.textContent='Cancelar';const save=document.createElement('button');save.type='button';save.className='sheet-button primary';save.textContent='Guardar';const done=v=>{this.dismissSheet();resolve(v);};const submit=()=>{const v=input.value.trim();if(!v){input.focus();return;}done(v);};cancel.addEventListener('click',()=>done(null));save.addEventListener('click',submit);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit();}else if(e.key==='Escape'){e.preventDefault();done(null);}});backdrop.addEventListener('click',e=>{if(e.target===backdrop)done(null);});head.append(title);actions.append(cancel,save);body.append(copy,input,actions);sheet.append(head,body);backdrop.append(sheet);this.sheet=backdrop;document.body.append(backdrop);setTimeout(()=>input.focus(),30);});}
         async confirmRemove(name){return await new Promise(resolve=>{this.dismissSheet();const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Eliminar de biblioteca';const body=document.createElement('div');body.className='sheet-body';const copy=document.createElement('p');copy.className='sheet-copy';copy.textContent=`¿Seguro que quieres eliminar “${name}” de la biblioteca? Esta acción no borra el archivo original fuera del launcher.`;const actions=document.createElement('div');actions.className='sheet-actions';const cancel=document.createElement('button');cancel.type='button';cancel.className='sheet-button secondary';cancel.textContent='Cancelar';const remove=document.createElement('button');remove.type='button';remove.className='sheet-button danger';remove.textContent='Eliminar';const done=v=>{this.dismissSheet();resolve(v);};cancel.addEventListener('click',()=>done(false));remove.addEventListener('click',()=>done(true));backdrop.addEventListener('click',e=>{if(e.target===backdrop)done(false);});head.append(title);actions.append(cancel,remove);body.append(copy,actions);sheet.append(head,body);backdrop.append(sheet);this.sheet=backdrop;document.body.append(backdrop);});}
         open=()=>{this.updateTargetId=null;this.input.value='';this.input.click();};
@@ -9709,12 +10007,12 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
             else consume(new Uint8Array(await file.arrayBuffer()));
             return'content-'+total.toString(16)+'-'+h1.toString(16).padStart(8,'0')+h2.toString(16).padStart(8,'0');
         }
-        async fileSelected(){const file=this.input.files?.[0];if(!file)return;this.set({screen:this.router.navigate('importing'),importError:null});try{this.disposeProject();const[project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);project.sourceName=file.name;project.sourceHash=sourceHash;let match=this.updateTargetId?await this.storage.get(this.updateTargetId):await this.storage.findMatch(project,file.name);project.libraryId=match?.id||null;project.libraryMode=match?(this.updateTargetId?'manual-update':(match.sourceHash===sourceHash?'same':'update')):'new';project.libraryName=match?.displayName||project.name;this.sourceMeta={sourceName:file.name,sourceHash,targetId:match?.id||null};this.updateTargetId=null;const[compatibility,validation,previewIconBlob]=await Promise.all([CompatibilityScanner_js_1.CompatibilityScanner.scan(project),ProjectValidator_js_1.ProjectValidator.validate(project),this.storage.detectCover(project)]);project.previewIconBlob=previewIconBlob||null;this.analysisAnimateIn=true;this.set({screen:this.router.navigate('analysis'),project,compatibility,validation});}catch(e){this.updateTargetId=null;this.sourceMeta=null;this.set({...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo importar.'});}}
+        async fileSelected(){const file=this.input.files?.[0];if(!file)return;this.set({screen:this.router.navigate('importing'),importError:null});try{this.disposeProject();const[project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);project.sourceName=file.name;project.sourceHash=sourceHash;let match=this.updateTargetId?await this.storage.get(this.updateTargetId):await this.storage.findMatch(project,file.name);project.libraryId=match?.id||null;project.libraryMode=match?(this.updateTargetId?'manual-update':(match.sourceHash===sourceHash?'same':'update')):'new';project.libraryName=match?.displayName||project.name;this.sourceMeta={sourceName:file.name,sourceHash,targetId:match?.id||null};this.updateTargetId=null;const previewCoverPromise=match?.coverBlob?Promise.resolve(match.coverBlob):this.storage.detectCover(project);const[compatibility,validation,previewIconBlob]=await Promise.all([CompatibilityScanner_js_1.CompatibilityScanner.scan(project),ProjectValidator_js_1.ProjectValidator.validate(project),previewCoverPromise]);project.previewIconBlob=previewIconBlob||null;this.analysisAnimateIn=true;this.set({screen:this.router.navigate('analysis'),project,compatibility,validation});}catch(e){this.updateTargetId=null;this.sourceMeta=null;this.set({...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo importar.'});}}
         async entry(path){const p=this.state.project;if(!p||!p.files.has(path))return;p.entryPoint=path;this.set({validation:await ProjectValidator_js_1.ProjectValidator.validate(p)});}
         async saveImportedProject(){const project=this.state.project;if(!project)throw new Error('No hay un proyecto para guardar.');const app=await this.storage.save(project,{targetId:project.libraryId||this.sourceMeta?.targetId,sourceName:this.sourceMeta?.sourceName||project.sourceName,sourceHash:this.sourceMeta?.sourceHash||project.sourceHash,compatibilityStatus:this.state.compatibility?.status});project.libraryId=app.id;project.libraryName=app.displayName;project.name=app.displayName;project.storedVersion=app.version;project.libraryMode='same';this.sourceMeta={...(this.sourceMeta||{}),targetId:app.id};return app;}
         openImported=async()=>{const project=this.state.project;if(!project||this.transitionBusy)return;try{const app=await this.saveImportedProject();await this.storage.touchOpened(app.id);this.state.importError=null;this.set({screen:this.router.navigate('runtime')});}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo guardar y abrir la app.';this.render();}};
         addImported=async()=>{const project=this.state.project;if(!project||this.transitionBusy)return;try{await this.saveImportedProject();await this.refreshLibrary();this.state.importError=null;await this.transitionPreflightToLibrary();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo añadir a la biblioteca.';this.render();}};
-        async transitionPreflightToLibrary(){if(this.transitionBusy)return;this.transitionBusy=true;const current=this.root.querySelector('.preflight-screen');const oldUrls=[...this.launcherUrls];try{const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);const newUrls=[...(view.__coverUrls||[])];view.classList.add('library-transition-under');if(!current){this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;this.root.replaceChildren(view);return;}current.classList.remove('preflight-enter-up');current.classList.add('preflight-exit-down');this.root.replaceChildren(view,current);this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};await new Promise(resolve=>{let done=false;const finish=()=>{if(done)return;done=true;resolve();};current.addEventListener('animationend',finish,{once:true});setTimeout(finish,520);});current.remove();view.classList.remove('library-transition-under');for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;}finally{this.transitionBusy=false;}}
+        async transitionPreflightToLibrary(){if(this.transitionBusy)return;this.transitionBusy=true;const current=this.root.querySelector('.preflight-screen');const oldUrls=[...this.launcherUrls];try{const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);const newUrls=[...(view.__coverUrls||[])];view.classList.add('library-transition-under');if(!current){this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;this.root.replaceChildren(view);return;}current.classList.remove('preflight-enter-up');current.classList.add('preflight-exit-down');this.root.replaceChildren(view,current);this.disposeProject();this.sourceMeta=null;this.detailApp=null;this.state={...state_js_1.initialState,screen:this.router.navigate('launcher')};await new Promise(resolve=>{let done=false;const finish=()=>{if(done)return;done=true;resolve();};current.addEventListener('animationend',finish,{once:true});setTimeout(finish,520);});current.remove();view.classList.remove('library-transition-under');for(const u of oldUrls)URL.revokeObjectURL(u);this.launcherUrls=newUrls;}finally{this.transitionBusy=false;}}
         showDetails=async id=>{try{const app=await this.storage.get(id);if(!app)throw new Error('La app ya no existe en la biblioteca.');this.detailApp=app;this.state.importError=null;this.set({screen:this.router.navigate('detail')});}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo abrir la ficha.';this.render();}};
         detailBack=()=>{this.detailApp=null;this.set({screen:this.router.navigate('launcher')});};
         async openLibrary(id){this.set({screen:this.router.navigate('importing'),importError:null});try{this.disposeProject();const project=await this.storage.loadProject(id);await this.storage.touchOpened(id);this.sourceMeta=null;this.detailApp=null;this.set({screen:this.router.navigate('runtime'),project,compatibility:null,validation:[]});}catch(e){await this.refreshLibrary();this.set({...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo abrir la app.'});}}
@@ -9729,21 +10027,88 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
         resetBanner=async item=>{try{await this.storage.resetBanner(item.id);await this.refreshLibrary();this.state.importError=null;this.render();}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo restablecer la portada.';this.render();}};
         remove=async item=>{try{const ok=await this.confirmRemove(item.displayName);if(!ok)return;await this.storage.remove(item.id);if(this.detailApp?.id===item.id)this.detailApp=null;await this.refreshLibrary();this.state.importError=null;this.set({screen:this.router.navigate('launcher')});}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo eliminar de la biblioteca.';this.render();}};
         versionHistory=async item=>{try{this.dismissSheet();const versions=await this.storage.listVersions(item.id);const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Historial de versiones';const body=document.createElement('div');body.className='sheet-body';const list=document.createElement('div');list.className='version-history-list';const date=v=>{try{return new Intl.DateTimeFormat('es',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v))}catch{return''}};for(const version of versions){const row=document.createElement('div');row.className='version-history-item';const main=document.createElement('div');main.className='version-history-main';const name=document.createElement('div');name.className='version-history-version';name.textContent=version.version||'Versión no declarada';const meta=document.createElement('div');meta.className='version-history-meta';meta.textContent=(version.current?'Instalada ahora':'Guardada')+' · '+date(version.installedAt)+' · '+((version.size||0)/1024/1024).toFixed(2)+' MB';main.append(name,meta);const action=document.createElement('button');action.type='button';action.className='version-history-action';action.textContent=version.current?'Actual':'Volver';action.disabled=!!version.current;if(!version.current)action.addEventListener('click',async()=>{action.disabled=true;action.textContent='Restaurando…';try{await this.storage.rollback(item.id,version.revisionId);await this.refreshLibrary();this.dismissSheet();this.state.importError=null;this.detailApp=await this.storage.get(item.id);this.render();}catch(e){action.disabled=false;action.textContent='Volver';const err=document.createElement('div');err.className='sheet-error';err.textContent=e instanceof Error?e.message:'No se pudo restaurar la versión.';body.append(err)}});row.append(main,action);list.append(row)}body.append(list);const note=document.createElement('p');note.className='version-history-note';note.textContent='Raven guarda copias de las últimas actualizaciones localmente. Volver a una versión no borra los datos guardados de la app o juego.';body.append(note);const actions=document.createElement('div');actions.className='sheet-actions';const close=document.createElement('button');close.type='button';close.className='sheet-button secondary';close.textContent='Cerrar';close.addEventListener('click',()=>this.dismissSheet());actions.append(close);body.append(actions);sheet.append(head,body);backdrop.append(sheet);backdrop.addEventListener('click',e=>{if(e.target===backdrop)this.dismissSheet()});this.sheet=backdrop;document.body.append(backdrop);}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo abrir el historial.';this.render();}};
+        async launchDirect(id){
+            try{
+                this.disposeProject();
+                const project=await this.storage.loadProject(id);
+                await this.storage.touchOpened(id);
+                this.sourceMeta=null;this.detailApp=null;
+                this.state={...state_js_1.initialState,screen:this.router.navigate('runtime'),project,compatibility:null,validation:[],importError:null};
+                this.render();
+            }catch(e){
+                await this.refreshLibrary();
+                this.state={...state_js_1.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo abrir el acceso directo.'};
+                this.render();
+            }
+        }
+        addToHome=async item=>{
+            try{
+                this.dismissSheet();
+                const prepared=await this.homeShortcuts.prepare(item);
+                const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';
+                const sheet=document.createElement('section');sheet.className='bottom-sheet';
+                const head=document.createElement('header');head.className='sheet-header';
+                const title=document.createElement('h2');title.className='sheet-title';title.textContent='Añadir al inicio';head.append(title);
+                const body=document.createElement('div');body.className='sheet-body';
+                const preview=document.createElement('div');preview.className='home-shortcut-preview';
+                const icon=document.createElement('div');icon.className='home-shortcut-icon';
+                let iconUrl=null;
+                if(item.coverBlob){iconUrl=URL.createObjectURL(item.coverBlob);const img=document.createElement('img');img.src=iconUrl;img.alt='';icon.append(img);}else{icon.textContent=String(item.displayName||'A').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase().slice(0,2)||'A';}
+                const copy=document.createElement('div');copy.className='home-shortcut-preview-copy';
+                const name=document.createElement('div');name.className='home-shortcut-name';name.textContent=item.displayName;
+                const sub=document.createElement('div');sub.className='home-shortcut-sub';sub.textContent='Acceso directo de Raven · abre esta app directamente';
+                copy.append(name,sub);preview.append(icon,copy);body.append(preview);
+                const status=document.createElement('div');status.className='home-shortcut-status'+(!prepared.installable?' warning':'');
+                if(prepared.installable){
+                    status.textContent=prepared.standalone?'El destino directo está preparado. Para crear otro icono independiente, abre este enlace en Safari y añádelo a la pantalla de inicio.':'Raven preparó temporalmente el nombre, icono y destino directo de esta app para que el sistema pueda guardarlos.';
+                }else{
+                    status.textContent='Este Raven se está ejecutando desde un archivo, una URL temporal o dentro de otro Raven. El acceso directo interno funciona, pero iOS no puede crear un icono permanente de pantalla de inicio desde este tipo de URL. Para instalarlo como icono real, abre la misma build de Raven desde una URL HTTP/HTTPS estable.';
+                }
+                body.append(status);
+                const steps=document.createElement('ol');steps.className='home-shortcut-steps';
+                if(prepared.installable){
+                    for(const text of ['Mantén esta pantalla abierta para conservar el nombre, icono y enlace preparados.','En Safari, abre Compartir.','Elige “Añadir a pantalla de inicio” y confirma.','Al tocar ese icono, Raven abrirá directamente esta app o juego con su runtime correspondiente.']){const li=document.createElement('li');li.textContent=text;steps.append(li)}
+                }else{
+                    for(const text of ['El identificador directo de la app ya está creado y seguirá siendo el mismo mientras la entrada exista en tu biblioteca.','Cuando Raven se ejecute desde una URL instalable, vuelve a esta opción.','Añade el acceso desde Safari; no será necesario modificar la app ni el juego.']){const li=document.createElement('li');li.textContent=text;steps.append(li)}
+                }
+                body.append(steps);
+                const url=document.createElement('div');url.className='home-shortcut-url';url.textContent=prepared.directUrl;body.append(url);
+                const actions=document.createElement('div');actions.className='home-shortcut-actions';
+                const copyBtn=document.createElement('button');copyBtn.type='button';copyBtn.className='sheet-button secondary';copyBtn.textContent='Copiar enlace';copyBtn.addEventListener('click',async()=>{try{await this.homeShortcuts.copy(prepared.directUrl);copyBtn.textContent='Copiado';setTimeout(()=>{if(copyBtn.isConnected)copyBtn.textContent='Copiar enlace'},1400)}catch{copyBtn.textContent='No se pudo copiar'}});
+                const close=document.createElement('button');close.type='button';close.className='sheet-button primary';close.textContent='Cerrar';close.addEventListener('click',()=>this.dismissSheet());
+                actions.append(copyBtn,close);body.append(actions);
+                if(prepared.installable&&navigator.share){
+                    const share=document.createElement('button');share.type='button';share.className='sheet-button secondary';share.style.width='100%';share.style.marginTop='10px';share.textContent='Compartir enlace directo';share.addEventListener('click',async()=>{try{await this.homeShortcuts.share(item,prepared.directUrl)}catch(e){if(e?.name!=='AbortError'){share.textContent='No se pudo compartir';setTimeout(()=>{if(share.isConnected)share.textContent='Compartir enlace directo'},1600)}}});body.append(share);
+                }
+                if(prepared.installable&&this.homeShortcuts.canPromptInstall()){
+                    const install=document.createElement('button');install.type='button';install.className='sheet-button primary';install.style.width='100%';install.style.marginTop='10px';install.textContent='Instalar acceso';install.addEventListener('click',async()=>{install.disabled=true;try{const choice=await this.homeShortcuts.promptInstall();install.textContent=choice?.outcome==='accepted'?'Instalado':'Instalación cerrada';}catch{install.textContent='No se pudo instalar';}finally{setTimeout(()=>{if(install.isConnected){install.disabled=false;install.textContent='Instalar acceso'}},1800)}});body.append(install);
+                }
+                const note=document.createElement('p');note.className='home-shortcut-note';note.textContent='Raven no modifica la carátula guardada. Solo la presenta temporalmente al sistema como icono del acceso directo.';body.append(note);
+                sheet.append(head,body);backdrop.append(sheet);backdrop.addEventListener('click',e=>{if(e.target===backdrop)this.dismissSheet()});
+                this.homeShortcutCleanup=()=>{if(iconUrl)URL.revokeObjectURL(iconUrl);this.homeShortcuts.restore();};
+                this.sheet=backdrop;document.body.append(backdrop);
+            }catch(e){
+                try{this.homeShortcuts.restore()}catch{}
+                this.state.importError=e instanceof Error?e.message:'No se pudo preparar el acceso directo.';this.render();
+            }
+        };
         disposeProject(){if(this.state.project){new VirtualFileSystem_js_2.VirtualFileSystem(this.state.project).dispose();this.state.project=null;}}
         revokeLauncherUrls(){for(const u of this.launcherUrls)URL.revokeObjectURL(u);this.launcherUrls=[];}
         set(patch){this.state={...this.state,...patch};this.render();}
-        render(){document.querySelectorAll('.library-menu,.detail-menu').forEach(node=>node.remove());this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close(),this.storage);this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
+        render(){document.querySelectorAll('.library-menu,.detail-menu').forEach(node=>node.remove());this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close(),this.storage);this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
     }
     exports.App=App;
 });
 define("main", ["require", "exports", "app/App"], function (require, exports, App_js_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const update = () => document.documentElement.style.setProperty('--visual-height', `${window.visualViewport?.height ?? innerHeight}px`);
-    update();
-    addEventListener('resize', update, { passive: true });
-    addEventListener('orientationchange', update, { passive: true });
-    visualViewport?.addEventListener('resize', update, { passive: true });
+    const hasDynamicViewport = !!globalThis.CSS?.supports?.('height', '100dvh');
+    const updateLegacyViewport = () => { if (!hasDynamicViewport) document.documentElement.style.setProperty('--visual-height', `${innerHeight}px`); };
+    updateLegacyViewport();
+    if (!hasDynamicViewport) {
+        addEventListener('resize', updateLegacyViewport, { passive: true });
+        addEventListener('orientationchange', () => setTimeout(updateLegacyViewport, 80), { passive: true });
+    }
     const root = document.getElementById('root');
     if (!root)
         throw new Error('No se encontró #root.');
@@ -10049,8 +10414,10 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
                     const keep=(a.updatedAt||0)>=(b.updatedAt||0)?a:b, drop=keep===a?b:a;
                     keep.createdAt=Math.min(keep.createdAt||Date.now(),drop.createdAt||Date.now());
                     keep.openCount=Math.max(keep.openCount||0,drop.openCount||0);
-                    if(!keep.coverCustom&&drop.coverCustom){keep.coverBlob=drop.coverBlob;keep.coverCustom=true}
-                    if(!keep.bannerCustom&&drop.bannerCustom){keep.bannerBlob=drop.bannerBlob;keep.bannerCustom=true}
+                    if(!keep.coverBlob&&drop.coverBlob){keep.coverBlob=drop.coverBlob;keep.coverCustom=!!drop.coverCustom}
+                    else if(!keep.coverCustom&&drop.coverCustom&&drop.coverBlob){keep.coverBlob=drop.coverBlob;keep.coverCustom=true}
+                    if(!keep.bannerBlob&&drop.bannerBlob){keep.bannerBlob=drop.bannerBlob;keep.bannerCustom=!!drop.bannerCustom}
+                    else if(!keep.bannerCustom&&drop.bannerCustom&&drop.bannerBlob){keep.bannerBlob=drop.bannerBlob;keep.bannerCustom=true}
                     if(drop.sourceHash&&drop.sourceHash!==keep.sourceHash)await this.captureRevision(drop,'deduplicated',keep.id);
                     await this.putApp(keep); await this.moveRuntimeState(drop.id,keep.id); await this.remove(drop.id); removed.add(drop.id);
                     if(drop===a)break;
@@ -10093,11 +10460,14 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             const changed = !existing || !info.sourceHash || existing.sourceHash !== info.sourceHash;
             if (existing && changed) await this.captureRevision(existing, 'update');
             const id = existing?.id || crypto.randomUUID();
+            // Artwork is identity-level user state. Updating/opening an app must never
+            // silently replace or clear the artwork that is already visible in Raven.
+            // Auto-detection is only used the first time an entry has no stored cover.
             let coverBlob = existing?.coverBlob || null;
             let coverCustom = !!existing?.coverCustom;
-            if (!coverCustom && (changed || !coverBlob)) coverBlob = await autoCover(project);
+            if (!coverBlob) coverBlob = await autoCover(project);
             let bannerCustom = !!existing?.bannerCustom;
-            let bannerBlob = bannerCustom ? (existing?.bannerBlob || null) : null;
+            let bannerBlob = existing?.bannerBlob || null;
             const version = cleanVersion(project.metadata?.version) || (!changed ? cleanVersion(existing?.version) : null);
             const history = Array.isArray(existing?.updateHistory) ? [...existing.updateHistory] : [];
             if (existing && changed) history.push({ fromVersion: existing.version || null, version, hash: info.sourceHash || null, updatedAt: now, sourceName, size: project.size });
