@@ -8,7 +8,7 @@
   <title>Raven</title>
   <meta name="application-name" content="Raven">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.14.8">
+  <meta name="app-version" content="0.14.12">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -679,6 +679,62 @@ body.raven-direct-shortcut .runtime-toolbar,body.raven-direct-shortcut .runtime-
 .shortcut-setup-note{margin:12px 0 0;color:rgba(235,235,242,.46);font-size:11px;line-height:1.45}
 .shortcut-setup-ready{margin-top:22px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08);color:#f1f1f4;font-size:12px}
 </style>
+
+
+
+
+<style id="raven-v0.14.12-library-controls-refinement">
+/* Landscape library: one real-item rail, compact cards, no clone carousel. */
+.library-viewport{position:relative;width:100%;max-width:100%;min-width:0;overflow:hidden;box-sizing:border-box}
+@media (orientation:landscape){
+  .launcher-screen.launcher-grid-mode{padding-bottom:max(14px,env(safe-area-inset-bottom))}.launcher-content-library.launcher-grid-horizontal{overflow:hidden!important;padding:14px 0 max(14px,env(safe-area-inset-bottom))!important;overscroll-behavior:none!important}
+  .launcher-grid-horizontal .library-viewport{width:calc(100% - 76px);max-width:calc(100% - 76px);margin-right:76px;overflow:hidden;padding:0;isolation:isolate}
+  .launcher-grid-horizontal .library-grid{
+    width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;
+    padding:0 max(20px,env(safe-area-inset-right)) 12px max(20px,env(safe-area-inset-left));
+    box-sizing:border-box;display:flex!important;flex-flow:row nowrap!important;align-items:stretch;
+    justify-content:flex-start;gap:clamp(14px,1.55vw,24px);overflow-x:hidden!important;overflow-y:hidden!important;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;overscroll-behavior-y:none;
+    touch-action:pan-x;scroll-snap-type:none;scroll-behavior:auto;
+    transition:opacity .13s ease,filter .13s ease;
+  }
+  .launcher-grid-horizontal .library-grid::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+  .launcher-grid-horizontal .library-grid.horizontal-scroll-enabled{overflow-x:auto!important}
+  .launcher-grid-horizontal .library-card{
+    flex:0 0 clamp(158px,19vw,330px)!important;width:clamp(158px,19vw,330px)!important;
+    min-width:0!important;max-width:330px!important;box-sizing:border-box;scroll-snap-align:none!important;
+  }
+  .launcher-grid-horizontal .library-grid.edge-jumping{opacity:.58;filter:blur(2px)}
+  .launcher-grid-horizontal .library-viewport::before,
+  .launcher-grid-horizontal .library-viewport::after{
+    content:'';position:absolute;z-index:8;top:0;bottom:10px;width:clamp(28px,4vw,52px);pointer-events:none;
+    opacity:0;transition:opacity .16s ease;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)
+  }
+  .launcher-grid-horizontal .library-viewport::before{left:0;background:linear-gradient(90deg,rgba(8,8,12,.82) 0%,rgba(8,8,12,.28) 48%,rgba(8,8,12,0) 100%)}
+  .launcher-grid-horizontal .library-viewport::after{right:0;background:linear-gradient(270deg,rgba(8,8,12,.82) 0%,rgba(8,8,12,.28) 48%,rgba(8,8,12,0) 100%)}
+  .launcher-grid-horizontal .library-viewport.has-left-overflow::before{opacity:1}
+  .launcher-grid-horizontal .library-viewport.has-right-overflow::after{opacity:1}
+  .launcher-screen.launcher-grid-mode .import-fab{z-index:20}
+}
+
+/* Game Boy/GBC landscape controls: preserve input wiring, only position the existing controls. */
+@media (orientation:landscape) and (max-height:700px){
+  .console-shell{grid-template-columns:minmax(320px,1.12fr) minmax(330px,.88fr);column-gap:clamp(20px,3vw,34px)}
+  .console-screen-bezel{grid-column:1;grid-row:1/4}
+  .console-controls{grid-column:2;grid-row:1/4;position:relative!important;display:block!important;min-height:0!important;align-self:stretch;padding:0!important}
+  .console-dpad{position:absolute!important;left:0!important;top:50%!important;transform:translateY(-50%);width:130px;height:130px;margin:0!important}
+  .console-actions{position:absolute!important;right:2px!important;top:43%!important;justify-self:auto!important;align-self:auto!important;display:flex;gap:18px;padding:0!important;transform:translateY(-50%) rotate(-18deg)!important}
+  .console-action{position:relative;width:58px;height:58px}
+  .console-action::before{content:'';position:absolute;inset:-9px;border-radius:50%}
+  .console-system-controls{position:absolute!important;right:0!important;bottom:42px!important;left:auto!important;display:flex!important;justify-content:flex-end!important;gap:13px!important;margin:0!important}
+  .console-system-button{position:relative;min-width:70px}
+  .console-system-button::before{content:'';position:absolute;inset:-7px -5px;border-radius:999px}
+  .console-brandline{grid-column:2!important;grid-row:3!important;align-self:end!important;margin:0!important;padding:0 2px!important;pointer-events:none}
+  .console-status{display:none!important}
+  .console-runtime.display-focus .console-controls{transform:none!important;margin:0!important}
+}
+</style>
+
 </head>
 <body>
   <script>(()=>{
@@ -7833,6 +7889,7 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
     }
     function renderLauncher(items, onImport, actions, error, viewMode = 'list') {
         const root = (0, dom_js_3.el)('main', 'launcher-screen'), header = (0, dom_js_3.el)('header', 'launcher-header'), content = (0, dom_js_3.el)('section', 'launcher-content');
+        if (viewMode === 'grid') root.classList.add('launcher-grid-mode');
         const urls = [];
         root.__coverUrls = urls;
         header.append((0, dom_js_3.el)('h1', 'screen-title', 'Biblioteca'));
@@ -7888,54 +7945,147 @@ define("ui/launcher/LauncherView", ["require", "exports", "utils/dom", "utils/fo
         else {
             content.classList.add('launcher-content-library');
             const container = (0, dom_js_3.el)('div', viewMode === 'grid' ? 'library-grid' : 'library-list');
-            for (const item of items) {
-                const host = (0, dom_js_3.el)('article', viewMode === 'grid' ? 'library-card' : 'library-item');
-                host.tabIndex = 0;
-                host.setAttribute('role', 'button');
-                host.setAttribute('aria-label', `Abrir ${item.displayName}`);
-                host.addEventListener('click', e => {
-                    if (e.target instanceof Element && e.target.closest('.library-more,.library-card-more,.library-menu')) return;
-                    actions.open(item.id);
-                });
-                host.addEventListener('keydown', e => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); actions.open(item.id); }
-                });
-                let cover;
-                if (item.coverBlob) {
-                    const url = URL.createObjectURL(item.coverBlob);
-                    urls.push(url);
-                    cover = document.createElement('img');
-                    cover.className = viewMode === 'grid' ? 'library-card-cover' : 'library-cover';
-                    cover.src = url;
-                    cover.alt = '';
-                    cover.addEventListener('error', () => cover.replaceWith(fallbackCover(item, viewMode === 'grid' ? 'library-card-cover library-cover-fallback' : 'library-cover library-cover-fallback')), { once: true });
-                }
-                else {
-                    cover = fallbackCover(item, viewMode === 'grid' ? 'library-card-cover library-cover-fallback' : 'library-cover library-cover-fallback');
-                }
-                const moreClass = viewMode === 'grid' ? 'library-card-more' : 'library-more';
-                const more = (0, dom_js_3.button)('⋯', moreClass, e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openMenuAt(more, item);
-                }, 'Opciones');
-                if (viewMode === 'grid') {
-                    const coverWrap = (0, dom_js_3.el)('div', 'library-card-cover-wrap');
-                    coverWrap.append(cover);
-                    const info = (0, dom_js_3.el)('div', 'library-card-info');
-                    info.append((0, dom_js_3.el)('div', 'library-card-name', item.displayName), (0, dom_js_3.el)('div', 'library-card-meta', `${String(item.source || '').toUpperCase()} · ${item.version || 'Sin declarar'}`));
-                    host.append(coverWrap, info, more);
-                }
-                else {
-                    const info = (0, dom_js_3.el)('div', 'library-info');
-                    info.append((0, dom_js_3.el)('div', 'library-name', item.displayName), (0, dom_js_3.el)('div', 'library-meta', `${String(item.source || '').toUpperCase()} · ${item.version || 'Sin declarar'} · ${(0, format_js_2.formatBytes)(item.size || 0)}`));
-                    const coverShell = (0, dom_js_3.el)('div', 'library-cover-shell');
-                    coverShell.append(cover);
-                    host.append(coverShell, info, more);
-                }
-                container.append(host);
+            const gridViewport = viewMode === 'grid' ? (0, dom_js_3.el)('div', 'library-viewport') : null;
+            if (viewMode === 'grid') content.classList.add('launcher-grid-horizontal');
+            const buildLibraryItem = (item) => {
+            const host = (0, dom_js_3.el)('article', viewMode === 'grid' ? 'library-card' : 'library-item');
+            host.tabIndex = 0;
+            host.setAttribute('role', 'button');
+            host.setAttribute('aria-label', `Abrir ${item.displayName}`);
+            host.addEventListener('click', e => {
+                if (e.target instanceof Element && e.target.closest('.library-more,.library-card-more,.library-menu')) return;
+                actions.open(item.id);
+            });
+            host.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); actions.open(item.id); }
+            });
+            let cover;
+            if (item.coverBlob) {
+                const url = URL.createObjectURL(item.coverBlob);
+                urls.push(url);
+                cover = document.createElement('img');
+                cover.className = viewMode === 'grid' ? 'library-card-cover' : 'library-cover';
+                cover.src = url;
+                cover.alt = '';
+                cover.addEventListener('error', () => cover.replaceWith(fallbackCover(item, viewMode === 'grid' ? 'library-card-cover library-cover-fallback' : 'library-cover library-cover-fallback')), { once: true });
             }
-            content.append(container);
+            else {
+                cover = fallbackCover(item, viewMode === 'grid' ? 'library-card-cover library-cover-fallback' : 'library-cover library-cover-fallback');
+            }
+            const moreClass = viewMode === 'grid' ? 'library-card-more' : 'library-more';
+            const more = (0, dom_js_3.button)('⋯', moreClass, e => {
+                e.preventDefault();
+                e.stopPropagation();
+                openMenuAt(more, item);
+            }, 'Opciones');
+            if (viewMode === 'grid') {
+                const coverWrap = (0, dom_js_3.el)('div', 'library-card-cover-wrap');
+                coverWrap.append(cover);
+                const info = (0, dom_js_3.el)('div', 'library-card-info');
+                info.append((0, dom_js_3.el)('div', 'library-card-name', item.displayName), (0, dom_js_3.el)('div', 'library-card-meta', `${String(item.source || '').toUpperCase()} · ${item.version || 'Sin declarar'}`));
+                host.append(coverWrap, info, more);
+            }
+            else {
+                const info = (0, dom_js_3.el)('div', 'library-info');
+                info.append((0, dom_js_3.el)('div', 'library-name', item.displayName), (0, dom_js_3.el)('div', 'library-meta', `${String(item.source || '').toUpperCase()} · ${item.version || 'Sin declarar'} · ${(0, format_js_2.formatBytes)(item.size || 0)}`));
+                const coverShell = (0, dom_js_3.el)('div', 'library-cover-shell');
+                coverShell.append(cover);
+                host.append(coverShell, info, more);
+            }
+                return host;
+            };
+            // Render every library item exactly once. Circular navigation is an edge gesture,
+            // never a duplicated DOM/data carousel.
+            for (const item of items) container.append(buildLibraryItem(item));
+            if (gridViewport) {
+                gridViewport.append(container);
+                content.append(gridViewport);
+
+                const abort = new AbortController();
+                const signal = abort.signal;
+                let horizontalEnabled = false;
+                let edgeJumping = false;
+                let edgeRaf = 0;
+                let gesture = null;
+                const isLandscape = () => window.matchMedia?.('(orientation: landscape)').matches ?? (innerWidth > innerHeight);
+                const maxScroll = () => Math.max(0, container.scrollWidth - container.clientWidth);
+                const atStart = () => container.scrollLeft <= 2;
+                const atEnd = () => container.scrollLeft >= maxScroll() - 2;
+                const updateEdges = () => {
+                    edgeRaf = 0;
+                    if (!horizontalEnabled) {
+                        gridViewport.classList.remove('has-left-overflow','has-right-overflow');
+                        return;
+                    }
+                    const max = maxScroll();
+                    gridViewport.classList.toggle('has-left-overflow', container.scrollLeft > 2);
+                    gridViewport.classList.toggle('has-right-overflow', container.scrollLeft < max - 2);
+                };
+                const scheduleEdges = () => {
+                    if (!edgeRaf) edgeRaf = requestAnimationFrame(updateEdges);
+                };
+                const refreshHorizontalMode = () => {
+                    // CSS lays the landscape grid out as a single real-item row first; only
+                    // enable scrolling when that row genuinely exceeds the available viewport.
+                    const landscape = isLandscape();
+                    const overflow = landscape && items.length >= 4 && container.scrollWidth > container.clientWidth + 3;
+                    horizontalEnabled = !!overflow;
+                    container.classList.toggle('horizontal-scroll-enabled', horizontalEnabled);
+                    gridViewport.classList.toggle('horizontal-active', horizontalEnabled);
+                    if (!horizontalEnabled && container.scrollLeft) container.scrollLeft = 0;
+                    scheduleEdges();
+                };
+                const jumpEdge = target => {
+                    if (!horizontalEnabled || edgeJumping) return;
+                    edgeJumping = true;
+                    container.classList.add('edge-jumping');
+                    // Fade/blur briefly, jump directly to the opposite edge, then restore.
+                    // This avoids visually travelling through every intermediate application.
+                    setTimeout(() => {
+                        container.scrollLeft = target;
+                        scheduleEdges();
+                        requestAnimationFrame(() => {
+                            container.classList.remove('edge-jumping');
+                            setTimeout(() => { edgeJumping = false; }, 150);
+                        });
+                    }, 90);
+                };
+                container.addEventListener('scroll', scheduleEdges, { passive:true, signal });
+                container.addEventListener('pointerdown', e => {
+                    if (!horizontalEnabled || e.button > 0) return;
+                    gesture = {
+                        id:e.pointerId, x:e.clientX, y:e.clientY,
+                        fromStart:atStart(), fromEnd:atEnd()
+                    };
+                }, { passive:true, signal });
+                container.addEventListener('pointerup', e => {
+                    if (!gesture || gesture.id !== e.pointerId || !horizontalEnabled) { gesture = null; return; }
+                    const dx = e.clientX - gesture.x, dy = e.clientY - gesture.y;
+                    const threshold = Math.min(80, Math.max(52, container.clientWidth * .055));
+                    const horizontalGesture = Math.abs(dx) >= threshold && Math.abs(dx) > Math.abs(dy) * 1.15;
+                    if (horizontalGesture && gesture.fromEnd && dx < 0) jumpEdge(0);
+                    else if (horizontalGesture && gesture.fromStart && dx > 0) jumpEdge(maxScroll());
+                    gesture = null;
+                }, { passive:true, signal });
+                for (const type of ['pointercancel','lostpointercapture']) container.addEventListener(type, () => { gesture = null; }, { passive:true, signal });
+                container.addEventListener('keydown', e => {
+                    if (!horizontalEnabled || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+                    const firstCard = container.querySelector('.library-card');
+                    if (!firstCard) return;
+                    e.preventDefault();
+                    if (e.key === 'ArrowLeft' && atStart()) { jumpEdge(maxScroll()); return; }
+                    if (e.key === 'ArrowRight' && atEnd()) { jumpEdge(0); return; }
+                    const gap = Number.parseFloat(getComputedStyle(container).gap || '16') || 16;
+                    container.scrollBy({left:(firstCard.getBoundingClientRect().width + gap) * (e.key === 'ArrowRight' ? 1 : -1),behavior:'smooth'});
+                }, { signal });
+                const resizeObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(() => requestAnimationFrame(refreshHorizontalMode)) : null;
+                resizeObserver?.observe(gridViewport);
+                resizeObserver?.observe(container);
+                requestAnimationFrame(() => requestAnimationFrame(refreshHorizontalMode));
+                root.__cleanup = () => { abort.abort(); resizeObserver?.disconnect(); if (edgeRaf) cancelAnimationFrame(edgeRaf); };
+            } else {
+                content.append(container);
+            }
         }
         if (error) {
             const e = (0, dom_js_3.el)('div', 'inline-error', error);
@@ -9463,9 +9613,20 @@ exports.InputManager=InputManager;
 });
 
 define("runtime/gameboy/RavenGBEngine", ["require", "exports"], function(require,exports){
+/* Raven GB core r0.14.11: JR r8 fetch-order regression fixed. Verified against the supplied POKEMON RED (MBC3) and POKECARD (MBC5/CGB) ROMs. */
 "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.RavenGBEngine=void 0;
 const u8=v=>v&255,u16=v=>v&65535,s8=v=>(v&128)?v-256:v;const Z=128,N=64,H=32,C=16;
 const RAM_SIZES={0:0,1:0x800,2:0x2000,3:0x8000,4:0x20000,5:0x10000};
+const POST_BOOT_IO=new Uint8Array([
+  0x0F,0x00,0x7C,0xFF,0x00,0x00,0x00,0xF8,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x01,
+  0x80,0xBF,0xF3,0xFF,0xBF,0xFF,0x3F,0x00,0xFF,0xBF,0x7F,0xFF,0x9F,0xFF,0xBF,0xFF,
+  0xFF,0x00,0x00,0xBF,0x77,0xF3,0xF1,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+  0x00,0xFF,0x00,0xFF,0x00,0xFF,0x00,0xFF,0x00,0xFF,0x00,0xFF,0x00,0xFF,0x00,0xFF,
+  0x91,0x80,0x00,0x00,0x00,0x00,0x00,0xFC,0x00,0x00,0x00,0x00,0xFF,0x7E,0xFF,0xFE,
+  0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x3E,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+  0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xC0,0xFF,0xC1,0x00,0xFE,0xFF,0xFF,0xFF,
+  0xF8,0xFF,0x00,0x00,0x00,0x8F,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+]);
 class RavenGBEngine{
  constructor(canvas,rom,{smooth=false,audio=true}={}){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.rom=rom;this.smooth=smooth;this.audioEnabled=audio;this.image=this.ctx.createImageData(160,144);this.frame=this.image.data;this.onFrame=null;this.onError=null;this.reset()}
  reset(){
@@ -9482,25 +9643,24 @@ class RavenGBEngine{
   this.oam=new Uint8Array(0xA0);this.hram=new Uint8Array(0x7F);this.io=new Uint8Array(0x80);
   this.bgPal=new Uint8Array(64);this.objPal=new Uint8Array(64);this._bgColor=new Uint8Array(160*144);
   if(![0x00,0x01,0x02,0x03,0x05,0x06,0x08,0x09,0x0F,0x10,0x11,0x12,0x13,0x19,0x1A,0x1B,0x1C,0x1D,0x1E].includes(this.cart))throw new Error(`Tipo de cartucho 0x${this.cart.toString(16).toUpperCase().padStart(2,'0')} todavía no es compatible.`);
-  if(this.cgb){this.A=0x11;this.F=0x80;this.B=0;this.C=0;this.D=0xFF;this.E=0x56;this.H=0;this.L=0x0D}else{this.A=0x01;this.F=0xB0;this.B=0;this.C=0x13;this.D=0;this.E=0xD8;this.H=0x01;this.L=0x4D}
+  this.A=this.cgb?0x11:0x01;this.F=0xB0;this.B=0x00;this.C=0x13;this.D=0x00;this.E=0xD8;this.H=0x01;this.L=0x4D;
   this.SP=0xFFFE;this.PC=0x0100;this.ime=false;this.eiDelay=0;this.halted=false;this.haltBug=false;this.stopped=false;
   this.romBank=1;this.ramBank=0;this.ramEnabled=this.cart===0x08||this.cart===0x09;this.mbc1Mode=0;this.mbc1Hi=0;this.rtcSel=0;this.rtcLatchWrite=0;
   this.rtc={sec:0,min:0,hour:0,day:0,halt:false,carry:false,last:Date.now(),latched:null};
-  this.vramBank=0;this.wramBank=1;this.ie=0;this.joy=0xFF;this.joySelect=0x30;
-  this.divCounter=this.cgb?0x267C:0xABCC;this.timerReloadDelay=0;this.ppuCycles=0;this.ly=0;this.ppuMode=2;this.statLine=false;this.frameCounter=0;this.serialCycles=0;
+  // FF00 is 0xCF after the boot ROM: both selection lines low, no buttons pressed.
+  // Keeping joySelect at 0x30 made software probing JOYP see a different machine state.
+  this.vramBank=0;this.wramBank=1;this.ie=0;this.joy=0xFF;this.joySelect=0x00;
+  // Start where real skip-boot cores begin: VBlank line 144 with an already-running
+  // divider. A number of commercial games wait on LY before disabling the LCD.
+  this.divCounter=27044;this.timerReloadDelay=0;this.ppuCycles=160;this.ly=144;this.ppuMode=1;this.statLine=false;this.frameCounter=0;this.serialCycles=0;
   this.doubleSpeed=false;this.hdmaActive=false;this.hdmaBlocks=0;this.hdmaSource=0;this.hdmaDest=0x8000;this.rumbleOn=false;
-  this.running=false;this.raf=0;this.lastTime=0;this.acc=0;
-  // Post-boot register state. Games start at 0x0100 after the boot ROM, so the
-  // hardware-visible I/O state must match a booted console rather than a zeroed page.
-  this.io[0x00]=0xCF;this.io[0x01]=0x00;this.io[0x02]=0x7E;
-  this.io[0x05]=0x00;this.io[0x06]=0x00;this.io[0x07]=0xF8;this.io[0x0F]=0xE1;
-  this.io[0x10]=0x80;this.io[0x11]=0xBF;this.io[0x12]=0xF3;this.io[0x13]=0xFF;this.io[0x14]=0xBF;
-  this.io[0x16]=0x3F;this.io[0x17]=0x00;this.io[0x18]=0xFF;this.io[0x19]=0xBF;
-  this.io[0x1A]=0x7F;this.io[0x1B]=0xFF;this.io[0x1C]=0x9F;this.io[0x1D]=0xFF;this.io[0x1E]=0xBF;
-  this.io[0x20]=0xFF;this.io[0x21]=0x00;this.io[0x22]=0x00;this.io[0x23]=0xBF;this.io[0x24]=0x77;this.io[0x25]=0xF3;this.io[0x26]=0xF1;
-  this.io[0x40]=0x91;this.io[0x41]=0x80;this.io[0x42]=0;this.io[0x43]=0;this.io[0x44]=0;this.io[0x45]=0;
-  this.io[0x47]=0xFC;this.io[0x48]=0xFF;this.io[0x49]=0xFF;this.io[0x4A]=0;this.io[0x4B]=0;
-  this.io[0x4D]=0x7E;this.io[0x4F]=0xFE;this.io[0x55]=0xFF;this.io[0x68]=0;this.io[0x69]=0;this.io[0x6A]=0;this.io[0x6B]=0;this.io[0x70]=0xF9;
+  this.running=false;this.raf=0;this.lastTime=0;this.acc=0;this.vramWrites=0;this.paletteWrites=0;this.lastVisualWriteAt=0;
+  // Exact skip-boot I/O image. This matters for commercial ROMs that probe
+  // undocumented/high bits or CGB palette/index registers during their startup.
+  this.io.set(POST_BOOT_IO);
+  if(this.cgb){this.io[0x6C]=0xFE;this.io[0x74]=0xFE;}
+  else{this.io[0x48]=0xFF;this.io[0x49]=0xFF;this.io[0x6C]=0xFF;this.io[0x74]=0xFF;}
+  this.io[0x44]=144;this.io[0x4D]=0x7E;this.io[0x4F]=0xFE;this.io[0x55]=0xFF;this.io[0x70]=0xF8;
   // Host audio is deliberately lazy. Creating/resuming AudioContext before the first
   // user gesture can fail on iOS and must never be able to stop video emulation.
   this.audio?.dispose();this.audio=null;this.runtimeError=null;this.lastOpcode=0;this.lastPC=this.PC;this.instructions=0;this.lastFrameAt=performance.now?.()||Date.now();
@@ -9527,7 +9687,7 @@ class RavenGBEngine{
  write(a,v){
   a&=65535;v&=255;
   if(a<0x8000){this.writeCart(a,v);return}
-  if(a<0xA000){this.vram[(this.vramBank<<13)+(a-0x8000)]=v;return}
+  if(a<0xA000){this.vram[(this.vramBank<<13)+(a-0x8000)]=v;this.vramWrites++;this.lastVisualWriteAt=this.instructions||0;return}
   if(a<0xC000){if(!this.ramEnabled)return;if(this.mbc===2){this.eram[(a-0xA000)&511]=v&15;return}if(this.mbc===3&&this.rtcSel>=8&&this.rtcSel<=12){this._rtcWrite(this.rtcSel,v);return}if(this.eram.length)this.eram[(this._ramBank()*0x2000+(a-0xA000))%this.eram.length]=v;return}
   if(a<0xD000){this.wram[a-0xC000]=v;return}
   if(a<0xE000){this.wram[this.wramBank*0x1000+(a-0xD000)]=v;return}
@@ -9588,7 +9748,7 @@ class RavenGBEngine{
   if(i===4){const old=this._timerSignal();this.divCounter=0;if(old&&!this._timerSignal())this._timerIncrement();return}
   if(i===5){this.io[5]=v;this.timerReloadDelay=0;return}if(i===6){this.io[6]=v;return}
   if(i===7){const old=this._timerSignal();this.io[7]=v&7;if(old&&!this._timerSignal())this._timerIncrement();return}
-  if(i===0x0F){this.io[i]=v|0xE0;return}
+  if(i===0x0F){this.io[i]=v&0x1F;return}
   if(i===0x40){const was=!!(this.io[0x40]&0x80);this.io[i]=v;const on=!!(v&0x80);if(was&&!on){this.ly=0;this.ppuCycles=0;this.ppuMode=0;this.io[0x44]=0;this._updateSTAT()}else if(!was&&on){this.ppuCycles=0;this.ppuMode=2;this._updateSTAT()}return}
   if(i===0x41){this.io[i]=(this.io[i]&7)|(v&0x78)|0x80;this._updateSTAT();return}
   if(i===0x44){return}if(i===0x45){this.io[i]=v;this._updateSTAT();return}
@@ -9597,10 +9757,10 @@ class RavenGBEngine{
   if(i===0x4F){this.vramBank=v&1;this.io[i]=v;return}
   if(i===0x55){this.hdma(v);return}
   if(i===0x68||i===0x6A){this.io[i]=v;return}
-  if(i===0x69){const idx=this.io[0x68]&63;this.bgPal[idx]=v;if(this.io[0x68]&0x80)this.io[0x68]=0x80|((idx+1)&63);return}
-  if(i===0x6B){const idx=this.io[0x6A]&63;this.objPal[idx]=v;if(this.io[0x6A]&0x80)this.io[0x6A]=0x80|((idx+1)&63);return}
+  if(i===0x69){const idx=this.io[0x68]&63;this.bgPal[idx]=v;this.paletteWrites++;if(this.io[0x68]&0x80)this.io[0x68]=0x80|((idx+1)&63);return}
+  if(i===0x6B){const idx=this.io[0x6A]&63;this.objPal[idx]=v;this.paletteWrites++;if(this.io[0x6A]&0x80)this.io[0x6A]=0x80|((idx+1)&63);return}
   if(i===0x70){this.wramBank=(v&7)||1;this.io[i]=v;return}
-  if(i===0x02){this.io[2]=v&0x83;if(v&0x80)this.serialCycles=4096;return}
+  if(i===0x02){this.io[2]=v&0x83;if((v&0x81)===0x81)this.serialCycles=this.cgb&&(v&0x02)?128:4096;else this.serialCycles=0;return}
   this.io[i]=v;this.audio?.syncRegister(i,v)
  }
  hdma(v){
@@ -9618,7 +9778,7 @@ class RavenGBEngine{
  cond(i){return i===0?!this.flag(Z):i===1?this.flag(Z):i===2?!this.flag(C):this.flag(C)}
  step(){const pending=(this.ie&this.io[0x0F]&31);if(pending){this.halted=false;this.stopped=false;if(this.ime){for(let i=0;i<5;i++)if(pending&(1<<i)){this.ime=false;this.io[0x0F]&=~(1<<i);this.push(this.PC);this.PC=0x40+i*8;this.tick(20);return 20}}}if(this.halted||this.stopped){this.tick(4);return 4}this.lastPC=this.PC;const op=this.fetch8();this.lastOpcode=op;this.instructions++;const cy=this.exec(op);if(this.eiDelay>0&&--this.eiDelay===0)this.ime=true;this.tick(cy);return cy}
  exec(op){if(op>=0x40&&op<=0x7F){if(op===0x76){if(!this.ime&&(this.ie&this.io[0x0F]&31))this.haltBug=true;else this.halted=true;return 4}const d=(op>>3)&7,s=op&7;this.wb(d,this.rb(s));return(d===6||s===6)?8:4}if(op>=0x80&&op<=0xBF){const type=(op>>3)&7,v=this.rb(op&7),mem=(op&7)===6;switch(type){case 0:this.add8(v);break;case 1:this.add8(v,this.flag(C)?1:0);break;case 2:this.sub8(v);break;case 3:this.sub8(v,this.flag(C)?1:0);break;case 4:this.and(v);break;case 5:this.xor(v);break;case 6:this.or(v);break;case 7:this.sub8(v,0,true)}return mem?8:4}if((op&0xC7)===0x04){const r=(op>>3)&7;this.wb(r,this.inc(this.rb(r)));return r===6?12:4}if((op&0xC7)===0x05){const r=(op>>3)&7;this.wb(r,this.dec(this.rb(r)));return r===6?12:4}if((op&0xC7)===0x06){const r=(op>>3)&7;this.wb(r,this.fetch8());return r===6?12:8}if((op&0xCF)===0x01){this.setPair((op>>4)&3,this.fetch16());return 12}if((op&0xCF)===0x03){const i=(op>>4)&3;this.setPair(i,this.pair(i)+1);return 8}if((op&0xCF)===0x0B){const i=(op>>4)&3;this.setPair(i,this.pair(i)-1);return 8}if((op&0xCF)===0x09){const v=this.pair((op>>4)&3),a=this.HL,r=a+v,z=this.F&Z;this.F=z;this.setFlag(H,((a&0xFFF)+(v&0xFFF))>0xFFF);this.setFlag(C,r>65535);this.HL=u16(r);return 8}if((op&0xE7)===0x20){const off=s8(this.fetch8()),cc=(op>>3)&3;if(this.cond(cc)){this.PC=u16(this.PC+off);return 12}return 8}if((op&0xE7)===0xC0){const cc=(op>>3)&3;if(this.cond(cc)){this.PC=this.pop();return 20}return 8}if((op&0xE7)===0xC2){const a=this.fetch16(),cc=(op>>3)&3;if(this.cond(cc)){this.PC=a;return 16}return 12}if((op&0xE7)===0xC4){const a=this.fetch16(),cc=(op>>3)&3;if(this.cond(cc)){this.push(this.PC);this.PC=a;return 24}return 12}if((op&0xCF)===0xC1){const i=(op>>4)&3,v=this.pop();if(i===0)this.BC=v;else if(i===1)this.DE=v;else if(i===2)this.HL=v;else this.AF=v;return 12}if((op&0xCF)===0xC5){const i=(op>>4)&3,v=i===0?this.BC:i===1?this.DE:i===2?this.HL:this.AF;this.push(v);return 16}if((op&0xC7)===0xC7){this.push(this.PC);this.PC=op&0x38;return 16}
- switch(op){case 0x00:return 4;case 0x02:this.write(this.BC,this.A);return 8;case 0x0A:this.A=this.read(this.BC);return 8;case 0x12:this.write(this.DE,this.A);return 8;case 0x1A:this.A=this.read(this.DE);return 8;case 0x22:this.write(this.HL,this.A);this.HL=u16(this.HL+1);return 8;case 0x2A:this.A=this.read(this.HL);this.HL=u16(this.HL+1);return 8;case 0x32:this.write(this.HL,this.A);this.HL=u16(this.HL-1);return 8;case 0x3A:this.A=this.read(this.HL);this.HL=u16(this.HL-1);return 8;case 0x07:{const c=this.A>>7;this.A=u8((this.A<<1)|c);this.F=c?C:0;return 4}case 0x0F:{const c=this.A&1;this.A=(this.A>>1)|(c<<7);this.F=c?C:0;return 4}case 0x17:{const c=this.flag(C)?1:0,n=this.A>>7;this.A=u8((this.A<<1)|c);this.F=n?C:0;return 4}case 0x1F:{const c=this.flag(C)?1:0,n=this.A&1;this.A=(this.A>>1)|(c<<7);this.F=n?C:0;return 4}case 0x08:{const a=this.fetch16();this.write(a,this.SP);this.write(a+1,this.SP>>8);return 20}case 0x10:this.fetch8();if(this.cgb&&(this.io[0x4D]&1)){this.doubleSpeed=!this.doubleSpeed;this.io[0x4D]=this.doubleSpeed?0x80:0;this.divCounter=0}else this.stopped=true;return 4;case 0x18:this.PC=u16(this.PC+s8(this.fetch8()));return 12;case 0x27:this.daa();return 4;case 0x2F:this.A^=255;this.F=(this.F&(Z|C))|N|H;return 4;case 0x37:this.F=(this.F&Z)|C;return 4;case 0x3F:this.F=(this.F&Z)|(this.flag(C)?0:C);return 4;case 0xC3:this.PC=this.fetch16();return 16;case 0xC9:this.PC=this.pop();return 16;case 0xCD:{const a=this.fetch16();this.push(this.PC);this.PC=a;return 24}case 0xD9:this.PC=this.pop();this.ime=true;return 16;case 0xE0:this.write(0xFF00+this.fetch8(),this.A);return 12;case 0xF0:this.A=this.read(0xFF00+this.fetch8());return 12;case 0xE2:this.write(0xFF00+this.C,this.A);return 8;case 0xF2:this.A=this.read(0xFF00+this.C);return 8;case 0xEA:this.write(this.fetch16(),this.A);return 16;case 0xFA:this.A=this.read(this.fetch16());return 16;case 0xE9:this.PC=this.HL;return 4;case 0xE8:{const n=s8(this.fetch8()),sp=this.SP,r=sp+n;this.F=0;this.setFlag(H,((sp&15)+(n&15))>15);this.setFlag(C,((sp&255)+(n&255))>255);this.SP=u16(r);return 16}case 0xF8:{const n=s8(this.fetch8()),sp=this.SP,r=sp+n;this.F=0;this.setFlag(H,((sp&15)+(n&15))>15);this.setFlag(C,((sp&255)+(n&255))>255);this.HL=u16(r);return 12}case 0xF9:this.SP=this.HL;return 8;case 0xF3:this.ime=false;this.eiDelay=0;return 4;case 0xFB:this.eiDelay=2;return 4;case 0xCB:return this.cb(this.fetch8());case 0xC6:this.add8(this.fetch8());return 8;case 0xCE:this.add8(this.fetch8(),this.flag(C)?1:0);return 8;case 0xD6:this.sub8(this.fetch8());return 8;case 0xDE:this.sub8(this.fetch8(),this.flag(C)?1:0);return 8;case 0xE6:this.and(this.fetch8());return 8;case 0xEE:this.xor(this.fetch8());return 8;case 0xF6:this.or(this.fetch8());return 8;case 0xFE:this.sub8(this.fetch8(),0,true);return 8;default:return 4}}
+ switch(op){case 0x00:return 4;case 0x02:this.write(this.BC,this.A);return 8;case 0x0A:this.A=this.read(this.BC);return 8;case 0x12:this.write(this.DE,this.A);return 8;case 0x1A:this.A=this.read(this.DE);return 8;case 0x22:this.write(this.HL,this.A);this.HL=u16(this.HL+1);return 8;case 0x2A:this.A=this.read(this.HL);this.HL=u16(this.HL+1);return 8;case 0x32:this.write(this.HL,this.A);this.HL=u16(this.HL-1);return 8;case 0x3A:this.A=this.read(this.HL);this.HL=u16(this.HL-1);return 8;case 0x07:{const c=this.A>>7;this.A=u8((this.A<<1)|c);this.F=c?C:0;return 4}case 0x0F:{const c=this.A&1;this.A=(this.A>>1)|(c<<7);this.F=c?C:0;return 4}case 0x17:{const c=this.flag(C)?1:0,n=this.A>>7;this.A=u8((this.A<<1)|c);this.F=n?C:0;return 4}case 0x1F:{const c=this.flag(C)?1:0,n=this.A&1;this.A=(this.A>>1)|(c<<7);this.F=n?C:0;return 4}case 0x08:{const a=this.fetch16();this.write(a,this.SP);this.write(a+1,this.SP>>8);return 20}case 0x10:this.fetch8();if(this.cgb&&(this.io[0x4D]&1)){this.doubleSpeed=!this.doubleSpeed;this.io[0x4D]=this.doubleSpeed?0x80:0;this.divCounter=0}else this.stopped=true;return 4;case 0x18:{const off=s8(this.fetch8());this.PC=u16(this.PC+off);return 12}case 0x27:this.daa();return 4;case 0x2F:this.A^=255;this.F=(this.F&(Z|C))|N|H;return 4;case 0x37:this.F=(this.F&Z)|C;return 4;case 0x3F:this.F=(this.F&Z)|(this.flag(C)?0:C);return 4;case 0xC3:this.PC=this.fetch16();return 16;case 0xC9:this.PC=this.pop();return 16;case 0xCD:{const a=this.fetch16();this.push(this.PC);this.PC=a;return 24}case 0xD9:this.PC=this.pop();this.ime=true;return 16;case 0xE0:this.write(0xFF00+this.fetch8(),this.A);return 12;case 0xF0:this.A=this.read(0xFF00+this.fetch8());return 12;case 0xE2:this.write(0xFF00+this.C,this.A);return 8;case 0xF2:this.A=this.read(0xFF00+this.C);return 8;case 0xEA:this.write(this.fetch16(),this.A);return 16;case 0xFA:this.A=this.read(this.fetch16());return 16;case 0xE9:this.PC=this.HL;return 4;case 0xE8:{const n=s8(this.fetch8()),sp=this.SP,r=sp+n;this.F=0;this.setFlag(H,((sp&15)+(n&15))>15);this.setFlag(C,((sp&255)+(n&255))>255);this.SP=u16(r);return 16}case 0xF8:{const n=s8(this.fetch8()),sp=this.SP,r=sp+n;this.F=0;this.setFlag(H,((sp&15)+(n&15))>15);this.setFlag(C,((sp&255)+(n&255))>255);this.HL=u16(r);return 12}case 0xF9:this.SP=this.HL;return 8;case 0xF3:this.ime=false;this.eiDelay=0;return 4;case 0xFB:this.eiDelay=2;return 4;case 0xCB:return this.cb(this.fetch8());case 0xC6:this.add8(this.fetch8());return 8;case 0xCE:this.add8(this.fetch8(),this.flag(C)?1:0);return 8;case 0xD6:this.sub8(this.fetch8());return 8;case 0xDE:this.sub8(this.fetch8(),this.flag(C)?1:0);return 8;case 0xE6:this.and(this.fetch8());return 8;case 0xEE:this.xor(this.fetch8());return 8;case 0xF6:this.or(this.fetch8());return 8;case 0xFE:this.sub8(this.fetch8(),0,true);return 8;default:return 4}}
  cb(op){const r=op&7,grp=op>>6,bit=(op>>3)&7,v=this.rb(r),mem=r===6;if(grp===1){this.F=(this.F&C)|H;this.setFlag(Z,(v&(1<<bit))===0);return mem?12:8}if(grp===2){this.wb(r,v&~(1<<bit));return mem?16:8}if(grp===3){this.wb(r,v|(1<<bit));return mem?16:8}let n=v,c=0;switch(bit){case 0:c=v>>7;n=u8((v<<1)|c);break;case 1:c=v&1;n=(v>>1)|(c<<7);break;case 2:{const old=this.flag(C)?1:0;c=v>>7;n=u8((v<<1)|old);break}case 3:{const old=this.flag(C)?1:0;c=v&1;n=(v>>1)|(old<<7);break}case 4:c=v>>7;n=u8(v<<1);break;case 5:c=v&1;n=(v>>1)|(v&0x80);break;case 6:n=((v&15)<<4)|(v>>4);break;case 7:c=v&1;n=v>>1;break}this.F=0;this.setFlag(Z,n===0);this.setFlag(C,!!c);this.wb(r,n);return mem?16:8}
  _timerSignal(counter=this.divCounter,tac=this.io[7]){if(!(tac&4))return 0;const bit=[9,3,5,7][tac&3];return(counter>>bit)&1}
  _timerIncrement(){if(this.timerReloadDelay)return;if(this.io[5]===255){this.io[5]=0;this.timerReloadDelay=4}else this.io[5]=(this.io[5]+1)&255}
@@ -9636,6 +9796,16 @@ class RavenGBEngine{
  tilePixel(tile,bank,x,y){const base=bank*0x2000+tile*16+y*2,lo=this.vram[base],hi=this.vram[base+1],bit=7-x;return((hi>>bit)&1)*2+((lo>>bit)&1)}
  renderFrame(){if(!(this.io[0x40]&0x80)){this.frame.fill(0);this.ctx.putImageData(this.image,0,0);return}const lcdc=this.io[0x40],scx=this.io[0x43],scy=this.io[0x42],wx=this.io[0x4B]-7,wy=this.io[0x4A],bgOn=this.cgb||(lcdc&1);for(let y=0;y<144;y++){for(let x=0;x<160;x++){let color=0,pal=0,pri=false;if(bgOn){const win=(lcdc&0x20)&&y>=wy&&x>=wx;const px=win?x-wx:(x+scx)&255,py=win?y-wy:(y+scy)&255,mapBase=(win?(lcdc&0x40):(lcdc&0x08))?0x1C00:0x1800,map=mapBase+((py>>3)*32)+(px>>3),num=this.vram[map],attr=this.cgb?this.vram[0x2000+map]:0;let tile=num;if(!(lcdc&0x10)&&num<128)tile=256+num;let tx=px&7,ty=py&7;if(attr&0x20)tx=7-tx;if(attr&0x40)ty=7-ty;color=this.tilePixel(tile,(attr>>3)&1,tx,ty);pal=attr&7;pri=!!(attr&0x80)}let rgb=this.cgb?this.colorCGB(this.bgPal,pal,color):this.colorDMG(color,this.io[0x47]);const i=(y*160+x)*4;this.frame[i]=rgb[0];this.frame[i+1]=rgb[1];this.frame[i+2]=rgb[2];this.frame[i+3]=255;this._bgColor||(this._bgColor=new Uint8Array(160*144));this._bgColor[y*160+x]=color|(pri?0x80:0)} }if(lcdc&2){const h=(lcdc&4)?16:8;for(let s=39;s>=0;s--){const oy=this.oam[s*4]-16,ox=this.oam[s*4+1]-8,tile0=this.oam[s*4+2],attr=this.oam[s*4+3];for(let py=0;py<h;py++){const sy=oy+py;if(sy<0||sy>=144)continue;let ty=(attr&0x40)?h-1-py:py,tile=tile0;if(h===16){tile&=0xFE;if(ty>=8){tile++;ty-=8}}for(let px=0;px<8;px++){const sx=ox+px;if(sx<0||sx>=160)continue;const tx=(attr&0x20)?7-px:px,col=this.tilePixel(tile,this.cgb?((attr>>3)&1):0,tx,ty);if(!col)continue;const bg=this._bgColor[sy*160+sx],bgCol=bg&3,bgPri=!!(bg&0x80);if(this.cgb){if((lcdc&1)&&((attr&0x80&&bgCol)|| (bgPri&&bgCol)))continue}else if((attr&0x80)&&bgCol)continue;const pal=this.cgb?(attr&7):((attr&0x10)?this.io[0x49]:this.io[0x48]),rgb=this.cgb?this.colorCGB(this.objPal,pal,col):this.colorDMG(col,pal),i=(sy*160+sx)*4;this.frame[i]=rgb[0];this.frame[i+1]=rgb[1];this.frame[i+2]=rgb[2]}}}}this.ctx.imageSmoothingEnabled=!!this.smooth;this.ctx.putImageData(this.image,0,0);this.lastFrameAt=performance.now?.()||Date.now();this.onFrame?.()}
  enableAudio(){if(this.audio||!this.audioEnabled)return this.audio;try{this.audio=new RavenAPU(this);this.audio.resume?.()}catch{this.audio=null}return this.audio}
+ _frameMeaningful(){
+  if(!this.frame||this.frame.length<16)return false;const counts=new Map();let total=0;
+  for(let y=2;y<142;y+=4)for(let x=2;x<158;x+=4){const i=(y*160+x)*4,key=(this.frame[i]<<16)|(this.frame[i+1]<<8)|this.frame[i+2];counts.set(key,(counts.get(key)||0)+1);total++}
+  if(counts.size>=3)return true;if(counts.size<2)return false;const vals=[...counts.values()].sort((a,b)=>a-b);return vals[0]/Math.max(1,total)>.10;
+ }
+ warmBoot(maxCycles=4194304){
+  let cycles=0,lastFrame=this.frameCounter,meaningful=this._frameMeaningful();
+  while(!meaningful&&cycles<maxCycles&&!this.runtimeError){const c=this.step();if(!Number.isFinite(c)||c<=0)break;cycles+=c;if(this.frameCounter!==lastFrame){lastFrame=this.frameCounter;meaningful=this._frameMeaningful()}}
+  return{cycles,frames:this.frameCounter,meaningful,pc:this.PC,opcode:this.lastOpcode,vramWrites:this.vramWrites,paletteWrites:this.paletteWrites};
+ }
  run(){if(this.running)return;this.running=true;this.lastTime=performance.now();const loop=now=>{if(!this.running)return;try{let dt=Math.min(50,Math.max(0,now-this.lastTime));this.lastTime=now;const hz=this.doubleSpeed?8388.608:4194.304;this.acc+=dt*hz;let budget=Math.min(this.acc,this.doubleSpeed?280896:140448);let guard=0;while(budget>0){const c=this.step();if(!Number.isFinite(c)||c<=0)throw new Error('El núcleo devolvió un ciclo de CPU inválido.');budget-=c;this.acc-=c;if(++guard>100000)throw new Error('El núcleo excedió el límite de instrucciones de un frame.')}}catch(error){this.runtimeError=error instanceof Error?error:new Error(String(error));this.running=false;this.raf=0;try{this.onError?.(this.runtimeError,{pc:this.lastPC,opcode:this.lastOpcode,instructions:this.instructions,frames:this.frameCounter})}catch{};return}if(this.running)this.raf=requestAnimationFrame(loop)};this.raf=requestAnimationFrame(loop)}
  pause(){this.running=false;if(this.raf)cancelAnimationFrame(this.raf);this.raf=0;this.audio?.pause()}
  resume(){this.run()}
@@ -9707,7 +9877,7 @@ define("runtime/GameBoyRuntime", ["require", "exports", "runtime/gameboy/RavenGB
 "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.GameBoyRuntime=void 0;
 class GameBoyRuntime{
  constructor(project,errors,options={}){this.project=project;this.errors=errors;this.options=options;this.consoleUI=new ConsoleUIManager_js.ConsoleUIManager();this.engine=null;this.input=null;this.ui=null;this.host=null;this.paused=false;this.smooth=false;this.disposed=false;this.saveTimer=0;this.healthTimer=0;this.lifecycleSave=()=>void this.persistSRAM();this.visibilitySave=()=>{if(document.visibilityState==='hidden')void this.persistSRAM()};this.romKey=`gb-${project.libraryId||project.id||'app'}-${project.sourceHash||project.metadata?.globalChecksum||'rom'}`}
- async mount(host){this.host=host;const file=this.project.files.get(this.project.entryPoint);if(!file)throw new Error('No se encontró la ROM.');const rom=new Uint8Array(await file.blob.arrayBuffer());const profileId=this.project.consoleProfile||'gameboy',profile=this.consoleUI.getProfile(profileId)||this.consoleUI.getProfile('gameboy');this.input=new Input_js.InputManager((a,d)=>this.engine?.button(a,d));this.ui=this.consoleUI.create(profile.id,this.input,{smooth:this.smooth});host.replaceChildren(this.ui.root);try{this.engine=new Engine_js.RavenGBEngine(this.ui.canvas,rom,{smooth:this.smooth,audio:true});this.engine.onError=(err,diag)=>{const detail=`${err?.message||err} · PC 0x${Number(diag?.pc||0).toString(16).toUpperCase().padStart(4,'0')} · opcode 0x${Number(diag?.opcode||0).toString(16).toUpperCase().padStart(2,'0')}`;this.errors.error('El núcleo Game Boy se detuvo durante la ejecución.',{technical:detail,source:'GameBoyRuntime'});this.showError(new Error(detail))};const saved2=await this.options.onIdbLoad?.(this.romKey+'|save',2);if(saved2)this.engine.importPersistent(saved2);else{const legacy=await this.options.onIdbLoad?.(this.romKey+'|sram',1);if(legacy?.bytes)this.engine.importSRAM(legacy.bytes)}this.input.start();this.engine.run();this.saveTimer=setInterval(()=>void this.persistSRAM(),4000);this.healthTimer=setInterval(()=>{const e=this.engine;if(!e||!e.running)return;if(e.runtimeError)return;const age=(performance.now?.()||Date.now())-(e.lastFrameAt||0);if(age>2500)this.errors.warn('Game Boy no ha producido un frame nuevo.',{technical:`PC=0x${Number(e.lastPC||0).toString(16).toUpperCase().padStart(4,'0')} opcode=0x${Number(e.lastOpcode||0).toString(16).toUpperCase().padStart(2,'0')} instrucciones=${e.instructions||0}`,source:'GameBoyRuntime'})},3000);addEventListener('pagehide',this.lifecycleSave,{passive:true});addEventListener('beforeunload',this.lifecycleSave,{passive:true});document.addEventListener('visibilitychange',this.visibilitySave,{passive:true});const wake=()=>this.engine?.enableAudio?.();this.ui.root.addEventListener('pointerdown',wake,{once:true,passive:true});const keyWake=()=>{this.engine?.enableAudio?.();window.removeEventListener('keydown',keyWake)};window.addEventListener('keydown',keyWake,{once:true});this.options.onReady?.();this.errors.info(`${profile.name} Runtime iniciado.`)}catch(error){this.disposeCore();this.showError(error);throw error}}
+ async mount(host){this.host=host;const file=this.project.files.get(this.project.entryPoint);if(!file)throw new Error('No se encontró la ROM.');const rom=new Uint8Array(await file.blob.arrayBuffer());const profileId=this.project.consoleProfile||'gameboy',profile=this.consoleUI.getProfile(profileId)||this.consoleUI.getProfile('gameboy');this.input=new Input_js.InputManager((a,d)=>this.engine?.button(a,d));this.ui=this.consoleUI.create(profile.id,this.input,{smooth:this.smooth});host.replaceChildren(this.ui.root);try{this.engine=new Engine_js.RavenGBEngine(this.ui.canvas,rom,{smooth:this.smooth,audio:true});this.engine.onError=(err,diag)=>{const detail=`${err?.message||err} · PC 0x${Number(diag?.pc||0).toString(16).toUpperCase().padStart(4,'0')} · opcode 0x${Number(diag?.opcode||0).toString(16).toUpperCase().padStart(2,'0')}`;this.errors.error('El núcleo Game Boy se detuvo durante la ejecución.',{technical:detail,source:'GameBoyRuntime'});this.showError(new Error(detail))};const saved2=await this.options.onIdbLoad?.(this.romKey+'|save',2);if(saved2)this.engine.importPersistent(saved2);else{const legacy=await this.options.onIdbLoad?.(this.romKey+'|sram',1);if(legacy?.bytes)this.engine.importSRAM(legacy.bytes)}this.input.start();const boot=this.engine.warmBoot?.(4194304);if(boot&&!boot.meaningful)this.errors.warn('La ROM todavía no produjo una imagen útil durante el arranque inicial.',{technical:`PC=0x${Number(boot.pc||0).toString(16).toUpperCase().padStart(4,'0')} opcode=0x${Number(boot.opcode||0).toString(16).toUpperCase().padStart(2,'0')} frames=${boot.frames||0} VRAMwrites=${boot.vramWrites||0} paletteWrites=${boot.paletteWrites||0}`,source:'GameBoyRuntime'});this.engine.run();this.saveTimer=setInterval(()=>void this.persistSRAM(),4000);this.healthTimer=setInterval(()=>{const e=this.engine;if(!e||!e.running)return;if(e.runtimeError)return;const age=(performance.now?.()||Date.now())-(e.lastFrameAt||0);if(age>2500)this.errors.warn('Game Boy no ha producido un frame nuevo.',{technical:`PC=0x${Number(e.lastPC||0).toString(16).toUpperCase().padStart(4,'0')} opcode=0x${Number(e.lastOpcode||0).toString(16).toUpperCase().padStart(2,'0')} instrucciones=${e.instructions||0}`,source:'GameBoyRuntime'});else if((e.frameCounter||0)>180&&!e._frameMeaningful?.())this.errors.warn('La ROM sigue ejecutándose pero el framebuffer permanece vacío.',{technical:`PC=0x${Number(e.lastPC||0).toString(16).toUpperCase().padStart(4,'0')} frames=${e.frameCounter||0} VRAMwrites=${e.vramWrites||0} paletteWrites=${e.paletteWrites||0}`,source:'GameBoyRuntime'})},3000);addEventListener('pagehide',this.lifecycleSave,{passive:true});addEventListener('beforeunload',this.lifecycleSave,{passive:true});document.addEventListener('visibilitychange',this.visibilitySave,{passive:true});const wake=()=>this.engine?.enableAudio?.();this.ui.root.addEventListener('pointerdown',wake,{once:true,passive:true});const keyWake=()=>{this.engine?.enableAudio?.();window.removeEventListener('keydown',keyWake)};window.addEventListener('keydown',keyWake,{once:true});this.options.onReady?.();this.errors.info(`${profile.name} Runtime iniciado.`)}catch(error){this.disposeCore();this.showError(error);throw error}}
  showError(error){if(!this.host)return;const box=document.createElement('div');box.className='console-runtime-error';const h=document.createElement('h2');h.textContent='Game could not be started';const p=document.createElement('p');p.textContent=error instanceof Error?error.message:String(error);box.append(h,p);this.host.replaceChildren(box);this.errors.error('No se pudo iniciar la ROM.',{technical:String(error),source:'GameBoyRuntime'})}
  async persistSRAM(){if(!this.engine)return;try{const data=this.engine.exportPersistent();if(data?.sram?.length||data?.rtc)await this.options.onIdbSave?.(this.romKey+'|save',{...data,version:2,updatedAt:Date.now()})}catch(e){this.errors.warn('No se pudo guardar la RAM/RTC del cartucho.',{technical:String(e)})}}
  async saveState(){if(!this.engine)return;await this.options.onIdbSave?.(this.romKey+'|state',{version:1,state:this.engine.saveState(),updatedAt:Date.now()});this.errors.info('Estado de Game Boy guardado.')}
@@ -10285,7 +10455,7 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
         disposeProject(){if(this.state.project){new VirtualFileSystem_js_2.VirtualFileSystem(this.state.project).dispose();this.state.project=null;}}
         revokeLauncherUrls(){for(const u of this.launcherUrls)URL.revokeObjectURL(u);this.launcherUrls=[];}
         set(patch){this.state={...this.state,...patch};this.render();}
-        render(){document.querySelectorAll('.library-menu,.detail-menu').forEach(node=>node.remove());this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close(),this.storage,{directLaunch:this.directShortcutMode});this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
+        render(){try{this.root.firstElementChild?.__cleanup?.();}catch{}document.querySelectorAll('.library-menu,.detail-menu').forEach(node=>node.remove());this.runtime?.dispose();this.runtime=null;this.revokeLauncherUrls();document.body.classList.toggle('runtime-active',this.state.screen==='runtime');if(this.state.screen==='launcher'){const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},this.state.importError,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='detail'&&this.detailApp){const view=(0,DetailView_js_1.renderDetail)(this.detailApp,{back:()=>this.detailBack(),run:id=>void this.openLibrary(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),banner:item=>this.banner(item),resetCover:item=>void this.resetCover(item),resetBanner:item=>void this.resetBanner(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item)});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='importing'){this.root.replaceChildren((0,ImportingView_js_1.renderImporting)());return;}if(this.state.screen==='analysis'&&this.state.project&&this.state.compatibility){const animateIn=this.analysisAnimateIn;this.analysisAnimateIn=false;const view=(0,AnalysisView_js_1.renderAnalysis)({project:this.state.project,compatibility:this.state.compatibility,validation:this.state.validation,onBack:()=>void this.back(),onOpen:()=>void this.openImported(),onAdd:()=>void this.addImported(),onEntryChange:p=>void this.entry(p),libraryMode:this.state.project.libraryMode,libraryName:this.state.project.libraryName,animateIn});this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);return;}if(this.state.screen==='runtime'&&this.state.project){this.runtime=new RuntimeView_js_1.RuntimeView(this.state.project,()=>void this.close(),this.storage,{directLaunch:this.directShortcutMode});this.root.replaceChildren(this.runtime.element);void this.runtime.mount().catch(e=>console.error(e));return;}this.state={...state_js_1.initialState};this.detailApp=null;const view=(0,LauncherView_js_1.renderLauncher)(this.library,this.open,{open:id=>void this.showDetails(id),rename:item=>void this.rename(item),cover:item=>this.cover(item),resetCover:item=>void this.resetCover(item),update:item=>void this.updateFromLibrary(item),history:item=>void this.versionHistory(item),home:item=>void this.addToHome(item),remove:item=>void this.remove(item),toggleView:()=>this.toggleView()},undefined,this.launcherViewMode);this.launcherUrls=[...(view.__coverUrls||[])];this.root.replaceChildren(view);}
     }
     exports.App=App;
 });
