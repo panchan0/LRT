@@ -1,0 +1,19 @@
+{
+  "name": "Raven",
+  "short_name": "Raven",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#07070a",
+  "theme_color": "#0b0b0c",
+  "icons": [
+    {
+      "src": "./raven-icon.jpg",
+      "sizes": "1536x1536",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
