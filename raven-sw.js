@@ -1,4 +1,4 @@
-const VERSION='0.14.17';
+const VERSION='0.15.2';
 const CACHE='raven-shell-'+VERSION;
 const PREFIX='raven-shell-';
 const params=new URL(self.location.href).searchParams;
@@ -17,10 +17,8 @@ async function fetchFresh(url){
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
     const cache=await caches.open(CACHE);
-    // The shell is mandatory. Never activate an "offline" worker with no Raven shell.
     const shell=await fetchFresh(shellURL);
     await cache.put(shellURL,shell.clone());
-    // Metadata is useful but must not make the app un-installable if a host serves it late.
     for(const url of [manifestURL,iconURL]){
       try{const response=await fetchFresh(url);await cache.put(url,response.clone())}catch(error){console.warn('[Raven SW] Optional shell resource was not cached.',url,error)}
     }

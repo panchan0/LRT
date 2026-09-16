@@ -15,5 +15,6 @@
       "type": "image/jpeg",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "version": "0.15.2"
 }
