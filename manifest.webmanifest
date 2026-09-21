@@ -16,5 +16,7 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "0.15.2"
+  "version": "0.16.2",
+  "author": "Cloud Studio",
+  "description": "Raven · launcher, explorador jerárquico local y runtime universal"
 }
