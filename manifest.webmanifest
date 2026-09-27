@@ -6,8 +6,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#07070a",
-  "theme_color": "#0b0b0c",
+  "background_color": "#06070C",
+  "theme_color": "#06070C",
   "icons": [
     {
       "src": "./raven-icon.jpg",
@@ -16,7 +16,7 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "0.16.4",
+  "version": "0.17.1",
   "author": "Cloud Studio",
   "description": "Raven · launcher, Raven Files, runtime universal e Input System"
 }
