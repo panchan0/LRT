@@ -1,4 +1,4 @@
-const VERSION='0.17.2';
+const VERSION='0.17.6';
 const CACHE='raven-shell-'+VERSION;
 const PREFIX='raven-shell-';
 const params=new URL(self.location.href).searchParams;
@@ -78,3 +78,5 @@ self.addEventListener('fetch',event=>{
   if(request.mode==='navigate'){event.respondWith(navigationResponse(event));return}
   event.respondWith(sameOriginAsset(request));
 });
+
+self.addEventListener('message',event=>{if(event.data?.type==='RAVEN_SW_VERSION')event.source?.postMessage?.({type:'RAVEN_SW_VERSION',version:VERSION});});
