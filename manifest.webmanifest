@@ -16,7 +16,7 @@
       "purpose": "any maskable"
     }
   ],
-  "version": "0.17.6",
+  "version": "0.17.8",
   "author": "Cloud Studio",
-  "description": "Raven UI System v2 · launcher y runtime local universal con biblioteca, Raven Files, Input System y emulación local"
+  "description": "Raven UI System v2 · launcher y runtime local universal con Web, ROMs, Raven Files, Input System y T-OS nativo"
 }
