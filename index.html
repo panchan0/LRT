@@ -10,7 +10,7 @@
   <meta name="author" content="Cloud Studio">
   <meta name="creator" content="Cloud Studio">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.18.0">
+  <meta name="app-version" content="0.17.8">
   <meta name="raven:build" content="ui-system-v2">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -879,10 +879,6 @@ html[data-raven-theme]:not([data-raven-theme="raven"]) .raven-icon-button.active
 @media(max-width:560px){.raven-theme-grid{grid-template-columns:1fr}.raven-theme-choice{grid-template-columns:54px minmax(0,1fr) 22px}.raven-theme-preview{width:54px;height:54px}}
 @media(orientation:landscape){.raven-settings-subpage-header{max-width:820px;margin-bottom:12px}.raven-theme-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.raven-theme-choice{min-height:72px;padding:9px;grid-template-columns:50px minmax(0,1fr) 20px}.raven-theme-preview{width:50px;height:50px}}
 
-</style>
-
-<style id="raven-android-runtime-v2-styles">
-.android-guest-core-screen{position:absolute;inset:0;overflow:auto;box-sizing:border-box;padding:max(30px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(34px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));background:#08090c;color:#f1f1f5;font-family:inherit}.android-guest-core-screen h2{margin:0 0 8px;font-size:clamp(25px,5vw,38px);font-weight:760;letter-spacing:-.025em}.android-guest-core-state{margin:0 0 22px;color:#a99cf0;font-size:12px;font-weight:720;text-transform:uppercase;letter-spacing:.08em}.android-guest-core-screen>p:not(.android-guest-core-state){max-width:760px;color:#a8a8b2;line-height:1.55;font-size:13px}.android-guest-grid{width:min(760px,100%);margin-top:26px;border-top:1px solid rgba(255,255,255,.08)}.android-guest-row{min-height:48px;display:grid;grid-template-columns:minmax(120px,.8fr) minmax(0,1.2fr);gap:20px;align-items:center;border-bottom:1px solid rgba(255,255,255,.07)}.android-guest-row span{color:#777782;font-size:11px}.android-guest-row strong{min-width:0;overflow:hidden;text-overflow:ellipsis;color:#e8e8ed;font-size:12px;font-weight:670}.android-guest-note{margin-top:22px!important;padding:14px 0;border-top:1px solid rgba(255,255,255,.07);color:#c1c1ca!important}.android-runtime-status{position:absolute;inset:0;display:grid;place-content:center;gap:10px;padding:30px;background:#08090c;color:#f1f1f5;text-align:center}.android-runtime-status h2{margin:0}.android-runtime-status p{max-width:680px;color:#a8a8b2;line-height:1.5}.android-runtime-status pre{text-align:left;white-space:pre-wrap;max-width:min(760px,90vw);overflow:auto;color:#c7c7d0;background:rgba(255,255,255,.04);padding:14px;border-radius:12px}
 </style>
 </head>
 <body>
@@ -7200,7 +7196,7 @@ define("filesystem/MimeResolver", ["require", "exports"], function (require, exp
         json: 'application/json;charset=utf-8', jsonc: 'application/json;charset=utf-8', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp',
         svg: 'image/svg+xml', gif: 'image/gif', avif: 'image/avif', ico: 'image/x-icon', mp3: 'audio/mpeg', ogg: 'audio/ogg',
         wav: 'audio/wav', m4a: 'audio/mp4', mp4: 'video/mp4', webm: 'video/webm', woff: 'font/woff', woff2: 'font/woff2',
-        ttf: 'font/ttf', otf: 'font/otf', wasm: 'application/wasm', apk: 'application/vnd.android.package-archive', tos: 'application/vnd.tos.system', tapp: 'application/vnd.tos.app', xml: 'application/xml', txt: 'text/plain;charset=utf-8'
+        ttf: 'font/ttf', otf: 'font/otf', wasm: 'application/wasm', tos: 'application/vnd.tos.system', tapp: 'application/vnd.tos.app', xml: 'application/xml', txt: 'text/plain;charset=utf-8'
     };
     class MimeResolver {
         static extension(path) { const i = path.lastIndexOf('.'); return i < 0 ? '' : path.slice(i + 1).toLowerCase(); }
@@ -10134,7 +10130,7 @@ define("runtime/RuntimeManager", ["require", "exports", "runtime/WebRuntimeAdapt
         async mount(host){this.host=host;await this.create()}
         async restart(){if(this.runtime?.dispose)await this.runtime.dispose();this.runtime=null;this.errors.info('Runtime reiniciado.');await this.create()}
         getFrame(){return this.runtime?.getFrame?.()??null}getKind(){return this.runtime?.getKind?.()||this.definition?.id||'web'}isConsole(){return this.getKind()==='console'}
-        start(){return this.runtime?.start?.()}pause(){return this.runtime?.pause?.()}resume(){return this.runtime?.resume?.()}stop(){return this.runtime?.stop?.()}reset(){return this.runtime?.reset?.()}getMetadata(){return this.runtime?.getMetadata?.()||{}}getInputProfile(){return this.runtime?.getInputProfile?.()||null}getDisplayConfiguration(){return this.runtime?.getDisplayConfiguration?.()||null}getConsoleProfile(){return this.runtime?.getConsoleProfile?.()||null}togglePause(){return this.runtime?.togglePause?.()}toggleFocus(){return this.runtime?.toggleFocus?.()}toggleTouch(){return this.runtime?.toggleTouch?.()}toggleSmooth(){return this.runtime?.toggleSmooth?.()}toggleMute(){return this.runtime?.toggleMute?.()}isMuted(){return this.runtime?.isMuted?.()??false}saveState(){return this.runtime?.saveState?.()}loadState(){return this.runtime?.loadState?.()}capturePreview(){return this.runtime?.capturePreview?.()??null}getDiagnostics(){return this.runtime?.getDiagnostics?.()||null}
+        start(){return this.runtime?.start?.()}pause(){return this.runtime?.pause?.()}resume(){return this.runtime?.resume?.()}stop(){return this.runtime?.stop?.()}reset(){return this.runtime?.reset?.()}getMetadata(){return this.runtime?.getMetadata?.()||{}}getInputProfile(){return this.runtime?.getInputProfile?.()||null}getDisplayConfiguration(){return this.runtime?.getDisplayConfiguration?.()||null}getConsoleProfile(){return this.runtime?.getConsoleProfile?.()||null}togglePause(){return this.runtime?.togglePause?.()}toggleFocus(){return this.runtime?.toggleFocus?.()}toggleTouch(){return this.runtime?.toggleTouch?.()}toggleSmooth(){return this.runtime?.toggleSmooth?.()}toggleMute(){return this.runtime?.toggleMute?.()}isMuted(){return this.runtime?.isMuted?.()??false}saveState(){return this.runtime?.saveState?.()}loadState(){return this.runtime?.loadState?.()}capturePreview(){return this.runtime?.capturePreview?.()??null}
         async dispose(){if(this.runtime?.dispose)await this.runtime.dispose();this.runtime=null;this.host?.replaceChildren();this.host=null}
         async create(){if(!this.host)throw new Error('No existe host para el runtime.');this.definition=registry.resolve(this.project);this.runtime=this.definition.create(this.project,this.errors,this.options);await this.runtime.mount(this.host)}
         static register(def){registry.register(def)}static runtimes(){return registry.list()}
@@ -10146,15 +10142,13 @@ define("ui/dialogs/Dialogs", ["require", "exports", "utils/dom", "utils/format"]
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.infoDialog = infoDialog;
     exports.diagnosticsDialog = diagnosticsDialog;
-    exports.runtimeDiagnosticsDialog = runtimeDiagnosticsDialog;
     function shell(title, onClose) { const backdrop = (0, dom_js_4.el)('div', 'sheet-backdrop'), sheet = (0, dom_js_4.el)('section', 'bottom-sheet'), head = (0, dom_js_4.el)('header', 'sheet-header'), body = (0, dom_js_4.el)('div', 'sheet-body'); head.append((0, dom_js_4.el)('h2', 'sheet-title', title), (0, dom_js_4.button)('Cerrar', 'text-button', onClose)); sheet.append(head, body); backdrop.append(sheet); backdrop.addEventListener('click', e => { if (e.target === backdrop)
         onClose(); }); return { backdrop, body }; }
-    function infoDialog(project, onClose) { const { backdrop, body } = shell('Información', onClose); for (const [k, v] of [['Nombre', project.name], ['Runtime', project.runtimeId === 'gameboy' ? 'Game Boy' : project.runtimeId === 'nes' ? 'NES' : project.runtimeId === 'tos' ? 'T-OS' : project.runtimeId === 'android' ? 'Android' : 'Web'], ['Plataforma', project.platform || project.source], ['Inicio', project.entryPoint], ['Archivos', String(project.files.size)], ['Tamaño', (0, format_js_2.formatBytes)(project.size)]]) {
+    function infoDialog(project, onClose) { const { backdrop, body } = shell('Información', onClose); for (const [k, v] of [['Nombre', project.name], ['Runtime', project.runtimeId === 'gameboy' ? 'Game Boy' : 'Web'], ['Plataforma', project.platform || project.source], ['Inicio', project.entryPoint], ['Archivos', String(project.files.size)], ['Tamaño', (0, format_js_2.formatBytes)(project.size)]]) {
         const r = (0, dom_js_4.el)('div', 'analysis-row');
         r.append((0, dom_js_4.el)('span', 'analysis-label', k), (0, dom_js_4.el)('span', 'analysis-value', v));
         body.append(r);
     } body.append((0, dom_js_4.el)('p', 'privacy-note', project.libraryId ? 'Proyecto guardado localmente en la biblioteca de Raven. No se envía a servidores.' : 'Proyecto temporal. No se guarda permanentemente ni se envía a servidores.')); return backdrop; }
-    function runtimeDiagnosticsDialog(data, onClose) { const { backdrop, body } = shell('T-OS · Diagnóstico', onClose); const d=data||{}; const ok=v=>v?'✓':'✕'; const rows=[['TOSRuntime',ok(!!d.runtime)],['Package',ok(!!d.packageValidated)],['System manifest',ok(!!d.manifestValid)],['TOS frame',ok(!!d.frameCreated&&!!d.frameLoaded)],['Host bridge',ok(!!d.bridgeConnected)],['T-Core',ok(!!d.coreReady)],['T-Shell',ok(!!d.shellStarting||!!d.ready)],['READY handshake',ok(!!d.ready)],['State',String(d.state||'—')],['Bridge version',String(d.bridgeVersion||'—')],['Boot',d.bootMs!=null?`${d.bootMs} ms`:`${Number(d.elapsedMs)||0} ms (en curso)`],['Last message',d.lastMessage?.type||'—'],['Last stage',d.lastStage||'—']]; for(const [k,v] of rows){const r=(0,dom_js_4.el)('div','analysis-row');r.append((0,dom_js_4.el)('span','analysis-label',k),(0,dom_js_4.el)('span','analysis-value',v));body.append(r)} if(Array.isArray(d.rejections)&&d.rejections.length){const det=(0,dom_js_4.el)('details'),sum=(0,dom_js_4.el)('summary','','Mensajes rechazados'),pre=(0,dom_js_4.el)('pre','',d.rejections.map(x=>`${x.reason}: ${x.type||'sin tipo'}`).join('\n'));det.append(sum,pre);body.append(det)} return backdrop; }
     function diagnosticsDialog(entries, onClose) { const { backdrop, body } = shell('Errores', onClose); if (!entries.length)
         body.append((0, dom_js_4.el)('p', 'empty-copy', 'No se han registrado errores en esta ejecución.')); for (const d of [...entries].reverse()) {
         const item = (0, dom_js_4.el)('article', `diagnostic-item diagnostic-${d.level}`);
@@ -10193,7 +10187,7 @@ const signed=v=>{const n=Number(v)||0;return(n>=0?'+':'')+n.toFixed(2)};
 function renderSettings(snapshot,actions,error){const root=dom.el('main','settings-screen section-screen raven-page raven-settings-page'),header=UI.pageHeader('Configuración','Raven UI System v2'),content=dom.el('section','settings-content raven-settings-content'),stack=dom.el('div','settings-stack-v2');
  const directorySheet=()=>UI.openBottomSheet({title:'Directorio de Raven',subtitle:snapshot.directoryName||'Sin directorio vinculado',icon:'folder',sections:[{label:'Directorio',items:[{title:snapshot.directoryName?'Cambiar carpeta':'Vincular carpeta',subtitle:snapshot.directoryMode==='mirror'?'Se actualizará la copia local de Raven':undefined,icon:'folder',disabled:!(snapshot.directoryPicker||snapshot.directoryUpload),onClick:()=>actions.chooseDirectory?.()},{title:'Explorar Raven Files',icon:'search',disabled:!snapshot.directoryName,onClick:()=>actions.browseDirectory?.()},{title:'Desvincular carpeta',icon:'trash',danger:true,disabled:!snapshot.directoryName,onClick:()=>actions.clearDirectory?.()}]}]});
  const general=[UI.settingsRow({icon:'image',title:'Apariencia',subtitle:'Oscuro · Raven UI System v2'}),UI.settingsRow({icon:'refresh',title:'Comportamiento',subtitle:'Gestos de navegación y transiciones activas'}),UI.settingsRow({icon:'pin',title:'Inicio',subtitle:`${snapshot.pinnedCount||0} fijado${(snapshot.pinnedCount||0)===1?'':'s'}`})];stack.append(UI.settingsGroup('GENERAL',general));
- const dirValue=snapshot.directoryName?(snapshot.directoryMode==='handle'?'Acceso directo al directorio':`Copia local · ${snapshot.directoryFileCount||0} archivos · ${snapshot.directoryFolderCount||0} carpetas`):'Sin directorio vinculado';const stats=snapshot.libraryStats||{};const lib=[UI.settingsRow({icon:'folder',title:'Directorio de Raven',subtitle:dirValue,onClick:directorySheet}),UI.settingsRow({icon:'import',title:'Importación y actualizaciones',subtitle:'Staging transaccional · identidad preservada'}),UI.settingsRow({icon:'storage',title:'Almacenamiento',subtitle:`${stats.count||0} apps · ${format.formatBytes(stats.size||0)}`}),UI.settingsRow({icon:'data',title:'Formatos locales',subtitle:'HTML · ZIP · APK · GB · GBC · NES · T-OS'})];stack.append(UI.settingsGroup('BIBLIOTECA',lib));
+ const dirValue=snapshot.directoryName?(snapshot.directoryMode==='handle'?'Acceso directo al directorio':`Copia local · ${snapshot.directoryFileCount||0} archivos · ${snapshot.directoryFolderCount||0} carpetas`):'Sin directorio vinculado';const stats=snapshot.libraryStats||{};const lib=[UI.settingsRow({icon:'folder',title:'Directorio de Raven',subtitle:dirValue,onClick:directorySheet}),UI.settingsRow({icon:'import',title:'Importación y actualizaciones',subtitle:'Staging transaccional · identidad preservada'}),UI.settingsRow({icon:'storage',title:'Almacenamiento',subtitle:`${stats.count||0} apps · ${format.formatBytes(stats.size||0)}`}),UI.settingsRow({icon:'data',title:'Formatos locales',subtitle:'HTML · ZIP · GB · GBC · NES · T-OS'})];stack.append(UI.settingsGroup('BIBLIOTECA',lib));
  const inputBody=dom.el('div','raven-settings-group-body');const inputSec=dom.el('section','raven-settings-group');inputSec.append(dom.el('h2','raven-settings-group-title','ENTRADA'),inputBody);stack.append(inputSec);const renderInput=d=>{d=d||{gamepads:[],keyboard:{pressed:[]},pointer:{}};inputBody.replaceChildren();const pads=Array.isArray(d.gamepads)?d.gamepads:[];const pad=pads[0];inputBody.append(UI.settingsRow({icon:'gamepad',title:'Gamepads',subtitle:pad?(pad.responding?`${pad.id||'Mando'} · Entrada activa`:`${pad.id||'Mando'} · Sin respuesta`):'No hay mandos detectados',status:{dot:true,kind:pad?(pad.responding?'success':'warning'):'muted'}}));const keys=d.keyboard?.pressed||[];inputBody.append(UI.settingsRow({icon:'keyboard',title:'Teclado',subtitle:keys.length?`Activas: ${keys.join(' · ')}`:'Sin teclas activas',status:{dot:true,kind:keys.length?'success':'muted'}}));const pt=d.pointer||{};inputBody.append(UI.settingsRow({icon:'mouse',title:'Mouse / Pointer',subtitle:`${pt.pointerType||'touch'} · X ${Math.round(Number(pt.x)||0)} · Y ${Math.round(Number(pt.y)||0)} · Δ ${Math.round(Number(pt.deltaX)||0)}, ${Math.round(Number(pt.deltaY)||0)}`,status:{dot:true,kind:'muted'}}));inputBody.append(UI.settingsRow({icon:'touch',title:'Touch',subtitle:'Pointer Events y gestos táctiles disponibles'}))};renderInput(snapshot.input);
  const runtime=[UI.settingsRow({icon:'cube',title:'Compatibilidad',subtitle:'Canvas · WebGL · Audio · Storage'}),UI.settingsRow({icon:'diagnostic',title:'Diagnóstico',subtitle:'Comprobar capacidades reales del runtime',onClick:()=>UI.openDiagnostics(null,'Diagnóstico de Raven')}),UI.settingsRow({icon:'terminal',title:'Consola',subtitle:'Errores de ejecución visibles desde cada runtime'}),UI.settingsRow({icon:'lock',title:'Permisos',subtitle:snapshot.secure?'Contexto seguro':'Contexto limitado'})];stack.append(UI.settingsGroup('RUNTIME',runtime));
  const raven=[UI.settingsRow({icon:'info',title:'Versión',subtitle:`Raven ${snapshot.version||'—'} · Cloud Studio`}),UI.settingsRow({icon:'cube',title:'Información',subtitle:'Launcher + runtime local universal'}),UI.settingsRow({icon:'data',title:'Datos',subtitle:`${stats.count||0} entradas de biblioteca · ${format.formatBytes(stats.size||0)}`})];stack.append(UI.settingsGroup('RAVEN',raven));if(error){const e=dom.el('div','raven-banner-error',error);e.setAttribute('role','alert');stack.prepend(e)}content.append(stack);const nav=SectionNav.renderSectionNav('settings',{home:()=>actions.home?.(),library:()=>actions.library?.(),settings:()=>{}});root.append(header,content,nav);const swipeCleanup=SectionNav.attachSectionSwipe(root,'settings',{home:()=>actions.home?.(),library:()=>actions.library?.()}),inputCleanup=actions.subscribeInput?.(renderInput)||(()=>{});root.__cleanup=()=>{swipeCleanup();inputCleanup()};return root}
@@ -10237,7 +10231,7 @@ define("ui/runtime/RuntimeView", ["require", "exports", "diagnostics/ErrorCollec
             const m=(0,dom_js_5.el)('div','runtime-menu');
             const action=(label,fn,destructive=false)=>(0,dom_js_5.button)(label,`runtime-menu-item${destructive?' destructive':''}`,()=>{close();try{const r=fn();if(r&&typeof r.catch==='function')r.catch(e=>this.errors.error(e instanceof Error?e.message:String(e)))}catch(e){this.errors.error(e instanceof Error?e.message:String(e))}});
             if(this.manager.isConsole())m.append(action(this.manager.isMuted()?'Activar sonido':'Silenciar',()=>this.manager.toggleMute()),action('Pausar / Reanudar',()=>this.manager.togglePause()),action('Guardar estado',()=>this.manager.saveState()),action('Cargar estado',()=>this.manager.loadState()),action('Console / Display',()=>this.manager.toggleFocus()),action('Mostrar / ocultar controles',()=>this.manager.toggleTouch()),action('Pixel Perfect / Suave',()=>this.manager.toggleSmooth()));
-            if(this.manager.getKind()==='tos')m.append(action('T-OS · Diagnóstico',()=>this.openRuntimeDiagnostics()));if(this.manager.getKind()==='android')m.append(action('Android · Diagnóstico',()=>this.openRuntimeDiagnostics()));m.append(action('Reiniciar',()=>void this.restart()),action('Pantalla completa',()=>void this.fullscreen()),action('Rotar orientación',()=>void this.toggleOrientation()),action('Información',()=>this.openInfo()),action('Errores',()=>this.openErrors()),action('Cerrar proyecto',this.onClose,true));
+            m.append(action('Reiniciar',()=>void this.restart()),action('Pantalla completa',()=>void this.fullscreen()),action('Rotar orientación',()=>void this.toggleOrientation()),action('Información',()=>this.openInfo()),action('Errores',()=>this.openErrors()),action('Cerrar proyecto',this.onClose,true));
             anchor.parentElement?.append(m); this.menu=m;
             const abort=this.menuAbort=new AbortController(), signal=abort.signal;
             document.addEventListener('pointerdown',e=>{if(!(e.target instanceof Element))return;if(!m.contains(e.target)&&!anchor.contains(e.target))close()},{capture:true,signal});
@@ -10306,7 +10300,6 @@ define("ui/runtime/RuntimeView", ["require", "exports", "diagnostics/ErrorCollec
         async toggleOrientation() { const landscape=innerWidth>innerHeight; await this.orientation(landscape?'portrait':'landscape'); }
         openInfo() { this.closeDialog(); this.dialog=(0,Dialogs_js_1.infoDialog)(this.project,()=>this.closeDialog()); this.element.append(this.dialog); }
         openErrors() { this.closeDialog(); this.dialog=(0,Dialogs_js_1.diagnosticsDialog)(this.entries,()=>this.closeDialog()); this.element.append(this.dialog); }
-        openRuntimeDiagnostics() { this.closeDialog(); this.dialog=(0,Dialogs_js_1.runtimeDiagnosticsDialog)(this.manager.getDiagnostics?.(),()=>this.closeDialog()); this.element.append(this.dialog); }
         closeDialog() { this.dialog?.remove(); this.dialog=null; this.input.focusFrame(); }
         audioHint() { if(this.element.querySelector('.audio-hint'))return; const h=(0,dom_js_5.el)('div','audio-hint','Toca para activar audio'); this.host.append(h); setTimeout(()=>h.remove(),2400); }
     }
@@ -10574,7 +10567,7 @@ define("app/App", ["require", "exports", "diagnostics/CompatibilityScanner", "fi
 class App{
  root;router=new router.AppRouter();importer=new ProjectImporter.ProjectImporter();storage=new ProjectStorage.ProjectStorage();settings=new SettingsStorage.SettingsStorage();settingsSnapshot=null;inputHub=require('runtime/input/RavenInputHub').getRavenInputHub();homeShortcuts=new(require('launcher/HomeShortcutManager').HomeShortcutManager)();homeShortcutCleanup=null;shortcutDescriptor=null;directShortcutMode=false;shortcutInput=null;shortcutStatus=null;
  state={...state.initialState};input;coverInput;bannerInput;iconInput;runtime=null;library=[];updateTargetId=null;sourceMeta=null;launcherUrls=[];launcherViewMode='list';sheet=null;detailApp=null;analysisAnimateIn=false;transitionBusy=false;updateStates=new Map();returnScreen='home';
- constructor(root){this.root=root;try{const mode=localStorage.getItem('local-runtime-launcher-view');if(mode==='grid'||mode==='list')this.launcherViewMode=mode}catch{};const make=(accept,handler)=>{const i=document.createElement('input');i.type='file';i.accept=accept;i.hidden=true;i.addEventListener('change',handler);document.body.append(i);return i};this.input=make('.html,.htm,.zip,.gb,.gbc,.nes,.apk,.tos,.tapp,text/html,application/zip,application/x-zip-compressed,application/vnd.android.package-archive,application/octet-stream',()=>void this.fileSelected());this.coverInput=make('image/*',()=>void this.coverSelected());this.bannerInput=make('image/*',()=>void this.bannerSelected());this.iconInput=make('image/*',()=>void this.iconSelected());this.shortcutInput=make('.html,.htm,.zip,.gb,.gbc,.nes,.apk,.tos,.tapp,text/html,application/zip,application/x-zip-compressed,application/vnd.android.package-archive,application/octet-stream',()=>void this.shortcutFileSelected());this.directoryInput=document.createElement('input');this.directoryInput.type='file';this.directoryInput.hidden=true;this.directoryInput.multiple=true;this.directoryInput.setAttribute('webkitdirectory','');this.directoryInput.addEventListener('change',()=>void this.directorySelected());document.body.append(this.directoryInput)}
+ constructor(root){this.root=root;try{const mode=localStorage.getItem('local-runtime-launcher-view');if(mode==='grid'||mode==='list')this.launcherViewMode=mode}catch{};const make=(accept,handler)=>{const i=document.createElement('input');i.type='file';i.accept=accept;i.hidden=true;i.addEventListener('change',handler);document.body.append(i);return i};this.input=make('.html,.htm,.zip,.gb,.gbc,.nes,.tos,.tapp,text/html,application/zip,application/x-zip-compressed,application/octet-stream',()=>void this.fileSelected());this.coverInput=make('image/*',()=>void this.coverSelected());this.bannerInput=make('image/*',()=>void this.bannerSelected());this.iconInput=make('image/*',()=>void this.iconSelected());this.shortcutInput=make('.html,.htm,.zip,.gb,.gbc,.nes,.tos,.tapp,text/html,application/zip,application/x-zip-compressed,application/octet-stream',()=>void this.shortcutFileSelected());this.directoryInput=document.createElement('input');this.directoryInput.type='file';this.directoryInput.hidden=true;this.directoryInput.multiple=true;this.directoryInput.setAttribute('webkitdirectory','');this.directoryInput.addEventListener('change',()=>void this.directorySelected());document.body.append(this.directoryInput)}
  async start(){this.inputHub.start();try{await navigator.storage?.persist?.()}catch{}this.shortcutDescriptor=this.homeShortcuts.getDescriptor();this.directShortcutMode=!!this.shortcutDescriptor?.mode;document.body.classList.toggle('raven-direct-shortcut',this.directShortcutMode);if(this.shortcutDescriptor)this.homeShortcuts.applyDescriptor(this.shortcutDescriptor);try{const recovered=await this.storage.recoverInterruptedUpdates?.();if(recovered?.length)console.warn('[Raven] Staging recuperado tras una interrupción.',recovered);await this.storage.migrateLegacySchema?.();await this.storage.consolidateDuplicates()}catch(e){console.warn('[Raven] Recuperación/migración/consolidación parcial.',e)}await this.refreshLibrary();const launchId=this.shortcutDescriptor?.appId||this.homeShortcuts.getLaunchId();if(launchId){const exists=await this.storage.get(launchId).catch(()=>null);if(exists){try{await this.applyShortcutHandoff(launchId)}catch{}await this.launchDirect(launchId);return}if(this.directShortcutMode){this.renderShortcutSetup();return}this.state.importError='El acceso directo apunta a una app que ya no está en la biblioteca.'}this.state.screen=this.router.navigate(this.library.length?'home':'launcher');this.render()}
  renderShortcutSetup(message=null){const d=this.shortcutDescriptor;if(!d)return;document.body.classList.add('raven-direct-shortcut');const main=document.createElement('main');main.className='shortcut-setup-screen';const card=document.createElement('section');card.className='shortcut-setup-card';const icon=document.createElement('div');icon.className='shortcut-setup-icon';if(d.iconDataUrl){const img=document.createElement('img');img.src=d.iconDataUrl;img.alt='';icon.append(img)}else icon.textContent=String(d.name||'A').slice(0,2);const title=document.createElement('h1');title.textContent=d.name||'App';const copy=document.createElement('p');copy.className='shortcut-setup-copy';copy.textContent=this.homeShortcuts.isStandalone()?'Vincula el archivo original una sola vez; después este icono abrirá directamente la app.':'Abre este enlace desde Safari y usa Añadir a pantalla de inicio.';card.append(icon,title,copy);if(message){const st=document.createElement('div');st.className='shortcut-setup-status';st.textContent=message;card.append(st)}if(this.homeShortcuts.isStandalone()){const pick=document.createElement('button');pick.type='button';pick.className='shortcut-setup-button';pick.textContent='Vincular archivo';pick.addEventListener('click',()=>{this.shortcutInput.value='';this.shortcutInput.click()});card.append(pick)}main.append(card);this.root.replaceChildren(main)}
  async shortcutFileSelected(){const d=this.shortcutDescriptor,file=this.shortcutInput?.files?.[0];if(!d||!file)return;try{this.renderShortcutSetup('Vinculando y guardando…');const[project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);project.sourceName=file.name;project.sourceHash=sourceHash;const validation=await ProjectValidator.ProjectValidator.validate(project);const fatal=validation.find(x=>x.level==='error');if(fatal)throw new Error(fatal.message||'El archivo no es válido.');const compatibility=await CompatibilityScanner.CompatibilityScanner.scan(project);const coverBlob=d.iconDataUrl?this.homeShortcuts.dataURLToBlob(d.iconDataUrl):null;const app=await this.storage.commitPreparedBuild(project,{forcedId:d.appId,displayName:d.name,coverBlob,sourceName:file.name,sourceHash,compatibilityStatus:compatibility?.status});try{await this.applyShortcutHandoff(app.id)}catch{}project.libraryId=app.id;project.libraryName=app.displayName;project.name=app.displayName;project.storedVersion=app.version;await this.storage.touchOpened(app.id);this.state={...state.initialState,screen:this.router.navigate('runtime'),project};this.render()}catch(e){this.renderShortcutSetup(e instanceof Error?e.message:'No se pudo vincular el archivo.')}}
@@ -11142,7 +11135,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
                 for (const f of rows) files.set(f.path, { path: f.path, name: f.name, mimeType: f.mimeType, size: f.size, blob: f.blob });
                 return { id: __ravenUUID(), libraryId: app.id, name: app.displayName, sourceName: app.sourceName,
                     entryPoint: app.entryPoint, entryCandidates: app.entryCandidates || [app.entryPoint], files,
-                    createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null, runtimeId: app.runtimeId || (app.source==='gb'||app.source==='gbc'?'gameboy':app.source==='nes'?'nes':app.source==='apk'?'android':'web'), platform: app.platform || null, consoleProfile: app.consoleProfile || null };
+                    createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null, runtimeId: app.runtimeId || (app.source==='gb'||app.source==='gbc'?'gameboy':app.source==='nes'?'nes':'web'), platform: app.platform || null, consoleProfile: app.consoleProfile || null };
             }
             const tx = db.transaction([APP_STORE, FILE_STORE], 'readonly'); const done = txDone(tx);
             const app = await req(tx.objectStore(APP_STORE).get(id));
@@ -11153,7 +11146,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             for (const f of rows) files.set(f.path, { path: f.path, name: f.name, mimeType: f.mimeType, size: f.size, blob: f.blob });
             return { id: __ravenUUID(), libraryId: app.id, name: app.displayName, sourceName: app.sourceName,
                 entryPoint: app.entryPoint, entryCandidates: app.entryCandidates || [app.entryPoint], files,
-                createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null, runtimeId: app.runtimeId || (app.source==='gb'||app.source==='gbc'?'gameboy':app.source==='nes'?'nes':app.source==='apk'?'android':'web'), platform: app.platform || null, consoleProfile: app.consoleProfile || null };
+                createdAt: app.createdAt, source: app.source, size: app.size, sourceHash: app.sourceHash, storedVersion: app.version ?? null, metadata: app.metadata || null, runtimeId: app.runtimeId || (app.source==='gb'||app.source==='gbc'?'gameboy':app.source==='nes'?'nes':'web'), platform: app.platform || null, consoleProfile: app.consoleProfile || null };
         }
         revisionLimitFor(app){return(app?.size||0)>200*1024*1024?2:(app?.size||0)>80*1024*1024?4:8;}
         makeRevisionRecord(app,files,reason='update',targetId=app?.id){
@@ -11323,7 +11316,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             return result;
         }
         async migrateLegacySchema(){
-            const rows=await this.list();let changed=0;for(const app of rows){if((app.assetSchemaVersion||0)>=2&&app.currentBuild)continue;const next={...app,iconBlob:app.iconBlob||app.coverBlob||null,iconCustom:!!app.iconCustom,previewBlob:app.previewBlob||null,previewUpdatedAt:app.previewUpdatedAt||0,assetSchemaVersion:2,currentBuild:app.currentBuild||{version:app.version||null,entryPoint:app.entryPoint,source:app.source,size:app.size||0,contentHash:app.sourceHash||null,runtimeId:app.runtimeId||(app.source==='apk'?'android':app.source==='nes'?'nes':app.source==='gb'||app.source==='gbc'?'gameboy':'web'),installedAt:app.updatedAt||app.createdAt||Date.now()}};await this.putApp(next);changed++;}return changed;
+            const rows=await this.list();let changed=0;for(const app of rows){if((app.assetSchemaVersion||0)>=2&&app.currentBuild)continue;const next={...app,iconBlob:app.iconBlob||app.coverBlob||null,iconCustom:!!app.iconCustom,previewBlob:app.previewBlob||null,previewUpdatedAt:app.previewUpdatedAt||0,assetSchemaVersion:2,currentBuild:app.currentBuild||{version:app.version||null,entryPoint:app.entryPoint,source:app.source,size:app.size||0,contentHash:app.sourceHash||null,runtimeId:app.runtimeId||'web',installedAt:app.updatedAt||app.createdAt||Date.now()}};await this.putApp(next);changed++;}return changed;
         }
         async commitPreparedBuild(project,info={}){return await this.save(project,info);}
         async setIcon(id,blob){if(!blob||!/^image\//i.test(blob.type||''))throw new Error('Selecciona una imagen válida.');const app=await this.get(id);if(!app)return;app.iconBlob=blob;app.iconCustom=true;app.assetSchemaVersion=2;await this.putApp(app);}
@@ -11426,7 +11419,7 @@ function renderSettings(snapshot,actions,error,options={}){const prefs=options.p
  if(section==='root'){
   root.append(UI.pageHeader('Configuración','Raven UI System v2'));
   const general=[row('image','Apariencia',prefs.theme&&prefs.theme!=='raven'?`Tema ${theme.name} · Raven UI System v2`:'Oscuro · Raven UI System v2',()=>actions.openSection?.('appearance')),row('refresh','Comportamiento','Gestos de navegación y transiciones activas',()=>actions.openSection?.('behavior')),row('pin','Inicio',`${snapshot.pinnedCount||0} fijado${(snapshot.pinnedCount||0)===1?'':'s'}`,()=>actions.openSection?.('home'))];stack.append(group('GENERAL',general));
-  const dirValue=snapshot.directoryName?(snapshot.directoryMode==='handle'?'Acceso directo al directorio':`Copia local · ${snapshot.directoryFileCount||0} archivos · ${snapshot.directoryFolderCount||0} carpetas`):'Sin directorio vinculado';stack.append(group('BIBLIOTECA',[row('folder','Directorio de Raven',dirValue,()=>actions.openSection?.('directory')),row('import','Importación y actualizaciones',snapshot.autoUpdateEnabled===false?'Actualizaciones automáticas desactivadas':'Actualizaciones automáticas · identidad preservada',()=>actions.openSection?.('import')),row('storage','Almacenamiento',`${stats.count||0} apps · ${format.formatBytes(stats.size||0)}`,()=>actions.openSection?.('storage')),row('data','Formatos locales','HTML · ZIP · APK · GB · GBC · NES · T-OS',()=>actions.openSection?.('formats'))]));
+  const dirValue=snapshot.directoryName?(snapshot.directoryMode==='handle'?'Acceso directo al directorio':`Copia local · ${snapshot.directoryFileCount||0} archivos · ${snapshot.directoryFolderCount||0} carpetas`):'Sin directorio vinculado';stack.append(group('BIBLIOTECA',[row('folder','Directorio de Raven',dirValue,()=>actions.openSection?.('directory')),row('import','Importación y actualizaciones',snapshot.autoUpdateEnabled===false?'Actualizaciones automáticas desactivadas':'Actualizaciones automáticas · identidad preservada',()=>actions.openSection?.('import')),row('storage','Almacenamiento',`${stats.count||0} apps · ${format.formatBytes(stats.size||0)}`,()=>actions.openSection?.('storage')),row('data','Formatos locales','HTML · ZIP · GB · GBC · NES · T-OS',()=>actions.openSection?.('formats'))]));
   const d=snapshot.input||{},pads=Array.isArray(d.gamepads)?d.gamepads:[],keys=d.keyboard?.pressed||[],p=d.pointer||{},type=p.pointerType||'touch';stack.append(group('ENTRADA',[row('gamepad','Gamepads',pads[0]?(pads[0].responding?`${pads[0].id||'Mando'} · Entrada activa`:`${pads[0].id||'Mando'} · Sin respuesta`):'No hay mandos detectados',()=>actions.openSection?.('gamepads'),{dot:true,kind:pads[0]?(pads[0].responding?'success':'warning'):'muted'}),row('keyboard','Teclado',keys.length?`Activas: ${keys.join(' · ')}`:'Sin teclas activas',()=>actions.openSection?.('keyboard'),{dot:true,kind:keys.length?'success':'muted'}),row('mouse','Mouse / Pointer',`${type} · X ${Math.round(Number(p.x)||0)} · Y ${Math.round(Number(p.y)||0)} · Δ ${Math.round(Number(p.deltaX)||0)}, ${Math.round(Number(p.deltaY)||0)}`,()=>actions.openSection?.('pointer'),{dot:true,kind:p.active?'success':'muted'}),row('touch','Touch','Pointer Events y gestos táctiles disponibles',()=>actions.openSection?.('touch'))]));
   stack.append(group('RUNTIME',[row('cube','Compatibilidad','Canvas · WebGL · Audio · Storage',()=>actions.openSection?.('compatibility')),row('diagnostic','Diagnóstico','Comprobar capacidades reales del runtime',()=>actions.openSection?.('diagnostics')),row('terminal','Consola','Errores de ejecución visibles desde cada runtime',()=>actions.openSection?.('console')),row('lock','Permisos',snapshot.secure?'Contexto seguro':'Contexto limitado',()=>actions.openSection?.('permissions'))]));
   stack.append(group('RAVEN',[row('info','Versión',`Raven ${snapshot.version||'—'} · Cloud Studio`,()=>actions.openSection?.('version')),row('cube','Información','Launcher + runtime local universal',()=>actions.openSection?.('about')),row('data','Datos',`${stats.count||0} entradas de biblioteca · ${format.formatBytes(stats.size||0)}`,()=>actions.openSection?.('data'))]));
@@ -11439,9 +11432,9 @@ function renderSettings(snapshot,actions,error,options={}){const prefs=options.p
   else if(section==='directory'){headerTitle='Directorio de Raven';headerSubtitle='Ubicación principal para Raven Files e importación.';const linked=!!snapshot.directoryName;stack.append(group('DIRECTORIO ACTUAL',[row('folder',linked?snapshot.directoryName:'Sin directorio vinculado',linked?`${snapshot.directoryMode==='handle'?'Acceso directo':'Copia local'} · ${snapshot.directoryFileCount??0} archivos · ${snapshot.directoryFolderCount??0} carpetas`:'Raven puede usar una carpeta conocida para importaciones y actualizaciones.',null,{dot:true,kind:linked?'success':'warning'})]));stack.append(group('ACCIONES',[row('folder',linked?'Cambiar directorio':'Vincular directorio','Selecciona la carpeta principal de Raven.',()=>actions.chooseDirectory?.()),linked?row('search','Explorar directorio','Abrir Raven Files en la ubicación vinculada.',()=>actions.browseDirectory?.()):null,linked?row('trash','Desvincular directorio',snapshot.directoryMode==='mirror'?'Elimina solo la copia local; no toca los originales.':'Raven dejará de usar esta ubicación.',()=>actions.clearDirectory?.(),null,true):null]));}
   else if(section==='import'){headerTitle='Importación y actualizaciones';headerSubtitle='Raven puede mantener tu biblioteca al día desde la carpeta vinculada.';const automatic=snapshot.autoUpdateEnabled!==false,last=Number(snapshot.autoUpdateLastScanAt)||0,lastText=last?UI.relativeTime(last):'Todavía no se ha comprobado',mode=snapshot.directoryMode==='handle'?'Acceso directo persistente':snapshot.directoryMode==='mirror'?'Copia local del directorio':'Sin directorio vinculado';stack.append(group('ACTUALIZACIONES AUTOMÁTICAS',[row('refresh','Actualizar automáticamente','Compara las fuentes al abrir Raven, al volver a la app y periódicamente mientras está activa.',()=>actions.toggleAutoUpdate?.(),staticStatus(onOff(automatic),automatic?'success':'muted')),row('folder','Fuente supervisada',mode,null,{dot:true,kind:snapshot.directoryName?(snapshot.directoryMode==='handle'?'success':'warning'):'muted'}),row('refresh','Buscar actualizaciones ahora',snapshot.autoUpdateRunning?'Comprobando archivos…':`Última comprobación: ${lastText}`,snapshot.autoUpdateRunning?null:()=>actions.scanAutoUpdates?.(),staticStatus(snapshot.autoUpdateRunning?'Buscando':(snapshot.autoUpdateLastUpdatedCount?`${snapshot.autoUpdateLastUpdatedCount} actualizada${snapshot.autoUpdateLastUpdatedCount===1?'':'s'}`:'Listo'),snapshot.autoUpdateRunning?'accent':snapshot.autoUpdateLastError?'warning':'success'))]));if(snapshot.directoryMode==='mirror')stack.append(note('Límite de iPhone/iPad','Safari entrega una copia del directorio, no un acceso permanente a sus archivos. Raven actualizará todas las apps correspondientes en cuanto vuelvas a seleccionar esa carpeta, pero una web app no puede detectar cambios externos que iOS no le deja volver a leer.'));else if(snapshot.directoryMode==='handle')stack.append(note('Supervisión activa','Mientras el permiso de lectura siga concedido, Raven relee la carpeta vinculada sin pedirte que actualices cada app una por una.'));else stack.append(note('Vincula una carpeta','Selecciona un Directorio de Raven para que las apps cuyos archivos fuente coincidan puedan actualizarse automáticamente.'));stack.append(group('ACCIONES',[row('import','Importar archivo ahora','Abre Raven Files o el selector del sistema.',()=>actions.importFile?.()),row('folder','Abrir Directorio de Raven','Gestiona la carpeta usada para las actualizaciones automáticas.',()=>actions.openSection?.('directory'))]));stack.append(group('PROTECCIONES',[row('image','Personalización','Nombre, icono, carátula, portada y preview se preservan.',null,staticStatus('Siempre','success')),row('history','Historial','La revisión anterior se conserva cuando hay capacidad.',null,staticStatus('Activo','success')),row('diagnostic','Commit transaccional','Raven verifica archivos e identidad antes de declarar éxito.',null,staticStatus('Activo','success'))]));}
   else if(section==='storage'){headerTitle='Almacenamiento';headerSubtitle='Cuota real concedida por la plataforma.';const hasQuota=Number(snapshot.storageQuota)>0;stack.append(group('ESPACIO',[row('storage','Disponible',hasQuota?format.formatBytes(snapshot.storageAvailable):'No informado por el navegador',null,{dot:true,kind:hasQuota&&Number(snapshot.storageAvailable)<512*1024*1024?'warning':'success'}),row('storage','Cuota total',hasQuota?format.formatBytes(snapshot.storageQuota):`Respaldo de Raven: ${format.formatBytes(snapshot.storageFallbackLimit||8*1024*1024*1024)}`),row('storage','Uso del origen',Number.isFinite(Number(snapshot.storageUsage))?format.formatBytes(snapshot.storageUsage):'No informado'),row('folder','Copia Raven Files',snapshot.directoryMode==='mirror'?format.formatBytes(snapshot.directoryTotalBytes||0):'No hay copia local activa')]));stack.append(group('PERSISTENCIA',[row('storage','Almacenamiento persistente',snapshot.storagePersistent?'La plataforma lo marcó como persistente.':'Solicita reducir el riesgo de purga de datos locales.',snapshot.storagePersistent?null:()=>actions.requestPersistent?.(),{dot:true,kind:snapshot.storagePersistent?'success':'warning',text:snapshot.storagePersistent?'Activo':'Solicitar'}),row('refresh','Actualizar información','Vuelve a consultar uso, cuota y persistencia.',()=>actions.refreshSettings?.())]));}
-  else if(section==='formats'){headerTitle='Formatos locales';headerSubtitle='Compatibilidad declarada por esta build.';stack.append(group('APLICACIONES',[row('library','HTML','Proyecto web local',null,{dot:true,kind:'success'}),row('library','ZIP','Paquete web o ROM empaquetada',null,{dot:true,kind:'success'}),row('library','APK','Android · híbridos ejecutables · Guest Core para DEX',null,{dot:true,kind:'warning'})]));stack.append(group('ROMS',[row('gamepad','GB','Game Boy',null,{dot:true,kind:'success'}),row('gamepad','GBC','Game Boy Color',null,{dot:true,kind:'success'}),row('gamepad','NES','Nintendo Entertainment System',null,{dot:true,kind:'success'})]));stack.append(group('T-OS',[row('library','T-OS System (.tos)','Runtime nativo TOSRuntime · package format v1',null,{dot:true,kind:'success'}),row('library','T-OS App (.tapp)','Formato reconocido · instalación se añade en Fase F',null,{dot:true,kind:'warning'})]));}
+  else if(section==='formats'){headerTitle='Formatos locales';headerSubtitle='Compatibilidad declarada por esta build.';stack.append(group('APLICACIONES',[row('library','HTML','Proyecto web local',null,{dot:true,kind:'success'}),row('library','ZIP','Paquete web o ROM empaquetada',null,{dot:true,kind:'success'})]));stack.append(group('ROMS',[row('gamepad','GB','Game Boy',null,{dot:true,kind:'success'}),row('gamepad','GBC','Game Boy Color',null,{dot:true,kind:'success'}),row('gamepad','NES','Nintendo Entertainment System',null,{dot:true,kind:'success'})]));stack.append(group('T-OS',[row('library','T-OS System (.tos)','Runtime nativo TOSRuntime · package format v1',null,{dot:true,kind:'success'}),row('library','T-OS App (.tapp)','Formato reconocido · instalación se añade en Fase F',null,{dot:true,kind:'warning'})]));}
   else if(['gamepads','keyboard','pointer','touch'].includes(section)){const titles={gamepads:['Gamepads','Detección y actividad real de mandos.'],keyboard:['Teclado','Teclas físicas detectadas por Raven.'],pointer:['Mouse / Pointer','Posición y delta de la entrada actual.'],touch:['Touch','Estado táctil y Pointer Events.']};[headerTitle,headerSubtitle]=titles[section];const live=dom.el('div','settings-stack-v2'),render=d=>{live.replaceChildren(group(section==='gamepads'?'DISPOSITIVOS':section==='keyboard'?'TECLADO':section==='pointer'?'POINTER':'TOUCH',inputRows(section,d)))};render(snapshot.input);content.append(live);inputCleanup=actions.subscribeInput?.(render)||(()=>{});}
-  else if(section==='compatibility'){headerTitle='Compatibilidad';headerSubtitle='Capacidades principales de Raven Runtime.';stack.append(group('RUNTIME',[row('library','Web local','HTML y ZIP · DOM, Canvas, WebGL y AudioContext según disponibilidad.',null,{dot:true,kind:'success'}),row('gamepad','Game Boy / GBC','Runtime local integrado.',null,{dot:true,kind:'success'}),row('gamepad','NES','Runtime local integrado; compatibilidad depende del mapper.',null,{dot:true,kind:'success'}),row('library','Android APK','Runtime Android · híbrido completo / Guest Core DEX / host nativo en desarrollo.',null,{dot:true,kind:'warning'})]));stack.append(note('Sin compatibilidad fingida','Las APIs disponibles en este dispositivo se muestran en Diagnóstico.'));}
+  else if(section==='compatibility'){headerTitle='Compatibilidad';headerSubtitle='Capacidades principales de Raven Runtime.';stack.append(group('RUNTIME',[row('library','Web local','HTML y ZIP · DOM, Canvas, WebGL y AudioContext según disponibilidad.',null,{dot:true,kind:'success'}),row('gamepad','Game Boy / GBC','Runtime local integrado.',null,{dot:true,kind:'success'}),row('gamepad','NES','Runtime local integrado; compatibilidad depende del mapper.',null,{dot:true,kind:'success'})]));stack.append(note('Sin compatibilidad fingida','Las APIs disponibles en este dispositivo se muestran en Diagnóstico.'));}
   else if(section==='diagnostics'){headerTitle='Diagnóstico';headerSubtitle='Estado real de APIs en este dispositivo.';stack.append(group('RUNTIME',diagnosticRows()));stack.append(group('ACCIONES',[row('refresh','Actualizar diagnóstico','Vuelve a consultar el dispositivo.',()=>actions.refreshSettings?.())]));}
   else if(section==='console'){headerTitle='Consola';headerSubtitle='Información técnica asociada al runtime.';stack.append(group('CONSOLA DE EJECUCIÓN',[row('terminal','Ámbito','La consola pertenece al proyecto en ejecución.'),row('diagnostic','Errores','Los errores técnicos se presentan dentro del runtime o diagnóstico.'),row('diagnostic','Abrir Diagnóstico','Revisa disponibilidad de APIs y contexto.',()=>actions.openSection?.('diagnostics'))]));}
   else if(section==='permissions'){headerTitle='Permisos';headerSubtitle='Capacidades concedidas por navegador y plataforma.';stack.append(group('ENTORNO',[row('lock','Contexto seguro',snapshot.secure?'Activo':'No activo',null,{dot:true,kind:snapshot.secure?'success':'warning'}),row('folder','Selector de carpetas',snapshot.directoryPicker?'Disponible':snapshot.directoryUpload?'Disponible mediante copia local':'No disponible',null,{dot:true,kind:(snapshot.directoryPicker||snapshot.directoryUpload)?'success':'warning'}),row('folder','Selector de archivos',snapshot.filePicker?'File System Access API':'Selector estándar del sistema',null,{dot:true,kind:'success'}),row('refresh','Service Worker','serviceWorker'in navigator?'Disponible':'No disponible',null,{dot:true,kind:'serviceWorker'in navigator?'success':'warning'})]));}
@@ -11503,1137 +11496,7 @@ exports.THEMES=THEMES;exports.themeById=themeById;
 })();
 
 
-
-/* Raven 0.18.0 — Android Runtime Phase 2: APK importer + DEX Guest Core + iOS host bridge. */
-(function (root, factory) {
-  const api = factory();
-  if (typeof module === 'object' && module.exports) module.exports = api;
-  root.RavenAndroidRuntime = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  'use strict';
-
-  const VERSION = '0.2.0-guest-core';
-  const ZIP_LOCAL = 0x04034b50;
-  const ZIP_CENTRAL = 0x02014b50;
-  const ZIP_EOCD = 0x06054b50;
-  const AXML_XML = 0x0003;
-  const AXML_STRING_POOL = 0x0001;
-  const AXML_START_ELEMENT = 0x0102;
-  const AXML_END_ELEMENT = 0x0103;
-  const UTF8_FLAG = 0x00000100;
-
-  class RavenAndroidError extends Error {
-    constructor(code, message, details = null) {
-      super(message);
-      this.name = 'RavenAndroidError';
-      this.code = code;
-      this.details = details;
-    }
-  }
-
-  const td = new TextDecoder('utf-8', { fatal: false });
-
-  function normalizePath(path) {
-    const out = [];
-    for (const part of String(path || '').replace(/\\/g, '/').split('/')) {
-      if (!part || part === '.') continue;
-      if (part === '..') {
-        if (!out.length) throw new RavenAndroidError('PATH_ESCAPE', 'Ruta APK inválida.');
-        out.pop();
-      } else out.push(part);
-    }
-    return out.join('/');
-  }
-
-  function basename(path) {
-    const p = normalizePath(path);
-    return p.slice(p.lastIndexOf('/') + 1);
-  }
-
-  function stripExt(name) {
-    return String(name || '').replace(/\.[^.]+$/, '');
-  }
-
-  function formatBytes(n) {
-    if (!Number.isFinite(n)) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    let v = n, i = 0;
-    while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
-    return `${v >= 10 || i === 0 ? v.toFixed(0) : v.toFixed(1)} ${units[i]}`;
-  }
-
-  async function sha256Hex(bytes) {
-    const input = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
-    if (globalThis.crypto?.subtle) {
-      const digest = await globalThis.crypto.subtle.digest('SHA-256', input);
-      return [...new Uint8Array(digest)].map(x => x.toString(16).padStart(2, '0')).join('');
-    }
-    // Fallback FNV-like identifier only when SubtleCrypto is unavailable.
-    let h1 = 0x811c9dc5 >>> 0, h2 = 0x9e3779b9 >>> 0;
-    for (let i = 0; i < input.length; i++) {
-      h1 ^= input[i]; h1 = Math.imul(h1, 0x01000193) >>> 0;
-      h2 ^= (input[i] + i) & 255; h2 = Math.imul(h2, 0x85ebca6b) >>> 0;
-    }
-    return `${h1.toString(16).padStart(8, '0')}${h2.toString(16).padStart(8, '0')}`;
-  }
-
-  async function inflateRaw(bytes) {
-    if (typeof DecompressionStream !== 'undefined') {
-      const ds = new DecompressionStream('deflate-raw');
-      const stream = new Blob([bytes]).stream().pipeThrough(ds);
-      return new Uint8Array(await new Response(stream).arrayBuffer());
-    }
-    throw new RavenAndroidError('DEFLATE_UNAVAILABLE', 'Este entorno no expone descompresión DEFLATE. Raven debe inyectar su inflater ZIP.');
-  }
-
-  class ApkZipReader {
-    constructor(buffer, options = {}) {
-      const ab = buffer instanceof ArrayBuffer ? buffer : buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
-      this.buffer = ab;
-      this.bytes = new Uint8Array(ab);
-      this.view = new DataView(ab);
-      this.inflate = options.inflate || inflateRaw;
-      this.entries = new Map();
-      this._parse();
-    }
-
-    _u16(o) { return this.view.getUint16(o, true); }
-    _u32(o) { return this.view.getUint32(o, true); }
-
-    _findEocd() {
-      const min = Math.max(0, this.bytes.length - 0xffff - 22);
-      for (let i = this.bytes.length - 22; i >= min; i--) {
-        if (this._u32(i) === ZIP_EOCD) return i;
-      }
-      return -1;
-    }
-
-    _parse() {
-      if (this.bytes.length < 22) throw new RavenAndroidError('APK_NOT_ZIP', 'El APK está vacío o no es un ZIP válido.');
-      const eocd = this._findEocd();
-      if (eocd < 0) throw new RavenAndroidError('APK_NOT_ZIP', 'No se encontró el directorio central del APK.');
-      const total = this._u16(eocd + 10);
-      const cdSize = this._u32(eocd + 12);
-      const cdOffset = this._u32(eocd + 16);
-      if (cdOffset + cdSize > this.bytes.length) throw new RavenAndroidError('APK_ZIP_TRUNCATED', 'El directorio central está truncado.');
-      let p = cdOffset;
-      for (let i = 0; i < total; i++) {
-        if (p + 46 > this.bytes.length || this._u32(p) !== ZIP_CENTRAL) throw new RavenAndroidError('APK_ZIP_CENTRAL', 'Entrada ZIP central inválida.', { index: i });
-        const flags = this._u16(p + 8);
-        const method = this._u16(p + 10);
-        const crc32 = this._u32(p + 16);
-        const compressedSize = this._u32(p + 20);
-        const uncompressedSize = this._u32(p + 24);
-        const nameLen = this._u16(p + 28);
-        const extraLen = this._u16(p + 30);
-        const commentLen = this._u16(p + 32);
-        const localOffset = this._u32(p + 42);
-        const nameStart = p + 46;
-        const nameEnd = nameStart + nameLen;
-        if (nameEnd > this.bytes.length) throw new RavenAndroidError('APK_ZIP_NAME', 'Nombre de entrada ZIP truncado.');
-        const name = normalizePath(td.decode(this.bytes.slice(nameStart, nameEnd)));
-        if (name) {
-          this.entries.set(name, { name, flags, method, crc32, compressedSize, uncompressedSize, localOffset });
-        }
-        p = nameEnd + extraLen + commentLen;
-      }
-    }
-
-    has(name) { return this.entries.has(normalizePath(name)); }
-    get(name) { return this.entries.get(normalizePath(name)) || null; }
-    list(prefix = '') {
-      const px = normalizePath(prefix);
-      return [...this.entries.keys()].filter(x => !px || x.startsWith(px));
-    }
-
-    async read(name) {
-      const key = normalizePath(name);
-      const e = this.entries.get(key);
-      if (!e) throw new RavenAndroidError('APK_ENTRY_MISSING', `No existe ${key} dentro del APK.`);
-      const p = e.localOffset;
-      if (p + 30 > this.bytes.length || this._u32(p) !== ZIP_LOCAL) throw new RavenAndroidError('APK_ZIP_LOCAL', `Cabecera local inválida: ${key}`);
-      const nameLen = this._u16(p + 26), extraLen = this._u16(p + 28);
-      const start = p + 30 + nameLen + extraLen;
-      const end = start + e.compressedSize;
-      if (end > this.bytes.length) throw new RavenAndroidError('APK_ZIP_TRUNCATED_ENTRY', `Entrada truncada: ${key}`);
-      const payload = this.bytes.slice(start, end);
-      if (e.method === 0) return payload;
-      if (e.method === 8) {
-        const output = await this.inflate(payload);
-        if (e.uncompressedSize && output.byteLength !== e.uncompressedSize) {
-          throw new RavenAndroidError('APK_INFLATE_SIZE', `Tamaño inesperado al extraer ${key}.`, { expected: e.uncompressedSize, actual: output.byteLength });
-        }
-        return output;
-      }
-      throw new RavenAndroidError('APK_ZIP_METHOD', `Método ZIP ${e.method} no soportado en ${key}.`);
-    }
-
-    async readText(name) { return td.decode(await this.read(name)); }
-  }
-
-  function readLength8(bytes, offset) {
-    let a = bytes[offset++];
-    if (a & 0x80) return { value: ((a & 0x7f) << 8) | bytes[offset], next: offset + 1 };
-    return { value: a, next: offset };
-  }
-
-  function readLength16(view, offset) {
-    let a = view.getUint16(offset, true); offset += 2;
-    if (a & 0x8000) {
-      const b = view.getUint16(offset, true); offset += 2;
-      return { value: ((a & 0x7fff) << 16) | b, next: offset };
-    }
-    return { value: a, next: offset };
-  }
-
-  function parseStringPool(bytes, chunkStart, headerSize, chunkSize) {
-    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    const stringCount = view.getUint32(chunkStart + 8, true);
-    const styleCount = view.getUint32(chunkStart + 12, true);
-    const flags = view.getUint32(chunkStart + 16, true);
-    const stringsStart = view.getUint32(chunkStart + 20, true);
-    const stylesStart = view.getUint32(chunkStart + 24, true);
-    const utf8 = !!(flags & UTF8_FLAG);
-    const offsetsBase = chunkStart + headerSize;
-    const dataBase = chunkStart + stringsStart;
-    const strings = new Array(stringCount);
-    for (let i = 0; i < stringCount; i++) {
-      const rel = view.getUint32(offsetsBase + i * 4, true);
-      let p = dataBase + rel;
-      if (p >= chunkStart + chunkSize) { strings[i] = ''; continue; }
-      if (utf8) {
-        const l16 = readLength8(bytes, p); p = l16.next;
-        const l8 = readLength8(bytes, p); p = l8.next;
-        strings[i] = td.decode(bytes.slice(p, p + l8.value));
-      } else {
-        const len = readLength16(view, p); p = len.next;
-        const end = p + len.value * 2;
-        let out = '';
-        for (let q = p; q < end; q += 2) out += String.fromCharCode(view.getUint16(q, true));
-        strings[i] = out;
-      }
-    }
-    return { strings, styleCount, stylesStart };
-  }
-
-  function typedValueToJs(dataType, data, strings) {
-    switch (dataType) {
-      case 0x03: return strings[data] ?? '';
-      case 0x10: return data | 0;
-      case 0x11: return data >>> 0;
-      case 0x12: return data !== 0;
-      case 0x01: return `@0x${(data >>> 0).toString(16).padStart(8, '0')}`;
-      case 0x02: return `?0x${(data >>> 0).toString(16).padStart(8, '0')}`;
-      default: return data >>> 0;
-    }
-  }
-
-  function cleanAndroidName(name) {
-    return String(name || '').replace(/^android:/, '');
-  }
-
-  function parseTextManifest(text) {
-    const attr = (src, name) => {
-      const re = new RegExp(`(?:android:)?${name}\\s*=\\s*["']([^"']+)["']`, 'i');
-      return src.match(re)?.[1] ?? null;
-    };
-    const manifestTag = text.match(/<manifest\b[^>]*>/i)?.[0] || '';
-    const appTag = text.match(/<application\b[^>]*>/i)?.[0] || '';
-    const sdkTag = text.match(/<uses-sdk\b[^>]*>/i)?.[0] || '';
-    const activities = [];
-    const activityRe = /<(activity|activity-alias)\b([^>]*)>([\s\S]*?)<\/\1>/gi;
-    let m;
-    while ((m = activityRe.exec(text))) {
-      const tag = `<${m[1]} ${m[2]}>`;
-      const body = m[3];
-      const name = attr(tag, 'name');
-      if (!name) continue;
-      const launcher = /android\.intent\.action\.MAIN/.test(body) && /android\.intent\.category\.LAUNCHER/.test(body);
-      activities.push({ name, launcher, exported: attr(tag, 'exported') });
-    }
-    return {
-      format: 'xml-text',
-      packageName: attr(manifestTag, 'package') || manifestTag.match(/\bpackage\s*=\s*["']([^"']+)/i)?.[1] || null,
-      versionCode: attr(manifestTag, 'versionCode'),
-      versionName: attr(manifestTag, 'versionName'),
-      minSdk: attr(sdkTag, 'minSdkVersion'),
-      targetSdk: attr(sdkTag, 'targetSdkVersion'),
-      application: { label: attr(appTag, 'label'), icon: attr(appTag, 'icon'), theme: attr(appTag, 'theme') },
-      activities,
-      launcherActivity: activities.find(x => x.launcher)?.name || null
-    };
-  }
-
-  function parseBinaryManifest(bytes) {
-    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    if (bytes.byteLength < 8) throw new RavenAndroidError('AXML_TRUNCATED', 'AndroidManifest.xml binario truncado.');
-    const type = view.getUint16(0, true), headerSize = view.getUint16(2, true), size = view.getUint32(4, true);
-    if (type !== AXML_XML || size > bytes.byteLength) throw new RavenAndroidError('AXML_HEADER', 'Cabecera AXML inválida.');
-    let strings = [];
-    const result = {
-      format: 'axml', packageName: null, versionCode: null, versionName: null,
-      minSdk: null, targetSdk: null,
-      application: { label: null, icon: null, theme: null },
-      activities: [], launcherActivity: null
-    };
-    let p = headerSize;
-    let currentActivity = null;
-    let currentIntent = null;
-    const stack = [];
-
-    const getString = i => (i === 0xffffffff ? null : strings[i] ?? null);
-    const attrsToObject = (chunkStart, chunkHeaderSize) => {
-      const attrExt = chunkStart + 16;
-      if (attrExt + 20 > bytes.byteLength) return {};
-      const attrStart = view.getUint16(attrExt + 8, true);
-      const attrSize = view.getUint16(attrExt + 10, true) || 20;
-      const attrCount = view.getUint16(attrExt + 12, true);
-      const out = {};
-      let a = attrExt + attrStart;
-      for (let i = 0; i < attrCount; i++, a += attrSize) {
-        if (a + 20 > bytes.byteLength) break;
-        const nameIdx = view.getUint32(a + 4, true);
-        const rawIdx = view.getUint32(a + 8, true);
-        const dataType = bytes[a + 15];
-        const data = view.getUint32(a + 16, true);
-        const name = cleanAndroidName(getString(nameIdx));
-        const raw = getString(rawIdx);
-        if (name) out[name] = raw != null ? raw : typedValueToJs(dataType, data, strings);
-      }
-      return out;
-    };
-
-    while (p + 8 <= Math.min(size, bytes.byteLength)) {
-      const ct = view.getUint16(p, true), hs = view.getUint16(p + 2, true), cs = view.getUint32(p + 4, true);
-      if (cs < 8 || p + cs > bytes.byteLength) throw new RavenAndroidError('AXML_CHUNK', 'Chunk AXML inválido.', { offset: p, type: ct, size: cs });
-      if (ct === AXML_STRING_POOL) {
-        strings = parseStringPool(bytes, p, hs, cs).strings;
-      } else if (ct === AXML_START_ELEMENT) {
-        const nameIdx = view.getUint32(p + 20, true);
-        const name = getString(nameIdx) || '';
-        const attrs = attrsToObject(p, hs);
-        stack.push(name);
-        if (name === 'manifest') {
-          result.packageName = attrs.package ?? result.packageName;
-          result.versionCode = attrs.versionCode ?? result.versionCode;
-          result.versionName = attrs.versionName ?? result.versionName;
-        } else if (name === 'uses-sdk') {
-          result.minSdk = attrs.minSdkVersion ?? result.minSdk;
-          result.targetSdk = attrs.targetSdkVersion ?? result.targetSdk;
-        } else if (name === 'application') {
-          result.application.label = attrs.label ?? result.application.label;
-          result.application.icon = attrs.icon ?? result.application.icon;
-          result.application.theme = attrs.theme ?? result.application.theme;
-        } else if (name === 'activity' || name === 'activity-alias') {
-          currentActivity = { name: attrs.name || null, launcher: false, exported: attrs.exported ?? null };
-          if (currentActivity.name) result.activities.push(currentActivity);
-        } else if (name === 'intent-filter' && currentActivity) {
-          currentIntent = { main: false, launcher: false };
-        } else if (name === 'action' && currentIntent && attrs.name === 'android.intent.action.MAIN') {
-          currentIntent.main = true;
-        } else if (name === 'category' && currentIntent && attrs.name === 'android.intent.category.LAUNCHER') {
-          currentIntent.launcher = true;
-        }
-      } else if (ct === AXML_END_ELEMENT) {
-        const nameIdx = view.getUint32(p + 20, true);
-        const name = getString(nameIdx) || stack[stack.length - 1] || '';
-        if (name === 'intent-filter' && currentActivity && currentIntent) {
-          if (currentIntent.main && currentIntent.launcher) currentActivity.launcher = true;
-          currentIntent = null;
-        } else if (name === 'activity' || name === 'activity-alias') {
-          currentActivity = null;
-          currentIntent = null;
-        }
-        stack.pop();
-      }
-      p += cs;
-    }
-    result.launcherActivity = result.activities.find(x => x.launcher)?.name || null;
-    return result;
-  }
-
-  function parseAndroidManifest(bytes) {
-    let i = 0;
-    while (i < bytes.length && (bytes[i] === 0xef || bytes[i] === 0xbb || bytes[i] === 0xbf || bytes[i] <= 0x20)) i++;
-    if (bytes[i] === 0x3c) return parseTextManifest(td.decode(bytes));
-    return parseBinaryManifest(bytes);
-  }
-
-  function inspectDex(bytes) {
-    if (!bytes || bytes.length < 112) return null;
-    const magic = td.decode(bytes.slice(0, 8));
-    if (!/^dex\n\d{3}\0$/.test(magic)) return null;
-    const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    return {
-      version: magic.slice(4, 7),
-      checksum: v.getUint32(8, true),
-      fileSize: v.getUint32(32, true),
-      headerSize: v.getUint32(36, true),
-      stringIds: v.getUint32(56, true),
-      typeIds: v.getUint32(64, true),
-      protoIds: v.getUint32(72, true),
-      fieldIds: v.getUint32(80, true),
-      methodIds: v.getUint32(88, true),
-      classDefs: v.getUint32(96, true)
-    };
-  }
-
-  function detectAbis(entryNames) {
-    const set = new Set();
-    for (const name of entryNames) {
-      const m = name.match(/^lib\/([^/]+)\/[^/]+\.so$/i);
-      if (m) set.add(m[1]);
-    }
-    return [...set];
-  }
-
-  function detectHybrid(entryNames) {
-    const candidates = [
-      ['cordova', 'assets/www/index.html', 'assets/www/'],
-      ['capacitor', 'assets/public/index.html', 'assets/public/'],
-      ['web-assets', 'assets/index.html', 'assets/'],
-      ['web-root', 'www/index.html', 'www/']
-    ];
-    for (const [kind, entry, root] of candidates) {
-      if (entryNames.includes(entry)) return { kind, entry, root };
-    }
-    return null;
-  }
-
-  function scoreIconPath(path) {
-    const p = path.toLowerCase();
-    let score = 0;
-    if (/^res\/mipmap/.test(p)) score += 100;
-    if (/^res\/drawable/.test(p)) score += 40;
-    if (/ic_launcher|app_icon|icon/.test(p)) score += 80;
-    if (/xxxhdpi/.test(p)) score += 35;
-    else if (/xxhdpi/.test(p)) score += 30;
-    else if (/xhdpi/.test(p)) score += 25;
-    else if (/hdpi/.test(p)) score += 20;
-    if (/\.png$/.test(p)) score += 15;
-    if (/foreground|background|round/.test(p)) score -= 10;
-    return score;
-  }
-
-  function guessIcon(entryNames) {
-    return entryNames
-      .filter(x => /^res\/(mipmap|drawable)/i.test(x) && /\.(png|webp)$/i.test(x))
-      .map(path => ({ path, score: scoreIconPath(path) }))
-      .sort((a, b) => b.score - a.score)[0]?.path || null;
-  }
-
-  function deriveName(fileName, manifest) {
-    const label = manifest?.application?.label;
-    if (typeof label === 'string' && label && !label.startsWith('@') && !label.startsWith('?')) return label;
-    if (manifest?.packageName) {
-      const tail = manifest.packageName.split('.').filter(Boolean).pop();
-      if (tail) return tail.replace(/[_-]+/g, ' ').replace(/\b\w/g, x => x.toUpperCase());
-    }
-    return stripExt(basename(fileName || 'Android App')) || 'Android App';
-  }
-
-  class ApkInspector {
-    static async inspect(input, options = {}) {
-      const name = input?.name || options.name || 'app.apk';
-      const buffer = input instanceof ArrayBuffer ? input : input instanceof Uint8Array ? input.buffer.slice(input.byteOffset, input.byteOffset + input.byteLength) : await input.arrayBuffer();
-      const bytes = new Uint8Array(buffer);
-      const hash = await sha256Hex(bytes);
-      const zip = new ApkZipReader(buffer, options);
-      const entries = zip.list();
-      if (!zip.has('AndroidManifest.xml')) throw new RavenAndroidError('APK_NO_MANIFEST', 'El paquete no contiene AndroidManifest.xml.');
-      const manifest = parseAndroidManifest(await zip.read('AndroidManifest.xml'));
-      const dexFiles = entries.filter(x => /^classes\d*\.dex$/i.test(x)).sort();
-      const dex = [];
-      for (const path of dexFiles.slice(0, options.maxDexInspect || 8)) {
-        try { dex.push({ path, ...(inspectDex(await zip.read(path)) || {}) }); }
-        catch (error) { dex.push({ path, error: error.message }); }
-      }
-      const abis = detectAbis(entries);
-      const hybrid = detectHybrid(entries);
-      const iconPath = guessIcon(entries);
-      const packageName = manifest.packageName || null;
-      const appId = packageName ? `android:${packageName}` : `android:sha256:${hash.slice(0, 24)}`;
-      const report = {
-        runtimeVersion: VERSION,
-        fileName: name,
-        fileSize: bytes.byteLength,
-        fileSizeHuman: formatBytes(bytes.byteLength),
-        sha256: hash,
-        appId,
-        source: 'apk',
-        runtimeId: 'android',
-        name: deriveName(name, manifest),
-        packageName,
-        versionCode: manifest.versionCode,
-        versionName: manifest.versionName,
-        minSdk: manifest.minSdk,
-        targetSdk: manifest.targetSdk,
-        launcherActivity: manifest.launcherActivity,
-        application: manifest.application,
-        manifestFormat: manifest.format,
-        activities: manifest.activities,
-        dex,
-        dexFiles,
-        abis,
-        hasNativeCode: abis.length > 0,
-        hybrid,
-        iconPath,
-        entryCount: entries.length,
-        execution: hybrid
-          ? { preferredBackend: 'web-hybrid', nativeBackendRequired: false, reason: `Detectado paquete ${hybrid.kind}.` }
-          : { preferredBackend: 'native-android', nativeBackendRequired: true, reason: 'El APK contiene aplicación Android no-web.' }
-      };
-      Object.defineProperty(report, '_zip', { value: zip, enumerable: false });
-      Object.defineProperty(report, '_buffer', { value: buffer, enumerable: false });
-      return report;
-    }
-  }
-
-  function mimeFor(path) {
-    const ext = path.split('.').pop()?.toLowerCase();
-    const map = {
-      html: 'text/html;charset=utf-8', htm: 'text/html;charset=utf-8', css: 'text/css;charset=utf-8',
-      js: 'text/javascript;charset=utf-8', mjs: 'text/javascript;charset=utf-8', json: 'application/json;charset=utf-8',
-      png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif', svg: 'image/svg+xml',
-      mp3: 'audio/mpeg', ogg: 'audio/ogg', wav: 'audio/wav', mp4: 'video/mp4', webm: 'video/webm',
-      woff: 'font/woff', woff2: 'font/woff2', ttf: 'font/ttf', wasm: 'application/wasm', xml: 'application/xml'
-    };
-    return map[ext] || 'application/octet-stream';
-  }
-
-  function joinPath(base, ref) {
-    if (/^(?:[a-z]+:|\/\/|data:|blob:|#)/i.test(ref)) return ref;
-    const suffixMatch = ref.match(/^([^?#]*)([?#].*)?$/);
-    const raw = suffixMatch ? suffixMatch[1] : ref;
-    const suffix = suffixMatch?.[2] || '';
-    const dir = base.includes('/') ? base.slice(0, base.lastIndexOf('/') + 1) : '';
-    return normalizePath(dir + raw) + suffix;
-  }
-
-  class HybridWebBundle {
-    constructor(report) {
-      this.report = report;
-      this.zip = report._zip;
-      this.root = report.hybrid.root;
-      this.entry = report.hybrid.entry;
-      this.files = new Map();
-      this.urls = new Map();
-      this.disposed = false;
-    }
-
-    async extract() {
-      const names = this.zip.list(this.root).filter(x => !x.endsWith('/'));
-      for (const full of names) {
-        const rel = full.slice(this.root.length);
-        this.files.set(rel, await this.zip.read(full));
-      }
-      if (!this.files.has('index.html')) throw new RavenAndroidError('HYBRID_ENTRY_MISSING', 'El APK híbrido no contiene index.html en su raíz web.');
-      return this;
-    }
-
-    getFileMap() {
-      return new Map(this.files);
-    }
-
-    async createLaunchDocument() {
-      if (!this.files.size) await this.extract();
-      // Build object URLs for binary assets first.
-      for (const [path, bytes] of this.files) {
-        if (/\.(?:html?|css|m?js)$/i.test(path)) continue;
-        const url = URL.createObjectURL(new Blob([bytes], { type: mimeFor(path) }));
-        this.urls.set(path, url);
-      }
-      // CSS can refer to assets.
-      for (const [path, bytes] of this.files) {
-        if (!/\.css$/i.test(path)) continue;
-        let text = td.decode(bytes);
-        text = text.replace(/url\((['"]?)([^)'"\s]+)\1\)/g, (m, q, ref) => {
-          if (/^(?:data:|https?:|blob:|#)/i.test(ref)) return m;
-          const target = joinPath(path, ref).split(/[?#]/)[0];
-          const url = this.urls.get(target);
-          return url ? `url(${q}${url}${q})` : m;
-        });
-        const url = URL.createObjectURL(new Blob([text], { type: 'text/css;charset=utf-8' }));
-        this.urls.set(path, url);
-      }
-      // JS static imports and obvious worker/importScripts references.
-      for (const [path, bytes] of this.files) {
-        if (!/\.m?js$/i.test(path)) continue;
-        let text = td.decode(bytes);
-        text = text.replace(/\b(from\s*|import\s*\(|importScripts\s*\(|new\s+Worker\s*\()(["'])([^"']+)\2/g, (m, pre, q, ref) => {
-          const target = joinPath(path, ref).split(/[?#]/)[0];
-          const url = this.urls.get(target);
-          return url ? `${pre}${q}${url}${q}` : m;
-        });
-        const url = URL.createObjectURL(new Blob([text], { type: 'text/javascript;charset=utf-8' }));
-        this.urls.set(path, url);
-      }
-      let html = td.decode(this.files.get('index.html'));
-      html = html.replace(/\b(src|href)=(['"])([^'"]+)\2/gi, (m, attr, q, ref) => {
-        if (/^(?:data:|https?:|blob:|#|mailto:|tel:|javascript:)/i.test(ref)) return m;
-        const target = joinPath('index.html', ref).split(/[?#]/)[0];
-        const url = this.urls.get(target);
-        return url ? `${attr}=${q}${url}${q}` : m;
-      });
-      const bridge = `<script>window.__RAVEN_ANDROID_HYBRID__=${JSON.stringify({ packageName: this.report.packageName, appId: this.report.appId, runtimeVersion: VERSION })};<\/script>`;
-      html = /<head\b[^>]*>/i.test(html) ? html.replace(/<head\b[^>]*>/i, m => m + bridge) : bridge + html;
-      return html;
-    }
-
-    dispose() {
-      if (this.disposed) return;
-      this.disposed = true;
-      for (const url of this.urls.values()) URL.revokeObjectURL(url);
-      this.urls.clear();
-      this.files.clear();
-    }
-  }
-
-  const nativeBridgeInstances = new Set();
-  class NativeAndroidBridge {
-    constructor(options = {}) {
-      this.timeoutMs = options.timeoutMs || 15000;
-      this.handlerName = options.handlerName || 'ravenAndroidRuntime';
-      this.pending = new Map();
-      this.seq = 0;
-      this.runtimeId = options.runtimeId || (globalThis.crypto?.randomUUID?.() || `android-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`);
-      this.nonce = options.nonce || Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-      nativeBridgeInstances.add(this);
-      if (!globalThis.__RAVEN_ANDROID_NATIVE_RESOLVE__) {
-        globalThis.__RAVEN_ANDROID_NATIVE_RESOLVE__ = function (id, payload, error) {
-          for (const bridge of [...nativeBridgeInstances]) if (bridge.pending.has(id)) { bridge._resolve(id, payload, error); return true; }
-          return false;
-        };
-      }
-    }
-
-    available() {
-      return !!(globalThis.RavenNativeAndroid?.invoke || globalThis.webkit?.messageHandlers?.[this.handlerName]?.postMessage);
-    }
-
-    _resolve(id, payload, error) {
-      const item = this.pending.get(id);
-      if (!item) return;
-      this.pending.delete(id);
-      clearTimeout(item.timer);
-      if (error) item.reject(new RavenAndroidError('ANDROID_NATIVE_ERROR', typeof error === 'string' ? error : error.message || 'Error del backend Android.', error));
-      else item.resolve(payload);
-    }
-
-    invoke(command, payload = {}) {
-      if (globalThis.RavenNativeAndroid?.invoke) return Promise.resolve(globalThis.RavenNativeAndroid.invoke(command, payload));
-      const handler = globalThis.webkit?.messageHandlers?.[this.handlerName];
-      if (!handler?.postMessage) return Promise.reject(new RavenAndroidError('ANDROID_BACKEND_UNAVAILABLE', 'Raven no tiene un backend Android nativo conectado.'));
-      const id = `ra-${Date.now().toString(36)}-${(++this.seq).toString(36)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          this.pending.delete(id);
-          reject(new RavenAndroidError('ANDROID_NATIVE_TIMEOUT', `El backend Android no respondió a ${command}.`));
-        }, this.timeoutMs);
-        this.pending.set(id, { resolve, reject, timer });
-        handler.postMessage({ channel: 'raven-android-runtime/v1', runtimeId: this.runtimeId, nonce: this.nonce, id, command, payload });
-      });
-    }
-
-    getDiagnostics() { return { channel:'raven-android-runtime/v1', runtimeId:this.runtimeId, available:this.available(), pending:this.pending.size, handlerName:this.handlerName }; }
-
-    dispose() {
-      nativeBridgeInstances.delete(this);
-      for (const [id,item] of this.pending) { clearTimeout(item.timer); item.reject(new RavenAndroidError('ANDROID_BRIDGE_DISPOSED','El bridge Android fue cerrado.')); }
-      this.pending.clear();
-    }
-
-    async transferApk(buffer, metadata = {}, chunkSize = 512 * 1024) {
-      const bytes = new Uint8Array(buffer);
-      const session = await this.invoke('apk-transfer-begin', { size: bytes.byteLength, metadata });
-      const transferId = session?.transferId;
-      if (!transferId) throw new RavenAndroidError('ANDROID_TRANSFER', 'El backend no devolvió transferId.');
-      for (let offset = 0, index = 0; offset < bytes.byteLength; offset += chunkSize, index++) {
-        const chunk = bytes.slice(offset, Math.min(bytes.byteLength, offset + chunkSize));
-        let binary = '';
-        for (let i = 0; i < chunk.length; i += 0x8000) binary += String.fromCharCode(...chunk.subarray(i, i + 0x8000));
-        const data = btoa(binary);
-        await this.invoke('apk-transfer-chunk', { transferId, index, offset, data });
-      }
-      return this.invoke('apk-transfer-end', { transferId });
-    }
-  }
-
-  class AndroidRuntime {
-    constructor(project, errors, options = {}) {
-      this.project = project || {};
-      this.errors = errors || { info() {}, warn() {}, error() {} };
-      this.options = options;
-      this.host = null;
-      this.frame = null;
-      this.bundle = null;
-      this.report = null;
-      this.bridge = options.nativeBridge || new NativeAndroidBridge(options.nativeBridgeOptions);
-      this.paused = false;
-      this.disposed = false;
-    }
-
-    getKind() { return 'android'; }
-    getFrame() { return this.frame; }
-    getMetadata() { return this.report || this.project.metadata || {}; }
-    getDisplayConfiguration() { return { adaptive: true, pixelPerfect: false, smoothing: true }; }
-    getInputProfile() { return { actions: ['TOUCH', 'BACK', 'HOME', 'APP_SWITCH', 'GAMEPAD'], keyboard: { BACK: 'Escape' } }; }
-
-    _findApkBlob() {
-      const files = this.project?.files;
-      const entry = this.project?.entryPoint;
-      if (files?.get && entry) return files.get(entry)?.blob || files.get(entry);
-      if (this.project?.blob) return this.project.blob;
-      return null;
-    }
-
-    async mount(host) {
-      this.host = host;
-      const blob = this._findApkBlob();
-      if (!blob) throw new RavenAndroidError('APK_PROJECT_FILE', 'Raven no entregó el archivo APK al AndroidRuntime.');
-      this.report = await ApkInspector.inspect(blob, { name: this.project.name || this.project.fileName || this.project.entryPoint || 'app.apk', inflate: this.options.inflate });
-      this.errors.info?.(`APK inspeccionado: ${this.report.packageName || this.report.fileName}`);
-
-      if (this.report.hybrid) {
-        await this._mountHybrid(host);
-        this.options.onReady?.();
-        return;
-      }
-
-      if (this.bridge.available()) {
-        await this._mountNative(host, blob);
-        this.options.onReady?.();
-        return;
-      }
-
-      this._showUnavailable(host);
-      const err = new RavenAndroidError(
-        'ANDROID_BACKEND_UNAVAILABLE',
-        'Este APK requiere el backend Android nativo de Raven. El importador funciona, pero esta build web de Raven no puede ejecutar bytecode DEX/ART ni bibliotecas Android por sí sola.',
-        { report: this._publicReport() }
-      );
-      this.errors.error?.(err.message, { technical: err.code });
-      throw err;
-    }
-
-    _publicReport() {
-      if (!this.report) return null;
-      const { _zip, _buffer, ...publicReport } = this.report;
-      return publicReport;
-    }
-
-    async _mountHybrid(host) {
-      this.bundle = new HybridWebBundle(this.report);
-      await this.bundle.extract();
-      // Preferred path: let Raven's WebRuntime consume the extracted VFS.
-      if (typeof this.options.mountWebBundle === 'function') {
-        await this.options.mountWebBundle({
-          host,
-          entryPoint: 'index.html',
-          files: this.bundle.getFileMap(),
-          metadata: this._publicReport(),
-          source: 'apk-hybrid'
-        });
-        return;
-      }
-      const iframe = document.createElement('iframe');
-      iframe.className = 'android-runtime-frame';
-      iframe.setAttribute('allow', 'autoplay; gamepad; fullscreen; clipboard-read; clipboard-write');
-      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-modals allow-pointer-lock allow-downloads');
-      iframe.srcdoc = await this.bundle.createLaunchDocument();
-      host.replaceChildren(iframe);
-      this.frame = iframe;
-      this.errors.info?.(`Android Runtime: modo híbrido ${this.report.hybrid.kind}.`);
-    }
-
-    async _mountNative(host, blob) {
-      host.replaceChildren(this._statusNode('Iniciando Android…', 'Preparando el paquete para el backend nativo.'));
-      const buffer = await blob.arrayBuffer();
-      const installed = await this.bridge.transferApk(buffer, this._publicReport());
-      const session = await this.bridge.invoke('launch', { appId: this.report.appId, installId: installed?.installId, packageName: this.report.packageName });
-      host.replaceChildren(this._statusNode('Android activo', session?.message || this.report.name));
-      this.nativeSessionId = session?.sessionId || null;
-      this.errors.info?.('Android Runtime nativo iniciado.');
-    }
-
-    _statusNode(title, text) {
-      if (typeof document === 'undefined') return null;
-      const box = document.createElement('div');
-      box.className = 'android-runtime-status';
-      const h = document.createElement('h2'); h.textContent = title;
-      const p = document.createElement('p'); p.textContent = text;
-      box.append(h, p); return box;
-    }
-
-    _showUnavailable(host) {
-      if (typeof document === 'undefined') return;
-      const box = this._statusNode('Android Runtime no disponible', 'El APK fue reconocido correctamente, pero necesita el backend Android nativo de Raven para ejecutar DEX/ART y APIs Android.');
-      const pre = document.createElement('pre');
-      pre.textContent = JSON.stringify({ package: this.report.packageName, dex: this.report.dexFiles, abis: this.report.abis, launcher: this.report.launcherActivity }, null, 2);
-      box.append(pre); host.replaceChildren(box);
-    }
-
-    async start() { if (this.nativeSessionId) return this.bridge.invoke('resume', { sessionId: this.nativeSessionId }); this.paused = false; }
-    async pause() { this.paused = true; if (this.nativeSessionId) return this.bridge.invoke('pause', { sessionId: this.nativeSessionId }); }
-    async resume() { this.paused = false; if (this.nativeSessionId) return this.bridge.invoke('resume', { sessionId: this.nativeSessionId }); }
-    async stop() { if (this.nativeSessionId) return this.bridge.invoke('stop', { sessionId: this.nativeSessionId }); }
-    async reset() { if (this.nativeSessionId) return this.bridge.invoke('reset', { sessionId: this.nativeSessionId }); if (this.frame) this.frame.srcdoc = this.frame.srcdoc; }
-    togglePause() { return this.paused ? this.resume() : this.pause(); }
-    async capturePreview() {
-      if (this.nativeSessionId) return this.bridge.invoke('capture-preview', { sessionId: this.nativeSessionId });
-      return null;
-    }
-
-    async dispose() {
-      if (this.disposed) return;
-      this.disposed = true;
-      try { if (this.nativeSessionId) await this.bridge.invoke('dispose', { sessionId: this.nativeSessionId }); } catch {}
-      this.nativeSessionId = null;
-      try { this.bridge?.dispose?.(); } catch {}
-      try { this.bundle?.dispose(); } catch {}
-      this.bundle = null;
-      this.frame?.remove();
-      this.frame = null;
-      this.host?.replaceChildren();
-      this.host = null;
-    }
-  }
-
-  function projectCanOpen(project) {
-    return project?.runtimeId === 'android' || project?.source === 'apk' || /\.apk$/i.test(project?.entryPoint || project?.fileName || '');
-  }
-
-  function createRuntimeDefinition() {
-    return {
-      id: 'android',
-      canOpen: projectCanOpen,
-      create: (project, errors, options) => new AndroidRuntime(project, errors, options)
-    };
-  }
-
-  function registerWithRuntimeManager(RuntimeManager) {
-    if (!RuntimeManager?.register) throw new RavenAndroidError('RAVEN_RUNTIME_MANAGER', 'RuntimeManager.register no está disponible.');
-    RuntimeManager.register(createRuntimeDefinition());
-    return true;
-  }
-
-  async function buildImportMetadata(file, options = {}) {
-    if (!file || !/\.apk$/i.test(file.name || options.name || '')) throw new RavenAndroidError('APK_EXTENSION', 'Se esperaba un archivo .apk.');
-    const report = await ApkInspector.inspect(file, options);
-    const metadata = {
-      appId: report.appId,
-      source: 'apk',
-      runtimeId: 'android',
-      entryPoint: file.name || 'app.apk',
-      name: report.name,
-      packageName: report.packageName,
-      versionCode: report.versionCode,
-      versionName: report.versionName,
-      android: {
-        minSdk: report.minSdk,
-        targetSdk: report.targetSdk,
-        launcherActivity: report.launcherActivity,
-        abis: report.abis,
-        dexFiles: report.dexFiles,
-        hybrid: report.hybrid,
-        iconPath: report.iconPath,
-        sha256: report.sha256
-      }
-    };
-    return { metadata, report };
-  }
-
-  return {
-    VERSION,
-    RavenAndroidError,
-    ApkZipReader,
-    ApkInspector,
-    AndroidRuntime,
-    NativeAndroidBridge,
-    HybridWebBundle,
-    parseAndroidManifest,
-    parseBinaryManifest,
-    parseTextManifest,
-    inspectDex,
-    detectAbis,
-    detectHybrid,
-    buildImportMetadata,
-    createRuntimeDefinition,
-    registerWithRuntimeManager,
-    utils: { normalizePath, sha256Hex, formatBytes, mimeFor }
-  };
-});
-
-(function(root,factory){
-  const Core = typeof module==='object' && module.exports ? require('./raven-android-runtime.js') : root.RavenAndroidRuntime;
-  const api = factory(Core);
-  if(typeof module==='object' && module.exports) module.exports=api;
-  root.RavenAndroidGuestCore=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(Core){
-  'use strict';
-  if(!Core) throw new Error('RavenAndroidRuntime no está disponible.');
-
-  const VERSION='0.2.0-guest-core';
-  const NO_INDEX=0xffffffff;
-
-  class DexError extends Error{
-    constructor(code,message,details=null){super(message);this.name='DexError';this.code=code;this.details=details;}
-  }
-
-  function readUleb(bytes,offset){
-    let value=0,shift=0,p=offset;
-    for(let i=0;i<5;i++){
-      if(p>=bytes.length) throw new DexError('DEX_ULEB_TRUNCATED','ULEB128 truncado.',{offset});
-      const b=bytes[p++];value|=(b&0x7f)<<shift;if(!(b&0x80))return{value:value>>>0,next:p};shift+=7;
-    }
-    throw new DexError('DEX_ULEB_RANGE','ULEB128 fuera de rango.',{offset});
-  }
-
-  function sign4(v){return (v&8)?v-16:v;}
-  function sign8(v){return (v&0x80)?v-0x100:v;}
-  function sign16(v){return (v&0x8000)?v-0x10000:v;}
-  function sign32(v){return v|0;}
-
-  function decodeMutf8(bytes,offset){
-    const size=readUleb(bytes,offset);let p=size.next,end=p;
-    while(end<bytes.length&&bytes[end]!==0)end++;
-    const text=new TextDecoder('utf-8',{fatal:false}).decode(bytes.slice(p,end));
-    return{text,next:Math.min(bytes.length,end+1),utf16Size:size.value};
-  }
-
-  class DexFile{
-    constructor(input){
-      this.bytes=input instanceof Uint8Array?input:new Uint8Array(input);
-      this.view=new DataView(this.bytes.buffer,this.bytes.byteOffset,this.bytes.byteLength);
-      this.header=null;this.strings=[];this.types=[];this.protos=[];this.fields=[];this.methods=[];this.classDefs=[];this.classData=new Map();
-      this.parse();
-    }
-    u16(o){if(o<0||o+2>this.bytes.length)throw new DexError('DEX_RANGE','Lectura u16 fuera del DEX.',{offset:o});return this.view.getUint16(o,true)}
-    u32(o){if(o<0||o+4>this.bytes.length)throw new DexError('DEX_RANGE','Lectura u32 fuera del DEX.',{offset:o});return this.view.getUint32(o,true)}
-    range(off,size,label){if(off<0||size<0||off+size>this.bytes.length)throw new DexError('DEX_RANGE',`${label||'Rango'} fuera del DEX.`,{off,size,length:this.bytes.length})}
-    parse(){
-      if(this.bytes.length<112)throw new DexError('DEX_TRUNCATED','DEX demasiado pequeño.');
-      const magic=new TextDecoder().decode(this.bytes.slice(0,8));
-      if(!/^dex\n\d{3}\0$/.test(magic))throw new DexError('DEX_MAGIC','Cabecera DEX inválida.');
-      const h={magic,version:magic.slice(4,7),checksum:this.u32(8),fileSize:this.u32(32),headerSize:this.u32(36),endianTag:this.u32(40),linkSize:this.u32(44),linkOff:this.u32(48),mapOff:this.u32(52),stringIdsSize:this.u32(56),stringIdsOff:this.u32(60),typeIdsSize:this.u32(64),typeIdsOff:this.u32(68),protoIdsSize:this.u32(72),protoIdsOff:this.u32(76),fieldIdsSize:this.u32(80),fieldIdsOff:this.u32(84),methodIdsSize:this.u32(88),methodIdsOff:this.u32(92),classDefsSize:this.u32(96),classDefsOff:this.u32(100),dataSize:this.u32(104),dataOff:this.u32(108)};
-      if(h.headerSize!==112)throw new DexError('DEX_HEADER_SIZE',`Header DEX ${h.headerSize} no soportado.`);
-      if(h.fileSize>this.bytes.length)throw new DexError('DEX_FILE_SIZE','DEX truncado según file_size.',{declared:h.fileSize,actual:this.bytes.length});
-      this.header=h;
-      this.parseStrings();this.parseTypes();this.parseProtos();this.parseFields();this.parseMethods();this.parseClasses();
-    }
-    parseStrings(){
-      const h=this.header;this.range(h.stringIdsOff,h.stringIdsSize*4,'string_ids');
-      for(let i=0;i<h.stringIdsSize;i++){const off=this.u32(h.stringIdsOff+i*4);this.range(off,1,'string_data');this.strings.push(decodeMutf8(this.bytes,off).text)}
-    }
-    string(i){return i===NO_INDEX?null:this.strings[i]??null}
-    parseTypes(){
-      const h=this.header;this.range(h.typeIdsOff,h.typeIdsSize*4,'type_ids');
-      for(let i=0;i<h.typeIdsSize;i++){const idx=this.u32(h.typeIdsOff+i*4);this.types.push({descriptorIdx:idx,descriptor:this.string(idx)})}
-    }
-    type(i){return i===NO_INDEX?null:this.types[i]?.descriptor??null}
-    typeList(off){if(!off)return[];const size=this.u32(off);this.range(off+4,size*2,'type_list');const out=[];for(let i=0;i<size;i++)out.push(this.type(this.u16(off+4+i*2)));return out}
-    parseProtos(){
-      const h=this.header;this.range(h.protoIdsOff,h.protoIdsSize*12,'proto_ids');
-      for(let i=0;i<h.protoIdsSize;i++){const o=h.protoIdsOff+i*12;const shortyIdx=this.u32(o),returnTypeIdx=this.u32(o+4),parametersOff=this.u32(o+8);this.protos.push({shortyIdx,shorty:this.string(shortyIdx),returnTypeIdx,returnType:this.type(returnTypeIdx),parametersOff,parameters:this.typeList(parametersOff)})}
-    }
-    proto(i){return this.protos[i]||null}
-    parseFields(){
-      const h=this.header;this.range(h.fieldIdsOff,h.fieldIdsSize*8,'field_ids');
-      for(let i=0;i<h.fieldIdsSize;i++){const o=h.fieldIdsOff+i*8,thisClass=this.u16(o);const typeIdx=this.u16(o+2),nameIdx=this.u32(o+4);this.fields.push({index:i,classIdx:thisClass,className:this.type(thisClass),typeIdx,type:this.type(typeIdx),nameIdx,name:this.string(nameIdx)})}
-    }
-    parseMethods(){
-      const h=this.header;this.range(h.methodIdsOff,h.methodIdsSize*8,'method_ids');
-      for(let i=0;i<h.methodIdsSize;i++){const o=h.methodIdsOff+i*8,classIdx=this.u16(o),protoIdx=this.u16(o+2),nameIdx=this.u32(o+4),proto=this.proto(protoIdx);this.methods.push({index:i,classIdx,className:this.type(classIdx),protoIdx,proto,nameIdx,name:this.string(nameIdx),descriptor:`${this.type(classIdx)||'?'}->${this.string(nameIdx)||'?'}(${(proto?.parameters||[]).join('')})${proto?.returnType||'V'}`})}
-    }
-    parseClasses(){
-      const h=this.header;this.range(h.classDefsOff,h.classDefsSize*32,'class_defs');
-      for(let i=0;i<h.classDefsSize;i++){
-        const o=h.classDefsOff+i*32;const item={index:i,classIdx:this.u32(o),accessFlags:this.u32(o+4),superclassIdx:this.u32(o+8),interfacesOff:this.u32(o+12),sourceFileIdx:this.u32(o+16),annotationsOff:this.u32(o+20),classDataOff:this.u32(o+24),staticValuesOff:this.u32(o+28)};
-        item.className=this.type(item.classIdx);item.superclass=this.type(item.superclassIdx);item.interfaces=this.typeList(item.interfacesOff);item.sourceFile=this.string(item.sourceFileIdx);this.classDefs.push(item);
-        if(item.classDataOff)this.classData.set(item.className,this.parseClassData(item.classDataOff));
-      }
-    }
-    parseClassData(off){
-      let p=off;const a=readUleb(this.bytes,p);p=a.next;const b=readUleb(this.bytes,p);p=b.next;const c=readUleb(this.bytes,p);p=c.next;const d=readUleb(this.bytes,p);p=d.next;
-      const staticFields=[],instanceFields=[],directMethods=[],virtualMethods=[];
-      let fieldIdx=0;for(let i=0;i<a.value;i++){const di=readUleb(this.bytes,p);p=di.next;const af=readUleb(this.bytes,p);p=af.next;fieldIdx+=di.value;staticFields.push({fieldIdx,accessFlags:af.value,field:this.fields[fieldIdx]||null})}
-      fieldIdx=0;for(let i=0;i<b.value;i++){const di=readUleb(this.bytes,p);p=di.next;const af=readUleb(this.bytes,p);p=af.next;fieldIdx+=di.value;instanceFields.push({fieldIdx,accessFlags:af.value,field:this.fields[fieldIdx]||null})}
-      const readMethods=(count,target)=>{let methodIdx=0;for(let i=0;i<count;i++){const di=readUleb(this.bytes,p);p=di.next;const af=readUleb(this.bytes,p);p=af.next;const co=readUleb(this.bytes,p);p=co.next;methodIdx+=di.value;target.push({methodIdx,accessFlags:af.value,codeOff:co.value,method:this.methods[methodIdx]||null})}};
-      readMethods(c.value,directMethods);readMethods(d.value,virtualMethods);
-      return{staticFields,instanceFields,directMethods,virtualMethods,endOffset:p};
-    }
-    findClass(descriptor){return this.classDefs.find(x=>x.className===descriptor)||null}
-    findMethod(className,name){const data=this.classData.get(className);if(!data)return null;for(const item of [...data.directMethods,...data.virtualMethods])if(item.method?.name===name)return item;return null}
-    methodByIndex(i){return this.methods[i]||null}
-    codeFor(encodedMethod){
-      if(!encodedMethod?.codeOff)return null;const o=encodedMethod.codeOff;this.range(o,16,'code_item');const registersSize=this.u16(o),insSize=this.u16(o+2),outsSize=this.u16(o+4),triesSize=this.u16(o+6),debugInfoOff=this.u32(o+8),insnsSize=this.u32(o+12);this.range(o+16,insnsSize*2,'insns');const insns=[];for(let i=0;i<insnsSize;i++)insns.push(this.u16(o+16+i*2));return{offset:o,registersSize,insSize,outsSize,triesSize,debugInfoOff,insnsSize,insns};
-    }
-    summary(){return{version:this.header.version,strings:this.strings.length,types:this.types.length,protos:this.protos.length,fields:this.fields.length,methods:this.methods.length,classes:this.classDefs.length,classNames:this.classDefs.slice(0,64).map(x=>x.className)}}
-  }
-
-  class DexInterpreter{
-    constructor(dex,options={}){this.dex=dex;this.maxSteps=options.maxSteps||100000;this.maxDepth=options.maxDepth||64;this.hostCalls=options.hostCalls||{};this.logs=[];this.steps=0;}
-    invoke(className,name,args=[]){const encoded=this.dex.findMethod(className,name);if(!encoded)throw new DexError('DEX_METHOD_MISSING',`Método no encontrado: ${className}->${name}`);return this.execute(encoded,args,0)}
-    hostInvoke(method,args){
-      const key=method?.descriptor||'';if(typeof this.hostCalls[key]==='function')return this.hostCalls[key](...args);
-      if(method?.className==='Landroid/util/Log;'&&['d','i','w','e','v'].includes(method.name)){const line=args.map(x=>x==null?'null':String(x)).join(' ');this.logs.push({level:method.name,text:line});return 0}
-      if(method?.className==='Ljava/lang/Math;'){
-        const fn={abs:Math.abs,max:Math.max,min:Math.min}[method.name];if(fn)return fn(...args);
-      }
-      throw new DexError('DEX_HOST_CALL_UNSUPPORTED',`Llamada externa no implementada: ${key}`);
-    }
-    execute(encoded,args=[],depth=0){
-      if(depth>this.maxDepth)throw new DexError('DEX_STACK_LIMIT','Se superó el límite de llamadas del guest.');const code=this.dex.codeFor(encoded);if(!code)throw new DexError('DEX_NO_CODE',`El método ${encoded.method?.descriptor||encoded.methodIdx} no contiene code_item.`);
-      const r=new Array(code.registersSize).fill(0);const argBase=Math.max(0,code.registersSize-code.insSize);for(let i=0;i<args.length&&argBase+i<r.length;i++)r[argBase+i]=args[i];let pc=0,lastResult=0;
-      const ins=code.insns;
-      while(pc<ins.length){if(++this.steps>this.maxSteps)throw new DexError('DEX_STEP_LIMIT','El guest superó el presupuesto de instrucciones.');const unit=ins[pc],op=unit&0xff,A=(unit>>>8)&0x0f,B=(unit>>>12)&0x0f,AA=(unit>>>8)&0xff;
-        switch(op){
-          case 0x00:pc+=1;break;
-          case 0x01:r[A]=r[B];pc+=1;break;
-          case 0x02:{const BBBB=ins[pc+1];r[AA]=r[BBBB];pc+=2;break}
-          case 0x0a:r[AA]=lastResult;pc+=1;break;
-          case 0x0e:return undefined;
-          case 0x0f:return r[AA];
-          case 0x10:return r[AA];
-          case 0x11:return r[AA];
-          case 0x12:r[A]=sign4(B);pc+=1;break;
-          case 0x13:r[AA]=sign16(ins[pc+1]);pc+=2;break;
-          case 0x14:r[AA]=sign32((ins[pc+1]|(ins[pc+2]<<16))>>>0);pc+=3;break;
-          case 0x1a:{const idx=ins[pc+1];r[AA]=this.dex.string(idx);pc+=2;break}
-          case 0x22:{const idx=ins[pc+1];r[AA]={__dexType:this.dex.type(idx)};pc+=2;break}
-          case 0x28:{pc+=sign8(AA);break}
-          case 0x29:{pc+=sign16(ins[pc+1]);break}
-          case 0x32:case 0x33:case 0x34:case 0x35:case 0x36:case 0x37:{const off=sign16(ins[pc+1]),av=r[A]|0,bv=r[B]|0;const ok=op===0x32?av===bv:op===0x33?av!==bv:op===0x34?av<bv:op===0x35?av>=bv:op===0x36?av>bv:av<=bv;pc+=ok?off:2;break}
-          case 0x38:case 0x39:case 0x3a:case 0x3b:case 0x3c:case 0x3d:{const off=sign16(ins[pc+1]),av=r[AA]|0;const ok=op===0x38?av===0:op===0x39?av!==0:op===0x3a?av<0:op===0x3b?av>=0:op===0x3c?av>0:av<=0;pc+=ok?off:2;break}
-          case 0x6e:case 0x6f:case 0x70:case 0x71:case 0x72:{const count=(unit>>>12)&0x0f,g=(unit>>>8)&0x0f,methodIdx=ins[pc+1],regs=ins[pc+2],list=[regs&0x0f,(regs>>>4)&0x0f,(regs>>>8)&0x0f,(regs>>>12)&0x0f,g].slice(0,count),vals=list.map(i=>r[i]),method=this.dex.methodByIndex(methodIdx);if(!method)throw new DexError('DEX_BAD_METHOD_INDEX',`method@${methodIdx} no existe.`);const internal=this.dex.findMethod(method.className,method.name);lastResult=internal?.codeOff?this.execute(internal,vals,depth+1):this.hostInvoke(method,vals);pc+=3;break}
-          case 0x90:case 0x91:case 0x92:case 0x93:case 0x94:case 0x95:case 0x96:case 0x97:case 0x98:case 0x99:case 0x9a:{const BB=ins[pc+1]&0xff,CC=(ins[pc+1]>>>8)&0xff,x=r[BB]|0,y=r[CC]|0;r[AA]=op===0x90?(x+y)|0:op===0x91?(x-y)|0:op===0x92?Math.imul(x,y):op===0x93?(y===0?0:(x/y)|0):op===0x94?(y===0?0:x%y):op===0x95?(x&y):op===0x96?(x|y):op===0x97?(x^y):op===0x98?(x<<(y&31)):op===0x99?(x>>(y&31)):(x>>>(y&31));pc+=2;break}
-          case 0xb0:case 0xb1:case 0xb2:case 0xb3:case 0xb4:case 0xb5:case 0xb6:case 0xb7:{const x=r[A]|0,y=r[B]|0;r[A]=op===0xb0?(x+y)|0:op===0xb1?(x-y)|0:op===0xb2?Math.imul(x,y):op===0xb3?(y===0?0:(x/y)|0):op===0xb4?(y===0?0:x%y):op===0xb5?(x&y):op===0xb6?(x|y):(x^y);pc+=1;break}
-          case 0xd0:case 0xd1:case 0xd2:case 0xd3:case 0xd4:case 0xd5:case 0xd6:case 0xd7:{const lit=sign16(ins[pc+1]),x=r[B]|0;r[A]=op===0xd0?(x+lit)|0:op===0xd1?(x-lit)|0:op===0xd2?Math.imul(x,lit):op===0xd3?(lit===0?0:(x/lit)|0):op===0xd4?(lit===0?0:x%lit):op===0xd5?(x&lit):op===0xd6?(x|lit):(x^lit);pc+=2;break}
-          case 0xd8:case 0xd9:case 0xda:case 0xdb:case 0xdc:case 0xdd:case 0xde:case 0xdf:case 0xe0:case 0xe1:case 0xe2:{const BB=ins[pc+1]&0xff,lit=sign8((ins[pc+1]>>>8)&0xff),x=r[BB]|0;r[AA]=op===0xd8?(x+lit)|0:op===0xd9?(x-lit)|0:op===0xda?Math.imul(x,lit):op===0xdb?(lit===0?0:(x/lit)|0):op===0xdc?(lit===0?0:x%lit):op===0xdd?(x&lit):op===0xde?(x|lit):op===0xdf?(x^lit):op===0xe0?(x<<(lit&31)):op===0xe1?(x>>(lit&31)):(x>>>(lit&31));pc+=2;break}
-          default:throw new DexError('DEX_OPCODE_UNSUPPORTED',`Opcode 0x${op.toString(16).padStart(2,'0')} no implementado.`,{pc,method:encoded.method?.descriptor});
-        }
-      }
-      return undefined;
-    }
-  }
-
-  function normalizeActivity(packageName,name){if(!name)return null;if(name.startsWith('.'))return `L${String(packageName||'').replace(/\./g,'/')}${name.replace(/\./g,'/')};`;if(name.includes('.'))return `L${name.replace(/\./g,'/')};`;return packageName?`L${packageName.replace(/\./g,'/')}/${name};`:`L${name};`}
-
-  class AndroidGuestCore{
-    constructor(report,options={}){this.report=report;this.options=options;this.dexFiles=[];this.state='CREATED';this.lastError=null;}
-    async prepare(){
-      this.state='DEX_LOADING';const zip=this.report?._zip;if(!zip)throw new DexError('GUEST_APK_SOURCE','El informe APK no conserva su ZIP interno.');
-      for(const path of (this.report.dexFiles||[]).slice(0,this.options.maxDexFiles||4)){const bytes=await zip.read(path);try{this.dexFiles.push({path,dex:new DexFile(bytes)})}catch(error){this.dexFiles.push({path,error})}}
-      this.state='DEX_READY';return this.getDiagnostics();
-    }
-    get launcherDescriptor(){return normalizeActivity(this.report?.packageName,this.report?.launcherActivity)}
-    getDiagnostics(){
-      const launcher=this.launcherDescriptor;const primary=this.dexFiles.find(x=>x.dex)?.dex||null;const cls=primary&&launcher?primary.findClass(launcher):null;const onCreate=primary&&launcher?primary.findMethod(launcher,'onCreate'):null;
-      return{runtime:'AndroidGuestCore',version:VERSION,state:this.state,packageName:this.report?.packageName||null,launcherActivity:this.report?.launcherActivity||null,launcherDescriptor:launcher,dexFiles:this.dexFiles.map(x=>x.dex?{path:x.path,...x.dex.summary()}:{path:x.path,error:String(x.error?.message||x.error)}),launcherClassFound:!!cls,onCreateFound:!!onCreate,hasNativeCode:!!this.report?.hasNativeCode,abis:[...(this.report?.abis||[])],hybrid:this.report?.hybrid||null,lastError:this.lastError?String(this.lastError.message||this.lastError):null};
-    }
-    compatibility(){
-      const d=this.getDiagnostics();if(d.hybrid)return{tier:'hybrid-web',runnable:true,reason:`Paquete ${d.hybrid.kind} ejecutable mediante WebRuntime.`};
-      if(d.hasNativeCode)return{tier:'native-host',runnable:false,reason:'Incluye bibliotecas ELF Android; requiere NativeAbiLayer/Bionic del host iOS.'};
-      if(!d.dexFiles.length)return{tier:'invalid',runnable:false,reason:'No contiene DEX ejecutable.'};
-      if(!d.launcherClassFound)return{tier:'dex-framework',runnable:false,reason:'El launcher no aparece en el DEX inspeccionado o usa multidex/framework no resuelto.'};
-      return{tier:'dex-framework',runnable:false,reason:'El Guest Core puede leer la Activity y bytecode, pero el framework Android UI/Binder aún requiere el host guest.'};
-    }
-    runMethod(className,name,args=[],options={}){const dex=this.dexFiles.find(x=>x.dex?.findMethod(className,name))?.dex;if(!dex)throw new DexError('GUEST_METHOD_MISSING',`No se encontró ${className}->${name}.`);const vm=new DexInterpreter(dex,options);return{result:vm.invoke(className,name,args),logs:vm.logs,steps:vm.steps}}
-  }
-
-  return{VERSION,DexError,DexFile,DexInterpreter,AndroidGuestCore,readUleb,normalizeActivity};
-});
-
-(function(){
-'use strict';
-const Core=globalThis.RavenAndroidRuntime,Guest=globalThis.RavenAndroidGuestCore;
-if(!Core||!Guest)throw new Error('Android Runtime v2 no cargado.');
-const req=globalThis.__LOCAL_RUNTIME_REQUIRE__;
-if(typeof req!=='function')throw new Error('No se encontró el cargador interno de Raven.');
-
-const FileImporter=req('importer/FileImporter').FileImporter;
-const ProjectImporter=req('importer/ProjectImporter').ProjectImporter;
-const Validator=req('importer/ProjectValidator').ProjectValidator;
-const Scanner=req('diagnostics/CompatibilityScanner').CompatibilityScanner;
-const RuntimeManager=req('runtime/RuntimeManager').RuntimeManager;
-const WebRuntimeAdapter=req('runtime/WebRuntimeAdapter').WebRuntimeAdapter;
-const App=req('app/App').App;
-const Dialogs=req('ui/dialogs/Dialogs');
-
-const oldValidate=FileImporter.validate.bind(FileImporter);
-FileImporter.isApk=file=>/\.apk$/i.test(file?.name||'')||file?.type==='application/vnd.android.package-archive';
-FileImporter.validateApk=file=>{if(!FileImporter.isApk(file))throw new Error('Selecciona un archivo APK válido.');if(!file.size)throw new Error('El APK está vacío.');if(file.size>2*1024*1024*1024)throw new Error('El APK supera el límite de seguridad de 2 GB.');};
-FileImporter.validate=file=>FileImporter.isApk(file)?FileImporter.validateApk(file):oldValidate(file);
-
-class AndroidImporter{
- async import(file,options={}){
-  FileImporter.validateApk(file);const progress=v=>{try{options.onProgress?.(v)}catch{}};
-  progress({stage:'reading',label:'Leyendo APK…',progress:0});
-  const ab=await FileImporter.readArrayBuffer(file,p=>progress({stage:'reading',label:'Leyendo APK…',progress:p}));
-  const blob=new Blob([ab],{type:'application/vnd.android.package-archive'});blob.name=file.name;
-  progress({stage:'analyzing',label:'Analizando AndroidManifest y DEX…',progress:.35});
-  const report=await Core.ApkInspector.inspect(blob,{name:file.name});
-  let guestSummary=null;try{const guest=new Guest.AndroidGuestCore(report);await guest.prepare();guestSummary={...guest.getDiagnostics(),compatibility:guest.compatibility()};}catch(error){guestSummary={state:'ERROR',error:String(error?.message||error)}}
-  const path='/app.apk',files=new Map();files.set(path,{path,name:file.name,mimeType:'application/vnd.android.package-archive',size:blob.size,blob});
-  let previewIconBlob=null;if(report.iconPath){try{const bytes=await report._zip.read(report.iconPath);previewIconBlob=new Blob([bytes],{type:Core.utils.mimeFor(report.iconPath)})}catch{}}
-  progress({stage:'analyzing',label:'APK preparado',progress:1});
-  return{id:typeof __ravenUUID==='function'?__ravenUUID():(crypto.randomUUID?.()||String(Date.now())),name:report.name,entryPoint:path,entryCandidates:[path],files,createdAt:Date.now(),source:'apk',size:blob.size,runtimeId:'android',platform:'android',previewIconBlob,metadata:{id:report.appId,name:report.name,shortName:report.name,version:report.versionName||(report.versionCode!=null?String(report.versionCode):null),androidPackage:report.packageName,androidVersionCode:report.versionCode,minSdk:report.minSdk,targetSdk:report.targetSdk,launcherActivity:report.launcherActivity,abis:report.abis,dexFiles:report.dexFiles,hybrid:report.hybrid,iconPath:report.iconPath,sourceHash:report.sha256,androidGuest:guestSummary,androidRuntimeVersion:Core.VERSION,compatibilityWarnings:report.hybrid?[]:[guestSummary?.compatibility?.reason||'Requiere Android Guest Host para el framework Android completo.']}};
- }
-}
-
-const oldImport=ProjectImporter.prototype.import;
-ProjectImporter.prototype.import=async function(file,options={}){if(FileImporter.isApk(file)){this.android=this.android||new AndroidImporter();return this.android.import(file,options)}return oldImport.call(this,file,options)};
-
-const oldProjectValidate=Validator.validate.bind(Validator);
-Validator.validate=async project=>{if(project?.runtimeId==='android'){const entry=project.files?.get?.(project.entryPoint);if(!entry||!entry.size)return[{level:'error',message:'El APK no está disponible.'}];try{const report=await Core.ApkInspector.inspect(entry.blob,{name:entry.name||'app.apk'});const issues=[];if(!report.packageName)issues.push({level:'warning',message:'AndroidManifest.xml no expone un package name legible.'});if(!report.hybrid&&!report.dexFiles.length)issues.push({level:'error',message:'El APK no contiene DEX ni un bundle web ejecutable.'});return issues}catch(error){return[{level:'error',message:`APK inválido: ${error instanceof Error?error.message:String(error)}`}]}}return oldProjectValidate(project)};
-
-const oldScan=Scanner.scan.bind(Scanner);
-Scanner.scan=async project=>{if(project?.runtimeId==='android'){const m=project.metadata||{},hybrid=m.hybrid||m.androidGuest?.hybrid||null,host=!!(globalThis.RavenNativeAndroid?.invoke||globalThis.webkit?.messageHandlers?.ravenAndroidRuntime?.postMessage),findings=[];if(hybrid)findings.push(`APK ${hybrid.kind}: assets web se ejecutarán dentro del WebRuntime de Raven.`);else if(host)findings.push('Android Guest Host detectado; Raven puede transferir e iniciar el paquete mediante el bridge v2.');else findings.push(m.androidGuest?.compatibility?.reason||'Guest Core preparado; falta el host Android para Activity/Framework/Binder/NDK.');if((m.abis||[]).length)findings.push(`ABI nativas: ${(m.abis||[]).join(', ')}.`);return{status:hybrid?'Compatible (Android híbrido)':host?'Compatible con Android Host':'Android Guest Core · parcial',technologies:['Android','APK',...(m.dexFiles?.length?['DEX']:[]),...((m.abis||[]).length?['NDK/ELF']:[]),...(hybrid?['Web híbrido']:[])],findings,nodeCompat:{enabled:false,adapted:[],deferred:[],unsupported:[]},scan:{reachableFiles:1,packageJsonPresent:false,npmDeclared:0,npmExternalMissing:0,localMissing:0,remoteReferences:0}}}return oldScan(project)};
-
-class RavenAndroidRuntimeAdapter extends Core.AndroidRuntime{
- constructor(project,errors,options={}){super(project,errors,options);this.guest=null;this.webRuntime=null;this.state='CREATED';this.hostCapabilities=null;}
- async mount(host){
-  this.host=host;this.state='INSPECTING';const blob=this._findApkBlob();if(!blob)throw new Core.RavenAndroidError('APK_PROJECT_FILE','Raven no entregó el APK al AndroidRuntime.');
-  this.report=await Core.ApkInspector.inspect(blob,{name:this.project.sourceName||this.project.name||'app.apk'});
-  this.guest=new Guest.AndroidGuestCore(this.report);try{await this.guest.prepare()}catch(error){this.errors.warn?.('Android Guest Core no pudo indexar todo el DEX.',{technical:String(error)})}
-  if(this.report.hybrid){this.state='HYBRID_STARTING';await this._mountHybrid(host);this.state='RUNNING';this.options.onReady?.({runtime:'android',state:this.state,backend:'web-hybrid'});return}
-  if(this.bridge.available()){
-   this.state='HOST_NEGOTIATING';try{this.hostCapabilities=await this.bridge.invoke('host-capabilities',{protocol:2,runtimeVersion:Core.VERSION,guestVersion:Guest.VERSION});}catch(error){this.errors.warn?.('El Android Host no respondió a capabilities.',{technical:String(error)})}
-   this.state='NATIVE_STARTING';await this._mountNative(host,blob);this.state='RUNNING';this.options.onReady?.({runtime:'android',state:this.state,backend:'native-host'});return;
-  }
-  this.state='GUEST_CORE_READY';this._showGuestCore(host);this.options.onReady?.({runtime:'android',state:this.state,backend:'guest-core',limited:true});
- }
- async _mountHybrid(host){
-  this.bundle=new Core.HybridWebBundle(this.report);await this.bundle.extract();const files=new Map();for(const[rel,bytes]of this.bundle.getFileMap()){const path='/'+rel.replace(/^\/+/,''),blob=new Blob([bytes],{type:Core.utils.mimeFor(path)});files.set(path,{path,name:path.split('/').pop(),mimeType:blob.type,size:blob.size,blob})}
-  const webProject={id:this.project.id,libraryId:this.project.libraryId,name:this.project.name||this.report.name,entryPoint:'/index.html',entryCandidates:['/index.html'],files,createdAt:this.project.createdAt||Date.now(),source:'zip',size:[...files.values()].reduce((n,f)=>n+f.size,0),sourceHash:this.project.sourceHash,storedVersion:this.project.storedVersion,metadata:{...(this.project.metadata||{}),androidHybrid:true,androidPackage:this.report.packageName},runtimeId:'web'};
-  this.webRuntime=new WebRuntimeAdapter(webProject,this.errors,this.options);await this.webRuntime.mount(host);this.frame=this.webRuntime.getFrame?.()||null;this.errors.info?.(`Android Runtime: ${this.report.hybrid.kind} ejecutado mediante WebRuntime.`);
- }
- _showGuestCore(host){
-  const d=this.guest?.getDiagnostics?.()||{},c=this.guest?.compatibility?.()||{};const root=document.createElement('section');root.className='android-guest-core-screen';const title=document.createElement('h2');title.textContent='Android Guest Core';const state=document.createElement('p');state.className='android-guest-core-state';state.textContent='APK cargado y DEX indexado';const copy=document.createElement('p');copy.textContent='Raven ya entiende la estructura ejecutable del APK. Esta build web todavía no contiene el host iOS que implementa Activity, Android Framework, Binder y Bionic para arrancar una app Android nativa completa.';const grid=document.createElement('div');grid.className='android-guest-grid';const rows=[['Paquete',this.report.packageName||'—'],['Launcher',this.report.launcherActivity||'—'],['DEX',String(this.report.dexFiles?.length||0)],['Clases',String(d.dexFiles?.reduce((n,x)=>n+(Number(x.classes)||0),0)||0)],['Launcher class',d.launcherClassFound?'Detectada':'No detectada'],['onCreate',d.onCreateFound?'Detectado':'No detectado'],['ABI',(this.report.abis||[]).join(', ')||'Java/Dex'],['Estado',c.tier||'dex-framework']];for(const[k,v]of rows){const row=document.createElement('div');row.className='android-guest-row';const a=document.createElement('span');a.textContent=k;const b=document.createElement('strong');b.textContent=v;row.append(a,b);grid.append(row)}const note=document.createElement('p');note.className='android-guest-note';note.textContent=c.reason||'';root.append(title,state,copy,grid,note);host.replaceChildren(root);
- }
- getFrame(){return this.webRuntime?.getFrame?.()||super.getFrame()}
- getDiagnostics(){const report=this.report?this._publicReport():null;return{runtime:'AndroidRuntime',runtimeVersion:Core.VERSION,guestVersion:Guest.VERSION,state:this.state,backend:this.report?.hybrid?'web-hybrid':this.nativeSessionId?'native-host':'guest-core',nativeHostAvailable:this.bridge.available(),hostCapabilities:this.hostCapabilities,packageName:this.report?.packageName||null,launcherActivity:this.report?.launcherActivity||null,dexFiles:this.report?.dexFiles||[],abis:this.report?.abis||[],hybrid:this.report?.hybrid||null,guest:this.guest?.getDiagnostics?.()||null,compatibility:this.guest?.compatibility?.()||null,report}}
- start(){return this.webRuntime?.start?.()??super.start()} pause(){this.state='SUSPENDED';return this.webRuntime?.pause?.()??super.pause()} resume(){this.state='RUNNING';return this.webRuntime?.resume?.()??super.resume()} stop(){return this.webRuntime?.stop?.()??super.stop()} reset(){return this.webRuntime?.reset?.()??super.reset()} async capturePreview(){return this.webRuntime?.capturePreview?.()??super.capturePreview()}
- async dispose(){try{await this.webRuntime?.dispose?.()}catch{}this.webRuntime=null;this.guest=null;this.state='TERMINATED';return super.dispose()}
-}
-
-RuntimeManager.register({id:'android',canOpen:p=>p?.runtimeId==='android'||p?.source==='apk'||/\.apk$/i.test(p?.entryPoint||p?.sourceName||''),create:(p,e,o)=>new RavenAndroidRuntimeAdapter(p,e,o)});
-
-const oldPreflight=App.prototype.preflightPendingBuild;
-App.prototype.preflightPendingBuild=async function(project){if(project?.runtimeId==='android'){const f=project.files?.get?.(project.entryPoint);if(!f||!f.size)throw new Error('El APK preparado no existe.');await Core.ApkInspector.inspect(f.blob,{name:f.name||'app.apk'});return true}return oldPreflight.call(this,project)};
-
-const originalDialog=Dialogs.runtimeDiagnosticsDialog;
-Dialogs.runtimeDiagnosticsDialog=function(data,onClose){
- if(data?.runtime!=='AndroidRuntime')return originalDialog(data,onClose);
- const backdrop=document.createElement('div');backdrop.className='sheet-backdrop';const sheet=document.createElement('section');sheet.className='bottom-sheet';const head=document.createElement('header');head.className='sheet-header';const title=document.createElement('h2');title.className='sheet-title';title.textContent='Android · Diagnóstico';const close=document.createElement('button');close.type='button';close.className='text-button';close.textContent='Cerrar';close.addEventListener('click',onClose);head.append(title,close);const body=document.createElement('div');body.className='sheet-body';const rows=[['Runtime',data.runtimeVersion||'—'],['Guest Core',data.guestVersion||'—'],['State',data.state||'—'],['Backend',data.backend||'—'],['Native host',data.nativeHostAvailable?'✓':'✕'],['Package',data.packageName||'—'],['Launcher',data.launcherActivity||'—'],['DEX',String(data.dexFiles?.length||0)],['ABI',(data.abis||[]).join(', ')||'—'],['Launcher class',data.guest?.launcherClassFound?'✓':'✕'],['onCreate',data.guest?.onCreateFound?'✓':'✕']];for(const[k,v]of rows){const r=document.createElement('div');r.className='analysis-row';const a=document.createElement('span');a.className='analysis-label';a.textContent=k;const b=document.createElement('span');b.className='analysis-value';b.textContent=v;r.append(a,b);body.append(r)}if(data.compatibility?.reason){const p=document.createElement('p');p.className='privacy-note';p.textContent=data.compatibility.reason;body.append(p)}sheet.append(head,body);backdrop.append(sheet);backdrop.addEventListener('click',e=>{if(e.target===backdrop)onClose()});return backdrop;
-};
-
-globalThis.RavenAndroidIntegration={version:Core.VERSION,guestVersion:Guest.VERSION,installed:true,AndroidImporter,RavenAndroidRuntimeAdapter};
-console.info(`[Raven Android Runtime] ${Core.VERSION} + ${Guest.VERSION} registrado.`);
-})();
-
-
-/* Raven 0.17.9 — T-OS runtime v1 authenticated handshake fix.
+/* Raven 0.17.8 — T-OS native runtime milestone A+B.
    Adds native format detection/package validation and a dedicated TOSRuntime.
    T-OS 0.1.0 currently uses a web-host transport internally, but is never routed
    through Raven's generic Web Runtime registry: package parsing, runtime identity,
@@ -12693,60 +11556,21 @@ exports.TOSPackageReader=TOSPackageReader;
 
 define("importer/TOSImporter",["require","exports","tos/TOSPackageReader"],function(require,exports,ReaderMod){
 "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.TOSImporter=void 0;
-const PACKAGE_LOAD_TIMEOUT_MS=300000;
-class TOSImporter{async import(file,options={}){let timer=0;try{return await Promise.race([ReaderMod.TOSPackageReader.readSystem(file,options),new Promise((_,reject)=>{timer=setTimeout(()=>{const error=new Error('PACKAGE_LOAD_TIMEOUT: Raven no pudo terminar de leer y montar la imagen .tos dentro de 5 minutos.');error.code='PACKAGE_LOAD_TIMEOUT';reject(error)},PACKAGE_LOAD_TIMEOUT_MS)})])}finally{if(timer)clearTimeout(timer)}}async inspectApp(file,options={}){return await ReaderMod.TOSPackageReader.readApp(file,options)}}exports.TOSImporter=TOSImporter;
+class TOSImporter{async import(file,options={}){return await ReaderMod.TOSPackageReader.readSystem(file,options)}async inspectApp(file,options={}){return await ReaderMod.TOSPackageReader.readApp(file,options)}}exports.TOSImporter=TOSImporter;
 });
 
 define("runtime/tos/TOSHostBridge",["require","exports"],function(require,exports){
 "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.TOSHostBridge=void 0;exports.TOS_CHANNEL='tos-runtime/v1';
 const C='tos-runtime/v1';
-const obj=v=>v&&typeof v==='object'?v:{};
 class TOSHostBridge{
- constructor(frame,errors,options={}){this.frame=frame;this.errors=errors;this.options=options;this.runtimeId=String(options.runtimeId||'');this.nonce=String(options.nonce||'');this.bound=e=>this.onMessage(e);this.started=false;this.ready=false;this.connected=false;this.helloSent=false;this.pendingReady=null;this.messages=[];this.lastMessage=null;this.rejections=[];this.debug=options.debug!==false}
- log(message,detail){if(this.debug)console.info(message,detail||'');}
- info(message,detail){this.log(message,detail);this.errors?.info?.(message,detail?{technical:typeof detail==='string'?detail:JSON.stringify(detail)}:undefined)}
- reject(reason,event,message){const row={at:Date.now(),reason,type:String(message?.type||''),channel:String(message?.channel||''),origin:String(event?.origin??'')};this.rejections.push(row);if(this.rejections.length>20)this.rejections.shift();console.warn('[TOSBridge] Message rejected',{reason,type:row.type,channel:row.channel,origin:row.origin});this.options.onRejected?.(row)}
- start(){if(this.started)return;this.started=true;addEventListener('message',this.bound);this.info('[TOSRuntime] message listener attached')}
- envelope(type,payload={}){return{channel:C,runtimeId:this.runtimeId,nonce:this.nonce,type,payload:obj(payload)}}
- send(type,payload={}){const message=this.envelope(type,payload);try{this.frame?.contentWindow?.postMessage(message,'*');this.log(`[TOSBridge] → ${type}`,payload);return true}catch(error){console.warn('[TOSBridge] send failed',type,error);return false}}
- hello(reason='host'){if(!this.started||!this.frame?.contentWindow)return false;this.helloSent=true;const sent=this.send('tos.host.hello',{bridgeVersion:1,reason});if(sent&&this.pendingReady){const pending=this.pendingReady;this.pendingReady=null;this.acceptReady(pending.payload,pending.legacy)}return sent}
+ constructor(frame,errors,options={}){this.frame=frame;this.errors=errors;this.options=options;this.bound=e=>this.onMessage(e);this.started=false;this.ready=false}
+ start(){if(this.started)return;this.started=true;addEventListener('message',this.bound)}
+ send(type,payload={}){try{this.frame?.contentWindow?.postMessage({channel:C,type,...payload},'*')}catch{}}
  respond(id,ok,result,error){this.send('tos.response',{id,ok,result,error})}
- adaptLegacy(m){/* LEGACY T-OS BETA COMPATIBILITY */
-  if(m?.type==='runtime-ready')return{type:'tos.shell.ready',payload:obj(m.payload||m.data),legacy:'runtime-ready'};
-  if(m?.type==='tos.event'){
-   const ev=String(m.event||'');
-   if(ev==='READY'||ev==='runtime.ready'||ev==='shell.ready')return{type:'tos.shell.ready',payload:obj(m.data||m.payload),legacy:`tos.event:${ev}`};
-   if(ev==='runtime.starting')return{type:'tos.boot.stage',payload:{stage:'shell-starting',...(obj(m.data))},legacy:`tos.event:${ev}`};
-   if(ev==='runtime.error')return{type:'tos.boot.error',payload:obj(m.data||m.payload),legacy:`tos.event:${ev}`};
-  }
-  if(m?.type==='tos.request'&&(!m.runtimeId||!m.nonce))return{type:'tos.request',payload:{id:m.id||null,method:m.method,params:obj(m.params)},legacy:'tos.request'};
-  return null
+ onMessage(event){if(!this.started||event.source!==this.frame?.contentWindow)return;const m=event.data;if(!m||m.channel!==C)return;
+  if(m.type==='tos.event'){const ev=String(m.event||'');if(ev==='runtime.starting')this.errors?.info?.('[TOSRuntime] T-Core/T-Shell boot iniciado.');else if(ev==='runtime.ready'&&!this.ready){this.ready=true;this.errors?.info?.('[TOSRuntime] T-Shell READY.');this.options.onReady?.(m.data||{})}else if(ev==='runtime.error')this.errors?.error?.('T-OS informó un error durante el arranque.',{technical:String(m.data?.message||'Error T-OS'),source:'TOSRuntime'});this.options.onEvent?.(ev,m.data||{});return}
+  if(m.type==='tos.request'){const id=m.id||null,method=String(m.method||'');if(method==='system.close'){this.respond(id,true,true);this.options.onClose?.();return}if(method==='system.hostCapabilities'){this.respond(id,true,{bridgeVersion:1,persistentStorage:!!this.options.persistentStorage,filesystem:false,haptics:typeof navigator.vibrate==='function',clipboard:!!navigator.clipboard,notifications:'Notification'in globalThis,camera:false,microphone:false});return}this.respond(id,false,null,{code:'UNSUPPORTED_METHOD',message:`TOS Bridge v1 todavía no implementa ${method}.`})}
  }
- normalize(event){const m=event?.data;if(!m||typeof m!=='object')return null;
-  if(event.source!==this.frame?.contentWindow){if(m.channel===C)this.reject('unexpected source',event,m);return null}
-  if(m.channel!==C){if(/^tos[.-]/i.test(String(m.type||'')))this.reject('unexpected channel',event,m);return null}
-  const hasSession=typeof m.runtimeId==='string'||typeof m.nonce==='string';
-  if(hasSession){if(m.runtimeId!==this.runtimeId){this.reject('invalid runtimeId',event,m);return null}if(m.nonce!==this.nonce){this.reject('invalid nonce',event,m);return null}const legacy=this.adaptLegacy(m);if(legacy){console.warn('[TOSBridge] LEGACY T-OS BETA COMPATIBILITY',{adapter:legacy.legacy});return{...legacy,raw:m}}return{type:String(m.type||''),payload:obj(m.payload),legacy:null,raw:m}}
-  const legacy=this.adaptLegacy(m);if(!legacy){this.reject('missing session credentials',event,m);return null}
-  console.warn('[TOSBridge] LEGACY T-OS BETA COMPATIBILITY',{adapter:legacy.legacy});return{...legacy,raw:m}
- }
- record(message){const row={at:Date.now(),type:message.type,legacy:message.legacy||null,payload:obj(message.payload)};this.lastMessage=row;this.messages.push(row);if(this.messages.length>24)this.messages.shift();this.log(`[TOSBridge] ← ${message.type}`,message.payload);this.options.onMessage?.(row)}
- acceptReady(payload={},legacy=null){if(this.ready){this.log('[TOSRuntime] duplicate READY ignored',legacy||'canonical');return}if(!this.helloSent){this.pendingReady={payload:obj(payload),legacy};this.log('[TOSRuntime] READY queued until host.hello',legacy||'canonical');return}this.ready=true;this.info('[TOSRuntime] READY accepted');this.options.onReady?.(obj(payload))}
- handleRequest(p){const id=p.id||null,method=String(p.method||'');if(method==='system.close'){this.respond(id,true,true);this.options.onClose?.();return}if(method==='system.hostCapabilities'){this.respond(id,true,{bridgeVersion:1,persistentStorage:!!this.options.persistentStorage,filesystem:false,haptics:typeof navigator.vibrate==='function',clipboard:!!navigator.clipboard,notifications:'Notification'in globalThis,camera:false,microphone:false});return}this.respond(id,false,null,{code:'UNSUPPORTED_METHOD',message:`TOS Bridge v1 todavía no implementa ${method}.`})}
- onMessage(event){if(!this.started)return;const m=this.normalize(event);if(!m)return;this.record(m);
-  switch(m.type){
-   case'tos.bridge.loaded':this.options.onBridgeLoaded?.(m.payload);this.hello('bridge-loaded');return;
-   case'tos.bridge.connected':this.connected=true;this.info('[TOSBridge] bridge connected');this.options.onConnected?.(m.payload);return;
-   case'tos.boot.stage':this.options.onStage?.(m.payload);return;
-   case'tos.core.ready':this.options.onCoreReady?.(m.payload);return;
-   case'tos.shell.starting':this.options.onStage?.({stage:'shell-starting',...m.payload});return;
-   case'tos.shell.ready':this.acceptReady(m.payload,m.legacy);return;
-   case'tos.boot.error':this.options.onBootError?.(m.payload);return;
-   case'tos.request':this.handleRequest(m.payload);return;
-  }
-  this.options.onEvent?.(m.type,m.payload)
- }
- getDiagnostics(){return{channel:C,runtimeId:this.runtimeId,bridgeVersion:1,started:this.started,connected:this.connected,helloSent:this.helloSent,ready:this.ready,lastMessage:this.lastMessage,messages:[...this.messages],rejections:[...this.rejections]}}
  dispose(){if(!this.started)return;removeEventListener('message',this.bound);this.started=false;this.frame=null}
 }
 exports.TOSHostBridge=TOSHostBridge;
@@ -12754,26 +11578,18 @@ exports.TOSHostBridge=TOSHostBridge;
 
 define("runtime/tos/TOSRuntime",["require","exports","runtime/HtmlRuntime","runtime/tos/TOSHostBridge","tos/TOSPackageReader"],function(require,exports,HtmlRuntimeMod,BridgeMod,ReaderMod){
 "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.TOSRuntime=void 0;
-const BOOT_TIMEOUT_MS=12000;
-const randomHex=bytes=>{const data=new Uint8Array(bytes);crypto.getRandomValues(data);return Array.from(data,b=>b.toString(16).padStart(2,'0')).join('')};
-const sessionId=()=>crypto.randomUUID?crypto.randomUUID():`tos-${Date.now().toString(36)}-${randomHex(8)}`;
-const bootstrap=(runtimeId,nonce)=>`(()=>{'use strict';const C='tos-runtime/v1',R=${JSON.stringify(runtimeId)},N=${JSON.stringify(nonce)};let hostConnected=false,shellReady=false,shellPayload={},seq=0;const obj=v=>v&&typeof v==='object'?v:{};const send=(type,payload={})=>{try{parent.postMessage({channel:C,runtimeId:R,nonce:N,type,payload:obj(payload)},'*')}catch{}};const stage=(name,data={})=>send('tos.boot.stage',{stage:name,...obj(data)});const request=(method,params={})=>new Promise((resolve,reject)=>{const id='tos-'+Date.now().toString(36)+'-'+(++seq);const on=e=>{const m=e.data;if(e.source!==parent||!m||m.channel!==C||m.runtimeId!==R||m.nonce!==N||m.type!=='tos.response'||m.payload?.id!==id)return;removeEventListener('message',on);m.payload?.ok?resolve(m.payload?.result):reject(Object.assign(new Error(m.payload?.error?.message||'TOS host request failed'),{code:m.payload?.error?.code||'HOST_ERROR'}))};addEventListener('message',on);send('tos.request',{id,method,params:obj(params)})});const emitReady=payload=>{shellReady=true;shellPayload={...shellPayload,...obj(payload)};if(hostConnected)send('tos.shell.ready',{state:'READY',bridgeVersion:1,...shellPayload})};const api=Object.freeze({version:1,runtimeId:R,hostCapabilities:()=>request('system.hostCapabilities'),close:()=>request('system.close'),request,bootStage:stage,coreReady:data=>send('tos.core.ready',obj(data)),shellStarting:data=>send('tos.shell.starting',obj(data)),shellReady:emitReady,bootError:error=>send('tos.boot.error',typeof error==='string'?{message:error}:obj(error))});Object.defineProperty(globalThis,'TOSHostBridge',{configurable:false,writable:false,value:api});addEventListener('message',e=>{const m=e.data;if(e.source!==parent||!m||m.channel!==C||m.runtimeId!==R||m.nonce!==N)return;if(m.type==='tos.host.hello'){hostConnected=true;send('tos.bridge.connected',{bridgeVersion:1});if(shellReady)emitReady(shellPayload);dispatchEvent(new CustomEvent('tos:host-ready',{detail:obj(m.payload)}));return}if(m.type==='tos.host.lifecycle'){const action=String(m.payload?.action||'');if(action==='pause')dispatchEvent(new CustomEvent('tos:pause'));else if(action==='resume')dispatchEvent(new CustomEvent('tos:resume'));else if(action==='terminate')dispatchEvent(new CustomEvent('tos:terminate'));}});addEventListener('tos:shell-ready',e=>emitReady(e.detail||{}));addEventListener('tos:ready',e=>emitReady(e.detail||{}));addEventListener('tos:boot-stage',e=>stage(String(e.detail?.stage||'unknown'),e.detail||{}));addEventListener('tos:boot-error',e=>api.bootError(e.detail||{}));addEventListener('error',e=>api.bootError({message:e.message||'JavaScript error',file:e.filename||''}),true);addEventListener('unhandledrejection',e=>api.bootError({message:e.reason?.message||String(e.reason||'Unhandled rejection')}));send('tos.bridge.loaded',{bridgeVersion:1,readyState:document.readyState});})();`;
+const BRIDGE_BOOTSTRAP=`(()=>{'use strict';const C='tos-runtime/v1';let ready=false,seq=0;const send=(type,payload={})=>{try{parent.postMessage({channel:C,type,...payload},'*')}catch{}};const event=(name,data={})=>send('tos.event',{event:name,data});const request=(method,params={})=>new Promise((resolve,reject)=>{const id='tos-'+Date.now().toString(36)+'-'+(++seq);const on=e=>{const m=e.data;if(e.source!==parent||!m||m.channel!==C||m.type!=='tos.response'||m.id!==id)return;removeEventListener('message',on);m.ok?resolve(m.result):reject(Object.assign(new Error(m.error?.message||'TOS host request failed'),{code:m.error?.code||'HOST_ERROR'}))};addEventListener('message',on);send('tos.request',{id,method,params})});const capabilities={bridgeVersion:1};Object.defineProperty(globalThis,'TOSHostBridge',{configurable:false,writable:false,value:Object.freeze({version:1,hostCapabilities:()=>request('system.hostCapabilities'),close:()=>request('system.close'),request})});const markReady=()=>{if(ready)return;const d=document.getElementById('device'),s=document.getElementById('shell');if(d&&s&&!d.classList.contains('hidden')){ready=true;event('runtime.ready',{state:'RUNNING',bridgeVersion:1,version:globalThis.TOS?.version||null})}};addEventListener('DOMContentLoaded',()=>{event('runtime.starting',{state:'STARTING'});const ob=new MutationObserver(markReady);ob.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});markReady();setTimeout(markReady,0)});addEventListener('message',e=>{const m=e.data;if(e.source!==parent||!m||m.channel!==C||m.type!=='tos.host')return;if(m.action==='pause'){event('runtime.background',{state:'BACKGROUND'});dispatchEvent(new CustomEvent('tos:pause'))}else if(m.action==='resume'){event('runtime.foreground',{state:'RUNNING'});dispatchEvent(new CustomEvent('tos:resume'))}else if(m.action==='terminate'){event('runtime.terminated',{state:'TERMINATED'});dispatchEvent(new CustomEvent('tos:terminate'))}});addEventListener('error',e=>event('runtime.error',{message:e.message||'JavaScript error',file:e.filename||''}),true);addEventListener('unhandledrejection',e=>event('runtime.error',{message:e.reason?.message||String(e.reason||'Unhandled rejection')}));addEventListener('pagehide',()=>event('runtime.terminated',{state:'TERMINATED'}),{once:true})})();`;
 class TOSRuntime{
- constructor(project,errors,options={}){this.project=project;this.errors=errors;this.options=options;this.webHost=null;this.bridge=null;this.frame=null;this.host=null;this.bootTimer=0;this.disposed=false;this.ready=false;this.state='CREATED';this.runtimeId='';this.nonce='';this.bootStartedAt=0;this.readyAt=0;this.failedAtState=null;this.lastStage=null;this.coreReady=false;this.shellStarting=false;this.frameLoaded=false}
- setState(next){if(this.disposed&&next!=='TERMINATED')return;this.state=next;console.info(`[TOSRuntime] state → ${next}`)}
- async mount(host){if(this.disposed)throw new Error('TOSRuntime ya fue liberado.');ReaderMod.TOSPackageReader.validateProject(this.project);this.setState('PACKAGE_VALIDATED');this.host=host;this.setState('HOST_READY');this.runtimeId=sessionId();this.nonce=randomHex(24);this.errors.info(`[TOSRuntime] Session created: ${this.runtimeId}`);
-  const files=new Map(this.project.files),entry=this.project.entryPoint,entryFile=files.get(entry);if(!entryFile)throw new Error('T-OS no contiene su entrypoint.');let html=await entryFile.blob.text();const injection='<script data-tos-host-bootstrap>'+bootstrap(this.runtimeId,this.nonce)+'</scr'+'ipt>';if(/<head[\s>]/i.test(html))html=html.replace(/<head([^>]*)>/i,`<head$1>${injection}`);else html=injection+html;const blob=new Blob([html],{type:'text/html;charset=utf-8'});files.set(entry,{...entryFile,blob,size:blob.size,mimeType:'text/html;charset=utf-8'});const hosted={...this.project,files,runtimeId:'web',source:'tos-host'};
-  const innerOptions={...this.options,onReady:info=>{this.errors.info('[TOSRuntime] raven-webhost document loaded.',{technical:JSON.stringify(info||{})})},onFrameCreated:frame=>{this.frame=frame;this.setState('FRAME_CREATED');this.bridge=new BridgeMod.TOSHostBridge(frame,this.errors,{runtimeId:this.runtimeId,nonce:this.nonce,onClose:()=>this.options.onClose?.(),persistentStorage:!!this.options.loadRuntimeLocalStorage,onBridgeLoaded:()=>{if(!this.ready){if(this.state==='FRAME_CREATED')this.setState('FRAME_LOADED');this.bridge?.hello('bootstrap-loaded')}},onConnected:()=>{if(!this.ready)this.setState('BRIDGE_CONNECTED')},onCoreReady:data=>{this.coreReady=true;if(!this.ready)this.setState('CORE_STARTING')},onStage:data=>this.onStage(data),onBootError:data=>this.failBoot(this.bootError(data)),onReady:data=>this.markReady(data)});this.bridge.start();frame.addEventListener('load',()=>{this.frameLoaded=true;if(!this.ready&&this.state!=='BRIDGE_CONNECTED'&&this.state!=='CORE_STARTING'&&this.state!=='SHELL_STARTING')this.setState('FRAME_LOADED');this.errors.info('[TOSRuntime] frame load event');this.bridge?.hello('frame-load')},{once:true});this.options.onFrameCreated?.(frame)}};
-  this.webHost=new HtmlRuntimeMod.HtmlRuntime(hosted,this.errors,innerOptions);await this.webHost.mount(host);this.bridge?.hello('srcdoc-assigned');this.bootStartedAt=performance.now();if(!this.ready&&!this.disposed){this.bootTimer=setTimeout(()=>this.handleBootTimeout(),BOOT_TIMEOUT_MS)}return this.frame}
- onStage(data={}){const stage=String(data.stage||data.name||'unknown');this.lastStage=stage;if(/core/i.test(stage)){this.coreReady=true;if(!this.ready)this.setState('CORE_STARTING')}if(/shell/i.test(stage)){this.shellStarting=true;if(!this.ready)this.setState('SHELL_STARTING')}this.errors.info(`[TOSBridge] ← tos.boot.stage`,{technical:stage})}
- bootError(data={}){const msg=String(data?.message||data?.error||'T-OS informó un error durante el arranque.');const err=new Error(`TOS_BOOT_ERROR: ${msg}`);err.code='TOS_BOOT_ERROR';err.payload=data;return err}
- handleBootTimeout(){if(this.disposed||this.ready)return;const d=this.getDiagnostics(),types=(d.messagesReceived||[]).map(x=>x.type+(x.legacy?` [legacy ${x.legacy}]`:''));const err=new Error(`BOOT_TIMEOUT: T-Shell no informó tos.shell.ready dentro de 12 segundos.\n\nLast state: ${d.state}\nExpected: tos.shell.ready\nMessages received: ${types.length?types.join(', '):'ninguno'}${d.lastStage?`\nLast stage: ${d.lastStage}`:''}`);err.code='BOOT_TIMEOUT';this.failBoot(err)}
- markReady(data={}){if(this.disposed||this.ready)return;this.ready=true;this.readyAt=performance.now();this.setState('READY');if(this.bootTimer)clearTimeout(this.bootTimer);this.bootTimer=0;const ms=this.bootStartedAt?Math.max(0,Math.round(this.readyAt-this.bootStartedAt)):0;this.errors.info(`[TOSRuntime] boot completed in ${ms}ms`);this.options.onReady?.({runtime:'tos',state:'READY',bridgeVersion:1,runtimeId:this.runtimeId,bootMs:ms,...data})}
- failBoot(error){if(this.disposed||this.ready||this.state==='ERROR')return;this.failedAtState=this.state;if(this.bootTimer)clearTimeout(this.bootTimer);this.bootTimer=0;this.setState('ERROR');const msg=error instanceof Error?error.message:String(error);const d=this.getDiagnostics();const detail=[msg,`Last state: ${this.failedAtState||'unknown'}`,`Expected: tos.shell.ready`,`Messages received: ${(d.messagesReceived||[]).map(x=>x.type).join(', ')||'ninguno'}`,d.lastStage?`Last stage: ${d.lastStage}`:''].filter(Boolean).join('\n');this.errors.error('No se pudo iniciar T-OS.',{technical:detail,source:'TOSRuntime'});try{this.webHost?.dispose?.()}catch{};if(this.host){const box=document.createElement('div');box.className='console-runtime-error';const h=document.createElement('h2');h.textContent='No se pudo iniciar T-OS';const p=document.createElement('p');p.textContent=detail;box.append(h,p);this.host.replaceChildren(box)}this.options.onReady?.({runtime:'tos',state:'ERROR',failed:true,error:msg,diagnostics:d})}
- getDiagnostics(){const b=this.bridge?.getDiagnostics?.()||{};const elapsed=this.readyAt&&this.bootStartedAt?Math.max(0,Math.round(this.readyAt-this.bootStartedAt)):this.bootStartedAt?Math.max(0,Math.round(performance.now()-this.bootStartedAt)):0;return{runtime:'TOSRuntime',state:this.state,failedAtState:this.failedAtState,runtimeId:this.runtimeId,channel:'tos-runtime/v1',bridgeVersion:1,packageValidated:['PACKAGE_VALIDATED','HOST_READY','FRAME_CREATED','FRAME_LOADED','BRIDGE_CONNECTED','CORE_STARTING','SHELL_STARTING','READY','SUSPENDED','ERROR'].includes(this.state),manifestValid:!!this.project?.metadata?.tosSystemManifest,frameCreated:!!this.frame,frameLoaded:this.frameLoaded||['FRAME_LOADED','BRIDGE_CONNECTED','CORE_STARTING','SHELL_STARTING','READY','SUSPENDED'].includes(this.state),bridgeConnected:!!b.connected,coreReady:this.coreReady,shellStarting:this.shellStarting||this.ready,ready:this.ready,helloSent:!!b.helloSent,bootMs:this.ready?elapsed:null,elapsedMs:elapsed,lastStage:this.lastStage,lastMessage:b.lastMessage||null,messagesReceived:b.messages||[],rejections:b.rejections||[]}}
+ constructor(project,errors,options={}){this.project=project;this.errors=errors;this.options=options;this.webHost=null;this.bridge=null;this.frame=null;this.host=null;this.bootTimer=0;this.disposed=false;this.ready=false;this.state='CREATED'}
+ async mount(host){if(this.disposed)throw new Error('TOSRuntime ya fue liberado.');ReaderMod.TOSPackageReader.validateProject(this.project);this.host=host;this.state='STARTING';this.errors.info('[TOSRuntime] Boot started.');this.errors.info('[TOSRuntime] System image mounted.');
+  const files=new Map(this.project.files),entry=this.project.entryPoint,entryFile=files.get(entry);if(!entryFile)throw new Error('T-OS no contiene su entrypoint.');let html=await entryFile.blob.text();const injection='<script data-tos-host-bootstrap>'+BRIDGE_BOOTSTRAP+'</scr'+'ipt>';if(/<head[\s>]/i.test(html))html=html.replace(/<head([^>]*)>/i,`<head$1>${injection}`);else html=injection+html;const blob=new Blob([html],{type:'text/html;charset=utf-8'});files.set(entry,{...entryFile,blob,size:blob.size,mimeType:'text/html;charset=utf-8'});const hosted={...this.project,files,runtimeId:'web',source:'tos-host'};
+  const innerOptions={...this.options,onReady:info=>{this.errors.info('[TOSRuntime] raven-webhost document loaded.',{technical:JSON.stringify(info||{})})},onFrameCreated:frame=>{this.frame=frame;this.bridge=new BridgeMod.TOSHostBridge(frame,this.errors,{onClose:()=>this.options.onClose?.(),persistentStorage:!!this.options.loadRuntimeLocalStorage,onReady:data=>this.markReady(data)});this.bridge.start();this.errors.info('[TOSBridge] API v1 ready.');this.options.onFrameCreated?.(frame)}};
+  this.webHost=new HtmlRuntimeMod.HtmlRuntime(hosted,this.errors,innerOptions);await this.webHost.mount(host);this.bootTimer=setTimeout(()=>this.failBoot(new Error('BOOT_TIMEOUT: T-Shell no informó READY dentro de 12 segundos.')),12000);return this.frame}
+ markReady(data={}){if(this.disposed||this.ready)return;this.ready=true;this.state='RUNNING';if(this.bootTimer)clearTimeout(this.bootTimer);this.bootTimer=0;this.options.onReady?.({runtime:'tos',state:this.state,bridgeVersion:1,...data})}
+ failBoot(error){if(this.disposed||this.ready)return;this.state='ERROR';if(this.bootTimer)clearTimeout(this.bootTimer);this.bootTimer=0;const msg=error instanceof Error?error.message:String(error);this.errors.error('No se pudo iniciar T-OS.',{technical:msg,source:'TOSRuntime'});try{this.webHost?.dispose?.()}catch{};if(this.host){const box=document.createElement('div');box.className='console-runtime-error';const h=document.createElement('h2');h.textContent='No se pudo iniciar T-OS';const p=document.createElement('p');p.textContent=msg;box.append(h,p);this.host.replaceChildren(box)}this.options.onReady?.({runtime:'tos',state:'ERROR',failed:true,error:msg})}
  getFrame(){return this.frame}getKind(){return'tos'}getMetadata(){return this.project.metadata||{}}getInputProfile(){return null}getDisplayConfiguration(){return{orientation:this.project.metadata?.tosRavenRuntime?.preferredOrientation||'any'}}getConsoleProfile(){return null}capturePreview(){return null}
- start(){this.resume()}pause(){if(this.disposed||!this.ready)return;this.setState('SUSPENDED');this.bridge?.send('tos.host.lifecycle',{action:'pause'})}resume(){if(this.disposed)return;if(this.ready)this.setState('READY');this.bridge?.send('tos.host.lifecycle',{action:'resume'})}stop(){this.pause()}reset(){return this.options.onRestart?.()}togglePause(){if(this.state==='SUSPENDED'){this.resume();return false}this.pause();return true}
- async dispose(){if(this.disposed)return;this.disposed=true;if(this.bootTimer)clearTimeout(this.bootTimer);this.bootTimer=0;this.bridge?.send('tos.host.lifecycle',{action:'terminate'});this.bridge?.dispose();this.bridge=null;try{await this.webHost?.dispose?.()}catch{}this.webHost=null;this.frame=null;this.host?.replaceChildren();this.host=null;this.state='TERMINATED';console.info('[TOSRuntime] state → TERMINATED')}
+ start(){this.resume()}pause(){if(this.disposed)return;this.state='SUSPENDED';this.bridge?.send('tos.host',{action:'pause'})}resume(){if(this.disposed)return;this.state='RUNNING';this.bridge?.send('tos.host',{action:'resume'})}stop(){this.pause()}reset(){return this.options.onRestart?.()}togglePause(){if(this.state==='SUSPENDED'){this.resume();return false}this.pause();return true}
+ async dispose(){if(this.disposed)return;this.disposed=true;this.state='TERMINATED';if(this.bootTimer)clearTimeout(this.bootTimer);this.bootTimer=0;this.bridge?.send('tos.host',{action:'terminate'});this.bridge?.dispose();this.bridge=null;try{await this.webHost?.dispose?.()}catch{}this.webHost=null;this.frame=null;this.host?.replaceChildren();this.host=null}
 }
 exports.TOSRuntime=TOSRuntime;
 });
@@ -12790,6 +11606,6 @@ exports.TOSRuntime=TOSRuntime;
 
 __LOCAL_RUNTIME_REQUIRE__('main');</script>
 
-<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.0');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
+<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.17.8');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
 </body>
 </html>
