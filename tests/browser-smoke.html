@@ -1,0 +1,38 @@
+<!doctype html><meta charset="utf-8"><title>Raven Android Browser Smoke</title>
+<pre id="out">RUNNING</pre>
+<iframe id="raven" src="../index.html" style="width:900px;height:700px"></iframe>
+<script>
+const out=document.getElementById('out');
+const fail=e=>{out.textContent='FAIL\n'+(e?.stack||e);document.documentElement.dataset.result='FAIL'};
+(async()=>{
+ const frame=document.getElementById('raven');
+ await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(new Error('Raven load timeout')),12000);frame.onload=()=>{clearTimeout(t);setTimeout(resolve,1000)}});
+ const w=frame.contentWindow;
+ if(!w.RavenAndroidIntegration?.installed) throw new Error('Android integration not installed');
+ const req=w.__LOCAL_RUNTIME_REQUIRE__; if(typeof req!=='function')throw new Error('Raven require missing');
+ const ids=req('runtime/RuntimeManager').RuntimeManager.runtimes().map(x=>x.id);
+ for(const id of ['web','android']) if(!ids.includes(id))throw new Error('Missing runtime '+id+' in '+ids.join(','));
+ const bytes=await fetch('./android-hybrid-fixture.apk').then(r=>{if(!r.ok)throw new Error('fixture HTTP '+r.status);return r.arrayBuffer()});
+ const file=new w.File([bytes],'hybrid.apk',{type:'application/vnd.android.package-archive'});
+ const project=await new (req('importer/ProjectImporter').ProjectImporter)().import(file);
+ if(project.runtimeId!=='android'||project.source!=='apk')throw new Error('Wrong APK route '+project.runtimeId+'/'+project.source);
+ const validation=await req('importer/ProjectValidator').ProjectValidator.validate(project);
+ if(validation.some(x=>x.level==='error'))throw new Error('Validation '+JSON.stringify(validation));
+ const compat=await req('diagnostics/CompatibilityScanner').CompatibilityScanner.scan(project);
+ if(!/Android híbrido/.test(compat.status))throw new Error('Compatibility '+compat.status);
+ const host=w.document.createElement('div');w.document.body.append(host);
+ let ready=null;
+ const errors={info(){},warn(){},error(){}};
+ const RM=req('runtime/RuntimeManager').RuntimeManager;
+ const runtime=new RM(project,errors,{onReady:v=>{ready=v||true}});
+ await runtime.mount(host);
+ await new Promise(r=>setTimeout(r,700));
+ const diag=runtime.getDiagnostics();
+ const nestedFrame=runtime.getFrame();
+ if(!nestedFrame)throw new Error('Hybrid runtime did not expose frame');
+ if(diag?.backend!=='web-hybrid')throw new Error('Wrong backend '+JSON.stringify(diag));
+ await runtime.dispose();
+ out.textContent='PASS\n'+JSON.stringify({ids,source:project.source,runtimeId:project.runtimeId,status:compat.status,backend:diag.backend,ready},null,2);
+ document.documentElement.dataset.result='PASS';
+})().catch(fail);
+</script>
