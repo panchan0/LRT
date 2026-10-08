@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="UTF-8"><title>Raven Diagnostics smoke</title></head><body><pre id="out">RUNNING</pre><iframe src="../index.html" id="frame" width="390" height="810"></iframe><script>
+(async()=>{const out=document.querySelector('#out'),frame=document.querySelector('#frame');try{
+ await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('app load timeout')),22000);frame.addEventListener('load',()=>{clearTimeout(t);setTimeout(resolve,1200)},{once:true})});
+ const w=frame.contentWindow,D=w.RavenDiagnostics,req=w.__LOCAL_RUNTIME_REQUIRE__;
+ if(!D?.installed)throw Error('diagnostic service missing');
+ D.record('error','qa.probe','TEST_ENTRY',{error:new Error('test detail')});
+ if(!D.list().some(v=>v.category==='qa.probe'))throw Error('record missing');
+ const v=req('ui/settings/SettingsView').renderSettings({input:{},version:'0.18.1',libraryStats:{count:0,size:0}},{},null,{section:'diagnostics'});
+ if(!v.querySelector('.raven-diag-panel')||!v.querySelector('.raven-diag-entry'))throw Error('diagnostic panel missing');
+ const labels=[...v.querySelectorAll('button')].map(x=>x.textContent);
+ for(const need of ['Copiar JSON','Exportar .json','Actualizar','Borrar registro'])if(!labels.includes(need))throw Error('button '+need+' missing');
+ if(!JSON.stringify(D.snapshot()).includes('qa.probe'))throw Error('report omitted event');
+ const event=v.querySelector('.raven-diag-entry');const copy=event.querySelector('button');if(!copy)throw Error('copy event action missing');
+ D.clear();if(D.list().length!==0)throw Error('clear did not work');
+ D.record('info','qa.complete','Finished smoke test');
+ out.textContent='PASS diagnostics: boot, journal, UI, JSON, copy actions, clear';document.documentElement.dataset.result='PASS';
+}catch(e){out.textContent='FAIL '+e.stack;document.documentElement.dataset.result='FAIL'}})();
+</script></body></html>
