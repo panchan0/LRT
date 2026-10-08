@@ -1,0 +1,28 @@
+/* Raven UI System v2: local diagnostics surfaces */
+.raven-diag-panel{display:flex;flex-direction:column;gap:12px;margin-top:22px;margin-bottom:18px;padding:18px 16px;border:1px solid rgba(154,143,224,.21);border-radius:22px;background:rgba(20,17,35,.72);color:var(--raven-text,#f5f7fc);min-width:0}
+.raven-diag-heading{font-size:18px;line-height:1.2;letter-spacing:-.02em;font-weight:730;margin:0;color:#f5f3ff}
+.raven-diag-desc,.raven-diag-feedback{font-size:12px;line-height:1.5;color:#a6a1b8;margin:0}
+.raven-diag-feedback:not(:empty){padding:8px 10px;border-radius:10px;background:rgba(122,97,255,.10)}
+.raven-diag-summary{font-size:12px;line-height:1.6;color:#cbc5e0;padding:12px;border-radius:13px;background:rgba(148,125,255,.085);border:1px solid rgba(148,125,255,.15);font-variant-numeric:tabular-nums}
+.raven-diag-actions{display:flex;gap:8px;flex-wrap:wrap}
+.raven-diag-button{min-height:40px;padding:0 12px;background:#221b39;border:1px solid rgba(164,142,255,.25);border-radius:12px;color:#eae7fd;font:inherit;font-size:12px;font-weight:650;touch-action:manipulation;cursor:pointer}
+.raven-diag-button.primary{background:#6e55dd;border-color:#8270e8;color:#fff}
+.raven-diag-button.muted{align-self:flex-start;background:transparent;color:#bbb4ce}
+.raven-diag-button:active{transform:scale(.98)}
+.raven-diag-filter{display:flex;align-items:center;gap:10px;font-size:13px;color:#aaa4bd}
+.raven-diag-select{min-width:160px;max-width:100%;padding:9px;background:#141025;border:1px solid #342a52;border-radius:11px;color:#fff;font:inherit;font-size:13px;touch-action:manipulation}
+.raven-diag-logs{display:flex;flex-direction:column;gap:10px;min-width:0}
+.raven-diag-empty{color:#aaa4ba;font-size:13px;margin:0;padding:15px 5px}
+.raven-diag-entry{min-width:0;padding:14px;border-radius:15px;background:#100d1d;border:1px solid rgba(160,144,207,.16);border-left:3px solid #8c7bdf;overflow:hidden}
+.raven-diag-error{border-left-color:#ef8d9a}.raven-diag-warning{border-left-color:#d3af70}.raven-diag-info{border-left-color:#8274db}
+.raven-diag-entry-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;letter-spacing:.04em;color:#c8bedc}
+.raven-diag-error .raven-diag-entry-head strong{color:#f5b0bb}.raven-diag-warning .raven-diag-entry-head strong{color:#e7c58a}
+.raven-diag-entry-head time{font-size:10px;color:#9891ae;white-space:nowrap;letter-spacing:0}
+.raven-diag-category{font-size:11px;color:#9e8bea;margin-top:6px;overflow-wrap:anywhere}
+.raven-diag-message{font-size:13px;line-height:1.5;color:#f4f0fc;margin:5px 0 8px;overflow-wrap:anywhere;white-space:pre-wrap}
+.raven-diag-technical{font-size:11px;color:#bcb6d2;border-top:1px solid rgba(255,255,255,.07);padding-top:9px}
+.raven-diag-technical summary{cursor:pointer;touch-action:manipulation}
+.raven-diag-technical pre{font-size:10px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;max-height:240px;overflow:auto;border-radius:8px;padding:10px;background:#080611;color:#ccc6e2}
+.raven-diag-inline-actions{display:flex;justify-content:flex-end;padding-top:8px}
+.raven-diag-inline-actions .raven-diag-button{min-height:32px}
+@media(min-width:700px){.raven-diag-panel{padding:22px}.raven-diag-actions{gap:10px}}

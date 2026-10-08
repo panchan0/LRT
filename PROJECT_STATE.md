@@ -6,11 +6,11 @@
 - Tipo: Launcher + runtime local universal
 - Plataforma principal: Web/PWA, con iPhone/iOS como dispositivo principal de prueba
 - Orientación: Adaptativa
-- Versión actual: `0.18.0`
+- Versión actual: `0.18.1`
 - Entrypoint: `index.html`
 - Estado: Beta
-- Última fase completada: Android Runtime Fase 2 · importación APK + Android Guest Core DEX + bridge host iOS v2, conservando T-OS v1
-- Última actualización: 2026-10-06
+- Última fase completada: v0.18.1 · diagnóstico técnico local y mitigaciones de actualización grande; Android Guest P2 conservado
+- Última actualización: 2026-10-08
 
 ## 2. Objetivo de esta build
 
@@ -405,3 +405,20 @@ Importar T-OS-Beta-v0.2.0-beta.2.tos
 - [x] GB/GBC/NES no fueron modificados internamente.
 - [ ] Lock Screen confirmado con el `.tos` real solicitado.
 - [ ] Cerrar/abrir confirmado en el `.tos` real solicitado (la nueva sesión sí está cubierta por test automatizado).
+
+
+## 0.18.1 · Diagnóstico y actualización, 2026-10-08
+
+**Estado real:** parche preparado. Tests unitarios Node y sintaxis pasan; pendientes prueba browser completa y QA en iPhone.
+
+- Diagnóstico local real (`RavenDiagnostics`), persistencia acotada en localStorage, JSON/copia/descarga, categorías, fallos de consola y runtime; comprobación manual de la legibilidad de entradas e imágenes de IDB sin modificarlas.
+- `transactionalUpdate` registra fase y error exacto; error global obsoleto se limpia al navegar a Inicio o Configuración dejando el registro técnico.
+- ProjectStorage: en updates grandes (>24 MiB) se evita crear revisiones costosas y releer los Blobs antiguos para hallar claves, sin modificar el almacenamiento de partidas. Se conservan el commit IDB atómico y el journal de staging. Hay limitación de rollback post-commit sin revisión histórica.
+- HTML >24 MiB: preflight de lectura y estructura de entrada sin duplicación del documento completo; sigue existiendo ProjectValidator previo.
+- `verifyInstalledBuild`: intento de lectura real de muestra de Blob del entrypoint (detecta fallos Safari que antes escapaban a verificación por tamaño).
+- `refreshLibrary`: no descarta silenciosamente la biblioteca que ya estaba visible al fallar IndexedDB.
+- Shell/meta/SW/manifest versión 0.18.1.
+
+**Pendiente de confirmar:** causa precisa de NotFoundError original, import/actualización de Superhumanos 0.5.5→0.5.6 en Safari iOS, almacenamiento/persistencia tras reinstalar, historial cuando >24 MiB, presión de memoria de dispositivos antiguos y nueva UI en todos los tamaños.
+
+**No modificar:** portada, icono, identidad, appId, partida, motor T-OS, Android P2 y HUD de aplicaciones externas.

@@ -94,3 +94,22 @@ Resultado automatizado: **11/11 PASS** después de integrar Android.
 - Regresión T-OS: 11/11 PASS.
 - Android híbrido: core/routing implementado; montaje browser real pendiente de dispositivo/navegador estable.
 - Android nativo arbitrario: no terminado y no declarado funcional.
+
+
+## Ejecución específica 0.18.1 (2026-10-08)
+
+| Prueba | Estado | Evidencia |
+|---|---|---|
+| Análisis sintáctico 6 scripts incrustados HTML | PASS | `node --check` de los scripts extraídos |
+| Tests Android Guest Core P2 | PASS | `node tests/android-guest-core-v2.test.js` |
+| Tests Android Runtime Core P2 | PASS | `node tests/android-runtime-core-v2.test.cjs` |
+| Tests T-OS Runtime | PASS | `node tests/tos-runtime-v1.test.js` (11 tests) |
+| Diagnóstico unitario y persistencia JSON | PASS | `node tests/diagnostics-unit.test.cjs` |
+| Check read-only de Blob IDB ausente (mock) | PASS | `node tests/diagnostics-unit.test.cjs` |
+| Chromium smoke browser | NOT TESTED | Chromium headless bloqueado en este contenedor; no se considera validación |
+| UI en iOS / Safari real | NOT TESTED | Requiere dispositivo físico |
+| Actualización real de Superhumanos de 38-47 MB | NOT TESTED | Requiere iPhone/archivo y almacenamiento real |
+| No pérdida de partidas tras update/restart | NOT TESTED | Requiere iOS con datos existentes |
+| Importación real de APK nativo | NOT TESTED | Fuera del alcance de este parche |
+
+Build: **PARCIAL / candidato de prueba**, no afirmar que el error de Safari esté reparado hasta recibir export JSON de una prueba real.

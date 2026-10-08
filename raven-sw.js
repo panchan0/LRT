@@ -1,4 +1,4 @@
-const VERSION='0.18.0';
+const VERSION='0.18.1';
 const CACHE='raven-shell-'+VERSION;
 const PREFIX='raven-shell-';
 const params=new URL(self.location.href).searchParams;
