@@ -10,7 +10,7 @@
   <meta name="author" content="Cloud Studio">
   <meta name="creator" content="Cloud Studio">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.18.1">
+  <meta name="app-version" content="0.18.2">
   <meta name="raven:build" content="ui-system-v2">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10658,16 +10658,19 @@ class App{
    committedApp=await this.storage.commitPreparedBuild(pending,{targetId:id,sourceName:file.name,sourceHash,compatibilityStatus:compatibility?.status,identitySnapshot});committed=true;
    // Do not announce success until build bytes and the exact pre-update identity have both been re-read from storage.
    await journal('verifying-identity');this.setUpdateState(id,{stage:'verifying-identity',label:'Conservando carátula y portada…',progress:null});
-   committedApp=await this.storage.ensureIdentitySnapshot(id,identitySnapshot);
-   this.setUpdateState(id,{stage:'finalizing',label:'Finalizando…',progress:null});
+   // Read-only identity verification. Do not decode or re-put Safari-backed artwork.
+   committedApp=await this.storage.verifyIdentityAfterCommit(id,identitySnapshot);
+   globalThis.RavenDiagnostics?.record('info','update.identity','Identidad visual conservada sin leer bytes de imágenes antiguas.',{projectId:id,artworkCheck:'descriptors-only',mutation:false});
+   this.setUpdateState(id,{stage:'finalizing',label:'Verificando archivos instalados…',progress:null});
    await this.storage.verifyInstalledBuild(id,{sourceHash,entryPoint:pending.entryPoint,source:pending.source,fileCount:pending.files.size,totalStoredBytes:expectedStoredBytes});
+   globalThis.RavenDiagnostics?.record('info','update.files','Archivo de inicio instalado y legible desde IndexedDB.',{projectId:id,entryPoint:pending.entryPoint,storedBytes:expectedStoredBytes});
    if(fileHandle)await this.settings.setSourceHandle(id,fileHandle,{size:Number(file.size)||0,lastModified:Number(file.lastModified)||0,sourceHash}).catch(()=>{});
    if(sourceRef)await this.settings.setSourceReference(id,{...sourceRef,size:Number(file.size)||Number(sourceRef.size)||0,lastModified:Number(file.lastModified)||Number(sourceRef.lastModified)||0,sourceHash,checkedAt:Date.now()}).catch(()=>{});
    await this.storage.clearPendingBuild?.(id).catch(e=>console.warn('[Raven] La build se guardó, pero no se pudo limpiar el journal.',e));
    await this.refreshLibrary();
-   // Final read after refresh prevents a stale in-memory library row from replacing the verified artwork.
-   committedApp=await this.storage.ensureIdentitySnapshot(id,identitySnapshot);
-   await this.refreshLibrary();
+   // Commit and metadata have already been verified. No second full artwork rewrite.
+   committedApp=await this.storage.get(id);
+   if(!committedApp)throw new Error('La app no se pudo leer después de actualizar la biblioteca.');
    this.setUpdateState(id,{stage:'ready',label:background?'Actualizado automáticamente':'Actualizado',progress:1});if(!background||this.state.screen==='launcher')this.render();
    setTimeout(()=>{this.setUpdateState(id,null);if(this.state.screen==='launcher')this.render()},320);
    return committedApp;
@@ -10679,8 +10682,10 @@ class App{
     try{
      const previousHash=existing.currentBuild?.contentHash||existing.sourceHash||null,restored=previousHash?await this.storage.restoreRevisionByHash(id,previousHash):null;
      if(restored){await this.storage.ensureIdentitySnapshot(id,identitySnapshot);await this.storage.clearPendingBuild?.(id).catch(()=>{});await this.refreshLibrary();this.setUpdateState(id,{stage:'failed',label:'Actualización revertida',progress:null});this.state.importError='La nueva build no superó la verificación final. Raven restauró automáticamente la versión anterior.';this.render();setTimeout(()=>{this.setUpdateState(id,null)},1600);return null}
-     committedApp=await this.storage.ensureIdentitySnapshot(id,identitySnapshot);
-    }catch(recoveryError){console.error('[Raven] Falló la recuperación posterior al commit.',recoveryError)}
+     // Failed verification without a saved revision cannot be repaired by rewriting
+     // stale artwork. Keep the original failure and inspect metadata read-only.
+     committedApp=await this.storage.verifyIdentityAfterCommit(id,identitySnapshot);
+    }catch(recoveryError){globalThis.RavenDiagnostics?.record('warning','update.recovery','No se pudo comprobar la identidad durante recuperación; no se reescribieron portadas.',{projectId:id,error:recoveryError});console.warn('[Raven] Recuperación limitada tras commit; no se reescribieron imágenes.',recoveryError)}
    }
    if(!committed)await this.storage.clearPendingBuild?.(id).catch(()=>{});this.setUpdateState(id,{stage:'failed',label:'No se pudo actualizar',progress:null});
    this.state.importError=e instanceof Error?e.message:'No se pudo actualizar.';await this.refreshLibrary().catch(()=>{});this.render();setTimeout(()=>{this.setUpdateState(id,null)},1400);
@@ -10838,7 +10843,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
     const RUNTIME_STORE = 'runtimeState';
     const STAGING_STORE = 'pendingBuilds';
     const req = request => new Promise((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => { const e=request.error; reject(e || new Error('IndexedDB request error')); }; });
-    const txDone = tx => new Promise((resolve, reject) => { const detail=(prefix,e)=>new Error(`${prefix}${e?.name?` · ${e.name}`:''}${e?.message?`: ${e.message}`:''}`); tx.oncomplete = () => resolve(); tx.onerror = () => { const e=tx.error; reject(e || detail('IndexedDB transaction error',e)); }; tx.onabort = () => { const e=tx.error; reject(e || detail('IndexedDB transaction aborted',e)); }; });
+    const txDone = tx => new Promise((resolve, reject) => { const detail=(prefix,e)=>new Error(`${prefix}${e?.name?` · ${e.name}`:''}${e?.message?`: ${e.message}`:''}`); tx.oncomplete = () => resolve(); tx.onerror = ev => { const e=ev?.target?.error||tx.error; reject(e || detail('IndexedDB transaction error',e)); }; tx.onabort = ev => { const e=ev?.target?.error||tx.error; reject(e || detail('IndexedDB transaction aborted',e)); }; });
     const cleanName = value => String(value || '').trim().replace(/\s+/g, ' ');
     const sourceKey = value => cleanName(value).toLocaleLowerCase();
     const cleanMetaText = value => typeof value === 'string' ? cleanName(value) : '';
@@ -11151,37 +11156,42 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             out.assetSchemaVersion=Math.max(2,Number(out.assetSchemaVersion)||0);
             return out;
         }
-        async blobsEqual(a,b){
+        // Safari may return a valid Blob descriptor whose older backing file is no longer
+        // readable. Identity verification must not decode stored artwork or its stale
+        // backing file. The incoming build never supplies replacement art on updates.
+        // This checks preservation of artwork descriptors, NOT binary integrity.
+        artworkDescriptorMatches(a,b){
             if(a==null||b==null)return a==null&&b==null;
-            if(!(a instanceof Blob)||!(b instanceof Blob)||a.size!==b.size||String(a.type||'')!==String(b.type||''))return false;
-            if(a===b)return true;
-            const chunk=512*1024;
-            for(let offset=0;offset<a.size;offset+=chunk){
-                const end=Math.min(a.size,offset+chunk),[ab,bb]=await Promise.all([a.slice(offset,end).arrayBuffer(),b.slice(offset,end).arrayBuffer()]),av=new Uint8Array(ab),bv=new Uint8Array(bb);
-                if(av.length!==bv.length)return false;for(let i=0;i<av.length;i++)if(av[i]!==bv[i])return false;
-            }
-            return true;
+            return a instanceof Blob&&b instanceof Blob&&a.size===b.size&&String(a.type||'')===String(b.type||'');
         }
-        async artworkMatches(snapshot,app){
+        identityMetadataMatches(snapshot,app){
             if(!snapshot||!app)return false;
             for(const key of ['iconBlob','coverBlob','bannerBlob','previewBlob']){
-                if(!(await this.blobsEqual(snapshot[key],app[key])))return false;
+                if(!this.artworkDescriptorMatches(snapshot[key],app[key]))return false;
             }
             return !!snapshot.iconCustom===!!app.iconCustom&&!!snapshot.coverCustom===!!app.coverCustom&&!!snapshot.bannerCustom===!!app.bannerCustom&&
                 String(snapshot.displayName||'')===String(app.displayName||'')&&Number(snapshot.previewUpdatedAt||0)===Number(app.previewUpdatedAt||0)&&
                 Number(snapshot.pinnedAt||0)===Number(app.pinnedAt||0)&&Number(snapshot.createdAt||0)===Number(app.createdAt||0)&&
                 Number(snapshot.lastOpenedAt||0)===Number(app.lastOpenedAt||0)&&Number(snapshot.openCount||0)===Number(app.openCount||0);
         }
+        async verifyIdentityAfterCommit(id,snapshot){
+            const app=await this.get(id);
+            if(!app)throw new Error('La aplicación desapareció tras guardar la actualización.');
+            if(snapshot&&!this.identityMetadataMatches(snapshot,app))throw new Error('La identidad visual cambió durante el commit. No se modificarán las imágenes existentes.');
+            return app;
+        }
         async ensureIdentitySnapshot(id,snapshot){
             if(!snapshot)return await this.get(id);
             let app=await this.get(id);
             if(!app)throw new Error('La actualización se guardó, pero Raven no pudo volver a leer la app.');
-            if(!(await this.artworkMatches(snapshot,app))){
+            if(!this.identityMetadataMatches(snapshot,app)){
+                // Only used for interruption recovery or explicit repair; the ordinary
+                // update path uses verifyIdentityAfterCommit (read-only).
                 app=this.applyIdentitySnapshot(app,snapshot);
                 await this.putApp(app);
                 app=await this.get(id);
             }
-            if(!(await this.artworkMatches(snapshot,app)))throw new Error('Raven no pudo conservar exactamente la identidad visual de la aplicación durante la actualización.');
+            if(!this.identityMetadataMatches(snapshot,app))throw new Error('La identidad visual no coincide con su estado anterior.');
             return app;
         }
         async loadProject(id) {
@@ -11252,7 +11262,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             };
             if(identitySnapshot)app=this.applyIdentitySnapshot(app,identitySnapshot);
             const keepRevision=!!(existing&&changed&&await hasRevisionCapacity(existing.size||0));
-            if(existing&&changed&&!keepRevision)console.warn('[Raven] Historial omitido por falta de espacio disponible; la build actual sigue protegida por el commit atómico.');
+            if(existing&&changed&&!keepRevision)console.warn('[Raven] Historial omitido para evitar duplicar una build grande; el commit de archivos y metadatos es atómico, pero no sustituye a una copia de seguridad.');
             if (!db) {
                 if(keepRevision){
                     const oldRows=(this.memoryFiles.get(id)||[]).map(x=>({...x}));
@@ -11371,7 +11381,7 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
                 const app=await this.get(row.projectId).catch(()=>null),committed=!!(app&&row.sourceHash&&String(app.sourceHash||'')===String(row.sourceHash));
                 if(!committed){result.push({projectId:row.projectId,stage:row.stage||null,status:'discarded',sourceName:row.sourceName||null});await this.clearPendingBuild(row.projectId).catch(()=>{});continue}
                 try{
-                    if(row.identitySnapshot)await this.ensureIdentitySnapshot(row.projectId,row.identitySnapshot);
+                    if(row.identitySnapshot)await this.verifyIdentityAfterCommit(row.projectId,row.identitySnapshot);
                     await this.verifyInstalledBuild(row.projectId,{sourceHash:row.sourceHash,entryPoint:row.expectedEntryPoint,source:row.expectedSource,fileCount:row.expectedFileCount,totalStoredBytes:row.expectedStoredBytes});
                     result.push({projectId:row.projectId,stage:row.stage||null,status:'recovered',sourceName:row.sourceName||null});await this.clearPendingBuild(row.projectId).catch(()=>{});
                 }catch(error){
@@ -12848,7 +12858,7 @@ exports.TOSRuntime=TOSRuntime;
  console.info('[TOSRuntime] Raven native T-OS integration A+B registered.');
 })();
 
-/* Raven 0.18.1 · Local, persistent diagnostic event journal. No remote telemetry. */
+/* Raven 0.18.2 · Local, persistent diagnostic event journal. No remote telemetry. */
 (function RavenDiagnosticPatch(){
 'use strict';
 const REQ=globalThis.__LOCAL_RUNTIME_REQUIRE__;
@@ -12969,6 +12979,6 @@ record('info','raven.boot','Sistema de diagnóstico activo.',{version:document.q
 
 __LOCAL_RUNTIME_REQUIRE__('main');</script>
 
-<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.1');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
+<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.2');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
 </body>
 </html>
