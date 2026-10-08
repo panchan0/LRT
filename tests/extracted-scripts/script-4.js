@@ -3407,7 +3407,7 @@ class App{
  renderShortcutSetup(message=null){const d=this.shortcutDescriptor;if(!d)return;document.body.classList.add('raven-direct-shortcut');const main=document.createElement('main');main.className='shortcut-setup-screen';const card=document.createElement('section');card.className='shortcut-setup-card';const icon=document.createElement('div');icon.className='shortcut-setup-icon';if(d.iconDataUrl){const img=document.createElement('img');img.src=d.iconDataUrl;img.alt='';icon.append(img)}else icon.textContent=String(d.name||'A').slice(0,2);const title=document.createElement('h1');title.textContent=d.name||'App';const copy=document.createElement('p');copy.className='shortcut-setup-copy';copy.textContent=this.homeShortcuts.isStandalone()?'Vincula el archivo original una sola vez; después este icono abrirá directamente la app.':'Abre este enlace desde Safari y usa Añadir a pantalla de inicio.';card.append(icon,title,copy);if(message){const st=document.createElement('div');st.className='shortcut-setup-status';st.textContent=message;card.append(st)}if(this.homeShortcuts.isStandalone()){const pick=document.createElement('button');pick.type='button';pick.className='shortcut-setup-button';pick.textContent='Vincular archivo';pick.addEventListener('click',()=>{this.shortcutInput.value='';this.shortcutInput.click()});card.append(pick)}main.append(card);this.root.replaceChildren(main)}
  async shortcutFileSelected(){const d=this.shortcutDescriptor,file=this.shortcutInput?.files?.[0];if(!d||!file)return;try{this.renderShortcutSetup('Vinculando y guardando…');const[project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);project.sourceName=file.name;project.sourceHash=sourceHash;const validation=await ProjectValidator.ProjectValidator.validate(project);const fatal=validation.find(x=>x.level==='error');if(fatal)throw new Error(fatal.message||'El archivo no es válido.');const compatibility=await CompatibilityScanner.CompatibilityScanner.scan(project);const coverBlob=d.iconDataUrl?this.homeShortcuts.dataURLToBlob(d.iconDataUrl):null;const app=await this.storage.commitPreparedBuild(project,{forcedId:d.appId,displayName:d.name,coverBlob,sourceName:file.name,sourceHash,compatibilityStatus:compatibility?.status});try{await this.applyShortcutHandoff(app.id)}catch{}project.libraryId=app.id;project.libraryName=app.displayName;project.name=app.displayName;project.storedVersion=app.version;await this.storage.touchOpened(app.id);this.state={...state.initialState,screen:this.router.navigate('runtime'),project};this.render()}catch(e){this.renderShortcutSetup(e instanceof Error?e.message:'No se pudo vincular el archivo.')}}
  async applyShortcutHandoff(appId){const d=this.shortcutDescriptor;if(!appId||!d?.progressToken||!d?.handoffId)return false;const receipt='raven-handoff:'+appId+':'+d.handoffId;try{if(localStorage.getItem(receipt)==='1')return false}catch{}const snapshot=await this.homeShortcuts.decodeProgress(d.progressToken);if(!snapshot)return false;await this.storage.importRuntimeState(appId,snapshot,{preferNewer:true});try{localStorage.setItem(receipt,'1')}catch{}return true}
- async refreshLibrary(){try{this.library=await this.storage.list();if(this.detailApp)this.detailApp=await this.storage.get(this.detailApp.id)||null}catch(e){this.library=[];this.state.importError=e instanceof Error?e.message:'No se pudo abrir la biblioteca local.'}}
+ async refreshLibrary(){try{const rows=await this.storage.list();this.library=rows;if(this.detailApp)this.detailApp=await this.storage.get(this.detailApp.id)||null}catch(e){globalThis.RavenDiagnostics?.record('error','library.read','No se pudo leer la biblioteca desde IndexedDB.',{error:e});this.state.importError=e instanceof Error?e.message:'No se pudo abrir la biblioteca local.';/* Conservar la última lista conocida; no fingir biblioteca vacía. */}}
  persistViewMode(){try{localStorage.setItem('local-runtime-launcher-view',this.launcherViewMode)}catch{}}setView=mode=>{if(mode!=='grid'&&mode!=='list')return;if(this.launcherViewMode===mode)return;this.launcherViewMode=mode;this.persistViewMode();this.render()};toggleView=()=>this.setView(this.launcherViewMode==='grid'?'list':'grid');showHome=()=>{this.dismissSheet();this.detailApp=null;this.set({screen:this.router.navigate('home')})};showLibrary=()=>{this.dismissSheet();this.detailApp=null;this.set({screen:this.router.navigate('launcher')})};showSettings=async()=>{this.dismissSheet();this.detailApp=null;try{this.settingsSnapshot=await this.settings.snapshot()}catch{this.settingsSnapshot={directoryPicker:false,directoryUpload:false,filePicker:false,directoryName:null}}this.set({screen:this.router.navigate('settings')})};chooseDirectory=async()=>{try{if(this.settings.supportsDirectoryPicker()){await this.settings.chooseDefaultDirectory();this.settingsSnapshot=await this.settings.snapshot();this.state.importError=null;this.render();return}if(this.settings.supportsDirectoryUpload()){this.directoryInput.value='';this.directoryInput.click();return}throw new Error('Este navegador no permite seleccionar carpetas.')}catch(e){if(e?.name!=='AbortError'){this.state.importError=e instanceof Error?e.message:'No se pudo elegir el directorio.';this.render()}}};directorySelected=async()=>{const files=this.directoryInput?.files;if(!files?.length)return;try{await this.settings.importDirectoryFiles(files);this.settingsSnapshot=await this.settings.snapshot();this.state.importError=null;this.render()}catch(e){this.state.importError=e instanceof Error?e.message:'No se pudo vincular la carpeta.';this.render()}finally{this.directoryInput.value=''}};clearDirectory=async()=>{await this.settings.clearDefaultDirectory();this.settingsSnapshot=await this.settings.snapshot();this.render()};browseDirectory=async()=>{await this.openFileBrowser(null,true)};dismissSheet=()=>{this.sheet?.remove();this.sheet=null;try{this.homeShortcutCleanup?.()}catch{}this.homeShortcutCleanup=null};
  compactDialog(title,contentBuilder){return new Promise(resolve=>{this.dismissSheet();const backdrop=document.createElement('div');backdrop.className='sheet-backdrop compact-dialog-backdrop';const dialog=document.createElement('section');dialog.className='compact-dialog';const head=document.createElement('header');head.className='compact-dialog-header';const h=document.createElement('h2');h.textContent=title;head.append(h);const body=document.createElement('div');body.className='compact-dialog-body';const done=value=>{this.dismissSheet();resolve(value)};contentBuilder(body,done);dialog.append(head,body);backdrop.append(dialog);backdrop.addEventListener('click',e=>{if(e.target===backdrop)done(null)});this.sheet=backdrop;document.body.append(backdrop)})}
  async promptName(current){return await this.compactDialog('Renombrar en biblioteca',(body,done)=>{const input=document.createElement('input');input.className='sheet-input';input.type='text';input.value=current;input.placeholder='Nombre visible';const actions=document.createElement('div');actions.className='compact-dialog-actions';const cancel=document.createElement('button');cancel.className='sheet-button secondary';cancel.textContent='Cancelar';const save=document.createElement('button');save.className='sheet-button primary';save.textContent='Guardar';cancel.addEventListener('click',()=>done(null));save.addEventListener('click',()=>{const v=input.value.trim();if(v)done(v);else input.focus()});input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save.click()}if(e.key==='Escape'){e.preventDefault();done(null)}});actions.append(cancel,save);body.append(input,actions);setTimeout(()=>input.focus({preventScroll:true}),40)})}
@@ -3420,7 +3420,19 @@ class App{
  async hashFile(file){if(file.size<=32*1024*1024){try{const b=await file.arrayBuffer();if(crypto?.subtle?.digest){const h=await crypto.subtle.digest('SHA-256',b);return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}}catch{}}let h1=2166136261>>>0,h2=0x9e3779b9>>>0,total=0,index=0;const consume=bytes=>{for(let i=0;i<bytes.length;i++,index++){h1^=bytes[i];h1=Math.imul(h1,16777619)>>>0;h2^=(bytes[i]+index)>>>0;h2=Math.imul(h2,2246822519)>>>0}total+=bytes.length};if(file.stream){const reader=file.stream().getReader();try{for(;;){const{done,value}=await reader.read();if(done)break;if(value)consume(value)}}finally{reader.releaseLock?.()}}else consume(new Uint8Array(await file.arrayBuffer()));return'content-'+total.toString(16)+'-'+h1.toString(16).padStart(8,'0')+h2.toString(16).padStart(8,'0')}
  async fileSelected(){const file=this.input.files?.[0];if(!file)return;const targetId=this.updateTargetId;this.updateTargetId=null;await this.processSelectedFile(file,null,targetId)}
  async processSelectedFile(file,fileHandle=null,targetId=null,sourceRef=null){if(!file)return;if(targetId){await this.transactionalUpdate(targetId,file,fileHandle,sourceRef);return}this.set({screen:this.router.navigate('importing'),importError:null});try{this.disposeProject();const[project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);project.sourceName=file.name;project.sourceHash=sourceHash;const match=await this.storage.findMatch(project,file.name);project.libraryId=match?.id||null;project.libraryMode=match?(match.sourceHash===sourceHash?'same':'update'):'new';project.libraryName=match?.displayName||project.name;this.sourceMeta={sourceName:file.name,sourceHash,targetId:match?.id||null,fileHandle:fileHandle||null,sourceRef:sourceRef||null,sourceSize:Number(file.size)||0,sourceLastModified:Number(file.lastModified)||0};const preview=match?.coverBlob?Promise.resolve(match.coverBlob):this.storage.detectCover(project);const[compatibility,validation,previewIconBlob]=await Promise.all([CompatibilityScanner.CompatibilityScanner.scan(project),ProjectValidator.ProjectValidator.validate(project),preview]);project.previewIconBlob=match?.iconBlob||previewIconBlob||null;project.previewBannerBlob=match?.bannerBlob||null;this.analysisAnimateIn=true;this.set({screen:this.router.navigate('analysis'),project,compatibility,validation})}catch(e){this.sourceMeta=null;this.set({...state.initialState,screen:this.router.navigate('launcher'),importError:e instanceof Error?e.message:'No se pudo importar.'})}}
- async preflightPendingBuild(project){if(!project?.files?.has(project.entryPoint))throw new Error('El entrypoint de la actualización no existe.');if((project.runtimeId||'web')==='web'){const H=__LOCAL_RUNTIME_REQUIRE__('runtime/HtmlRuntime').HtmlRuntime;const silent={info(){},warn(){},error(){}};const rt=new H(project,silent,{loadRuntimeLocalStorage:async()=>({})});try{await rt.buildDocument()}finally{try{rt.dispose()}catch{}}}else if(project.runtimeId==='gameboy'){const file=project.files.get(project.entryPoint);if(!file||file.blob.size<0x150)throw new Error('La ROM preparada no es válida.');}else if(project.runtimeId==='nes'){const file=project.files.get(project.entryPoint);if(!file||file.blob.size<16)throw new Error('La ROM NES preparada no es válida.');const b=new Uint8Array(await file.blob.slice(0,16).arrayBuffer());if(b[0]!==0x4e||b[1]!==0x45||b[2]!==0x53||b[3]!==0x1a)throw new Error('La ROM NES no contiene una cabecera iNES válida.');const mapper=(b[6]>>4)|(b[7]&0xf0);if(![0,2,3,4,66].includes(mapper))throw new Error(`Mapper NES ${mapper} todavía no está soportado por Raven.`);}return true}
+ async preflightPendingBuild(project){if(!project?.files?.has(project.entryPoint))throw new Error('El entrypoint de la actualización no existe.');if((project.runtimeId||'web')==='web'){
+       // Avoid constructing a second 40+ MB HTML document during install on memory-limited iPhones.
+       // Validation has already run; this is an entrypoint readability/structure preflight, not execution.
+       const entry=project.files.get(project.entryPoint),largeHtml=entry?.blob instanceof Blob && entry.blob.size>24*1024*1024 && /\.html?$/i.test(project.entryPoint);
+       if(largeHtml){
+         const head=await entry.blob.slice(0,65536).text();
+         const tail=await entry.blob.slice(Math.max(0,entry.blob.size-8192)).text();
+         if(!/<(?:!doctype\s+html|html|head|body|script)(?:\s|>)/i.test(head))throw new Error('El archivo HTML grande no tiene un documento de inicio reconocible.');
+         if(!tail.trim())throw new Error('El final del archivo HTML de actualización no es legible.');
+         globalThis.RavenDiagnostics?.record('info','update.preflight','Preflight de HTML grande mediante muestras, sin duplicar la página completa en memoria.',{entryPoint:project.entryPoint,bytes:entry.blob.size});
+         return true;
+       }
+       const H=__LOCAL_RUNTIME_REQUIRE__('runtime/HtmlRuntime').HtmlRuntime;const silent={info(){},warn(){},error(){}};const rt=new H(project,silent,{loadRuntimeLocalStorage:async()=>({})});try{await rt.buildDocument()}finally{try{rt.dispose()}catch{}}}else if(project.runtimeId==='gameboy'){const file=project.files.get(project.entryPoint);if(!file||file.blob.size<0x150)throw new Error('La ROM preparada no es válida.');}else if(project.runtimeId==='nes'){const file=project.files.get(project.entryPoint);if(!file||file.blob.size<16)throw new Error('La ROM NES preparada no es válida.');const b=new Uint8Array(await file.blob.slice(0,16).arrayBuffer());if(b[0]!==0x4e||b[1]!==0x45||b[2]!==0x53||b[3]!==0x1a)throw new Error('La ROM NES no contiene una cabecera iNES válida.');const mapper=(b[6]>>4)|(b[7]&0xf0);if(![0,2,3,4,66].includes(mapper))throw new Error(`Mapper NES ${mapper} todavía no está soportado por Raven.`);}return true}
  async transactionalUpdate(id,file,fileHandle=null,sourceRef=null,options={}){
   const existing=await this.storage.get(id);if(!existing)return;
   const identitySnapshot=this.storage.identitySnapshot(existing),background=!!options.background;
@@ -3458,6 +3470,8 @@ class App{
    setTimeout(()=>{this.setUpdateState(id,null);if(this.state.screen==='launcher')this.render()},320);
    return committedApp;
   }catch(e){
+   const failedStage=this.updateStates.get(id)?.stage||'unknown';
+   globalThis.RavenDiagnostics?.record('error','update.transaction','Error real de actualización: '+String(e?.message||e),{projectId:id,project:existing.displayName||null,filename:file?.name||null,fileSize:file?.size||0,stage:failedStage,committed,error:e});
    // If the commit happened but final verification failed, prefer the previous revision over a possibly incomplete build.
    if(committed){
     try{
@@ -3803,7 +3817,15 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
         return images[0]?.blob || null;
     }
     const __lwrSafeObject=value=>value&&typeof value==='object'&&!Array.isArray(value)?{...value}:{};
-    async function hasRevisionCapacity(bytes){try{const est=await navigator.storage?.estimate?.();const quota=Number(est?.quota)||0,usage=Number(est?.usage)||0;if(!quota)return true;const need=Math.max(16*1024*1024,(Number(bytes)||0)*1.15);return quota-usage>need&&usage/quota<.92}catch{return true}}
+    async function hasRevisionCapacity(bytes){
+      // Safari's storage.estimate() is not a reliable promise of allocatable disk space.
+      // Large archives frequently fail while duplicating old IDB Blob values into revisions.
+      // Use the existing atomic APP/FILE commit; keep revision snapshots only for small apps.
+      if((Number(bytes)||0)>24*1024*1024)return false;
+      try{const est=await navigator.storage?.estimate?.();const quota=Number(est?.quota)||0,usage=Number(est?.usage)||0;
+      if(!quota)return false;const need=Math.max(32*1024*1024,(Number(bytes)||0)*3);
+      return quota-usage>need&&usage/quota<.80}catch{return false}
+    }
     class ProjectStorage {
         dbPromise = null;
         dbDisabled = false;
@@ -4043,7 +4065,10 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             if(changed||!existing){
                 const stores=keepRevision?[FILE_STORE,REVISION_STORE]:[FILE_STORE];
                 const readTx=db.transaction(stores,'readonly'),readDone=txDone(readTx);
-                oldRows=await req(readTx.objectStore(FILE_STORE).index('projectId').getAll(IDBKeyRange.only(id)));
+                // Avoid reading the previous build's Blob bytes merely to delete its keys.
+                // Safari may hold a stale Blob backing file (NotFoundError) after reload.
+                if(keepRevision)oldRows=await req(readTx.objectStore(FILE_STORE).index('projectId').getAll(IDBKeyRange.only(id)));
+                else oldRows=(await req(readTx.objectStore(FILE_STORE).index('projectId').getAllKeys(IDBKeyRange.only(id)))).map(key=>({key}));
                 if(keepRevision)revisionRows=await req(readTx.objectStore(REVISION_STORE).index('projectId').getAll(IDBKeyRange.only(id)));
                 await readDone;
             }
@@ -4088,6 +4113,11 @@ define("storage/ProjectStorage", ["require", "exports", "filesystem/PathResolver
             const rows=await this.readStoredFiles(id),byPath=new Map(rows.map(r=>[r.path,r]));
             if(!rows.length)throw new Error('La actualización no dejó archivos instalados.');
             const entry=String(expected.entryPoint||app.entryPoint||'');if(entry&&!byPath.has(entry))throw new Error('El archivo de inicio no quedó almacenado correctamente.');
+            // IndexedDB can return a Blob whose backing file no longer exists in Safari.
+            if(entry){const stored=byPath.get(entry)?.blob;if(!(stored instanceof Blob))throw new Error('El archivo de inicio no es un Blob válido.');
+              try{if(stored.size>0)await stored.slice(0,Math.min(stored.size,1024)).arrayBuffer()}
+              catch(error){const wrapped=new Error('El archivo instalado no se puede leer de IndexedDB ('+(error?.name||'error')+'): '+(error?.message||error));wrapped.cause=error;throw wrapped}
+            }
             if(expected.sourceHash&&String(app.sourceHash||'')!==String(expected.sourceHash))throw new Error('El hash instalado no coincide con el archivo seleccionado.');
             if(expected.source&&String(app.source||'')!==String(expected.source))throw new Error('El formato instalado no coincide con la actualización validada.');
             if(Number.isFinite(expected.fileCount)&&rows.length!==Number(expected.fileCount))throw new Error(`La actualización quedó incompleta (${rows.length}/${expected.fileCount} archivos).`);
@@ -4256,7 +4286,7 @@ function renderSettings(snapshot,actions,error,options={}){const prefs=options.p
   const general=[row('image','Apariencia',prefs.theme&&prefs.theme!=='raven'?`Tema ${theme.name} · Raven UI System v2`:'Oscuro · Raven UI System v2',()=>actions.openSection?.('appearance')),row('refresh','Comportamiento','Gestos de navegación y transiciones activas',()=>actions.openSection?.('behavior')),row('pin','Inicio',`${snapshot.pinnedCount||0} fijado${(snapshot.pinnedCount||0)===1?'':'s'}`,()=>actions.openSection?.('home'))];stack.append(group('GENERAL',general));
   const dirValue=snapshot.directoryName?(snapshot.directoryMode==='handle'?'Acceso directo al directorio':`Copia local · ${snapshot.directoryFileCount||0} archivos · ${snapshot.directoryFolderCount||0} carpetas`):'Sin directorio vinculado';stack.append(group('BIBLIOTECA',[row('folder','Directorio de Raven',dirValue,()=>actions.openSection?.('directory')),row('import','Importación y actualizaciones',snapshot.autoUpdateEnabled===false?'Actualizaciones automáticas desactivadas':'Actualizaciones automáticas · identidad preservada',()=>actions.openSection?.('import')),row('storage','Almacenamiento',`${stats.count||0} apps · ${format.formatBytes(stats.size||0)}`,()=>actions.openSection?.('storage')),row('data','Formatos locales','HTML · ZIP · APK · GB · GBC · NES · T-OS',()=>actions.openSection?.('formats'))]));
   const d=snapshot.input||{},pads=Array.isArray(d.gamepads)?d.gamepads:[],keys=d.keyboard?.pressed||[],p=d.pointer||{},type=p.pointerType||'touch';stack.append(group('ENTRADA',[row('gamepad','Gamepads',pads[0]?(pads[0].responding?`${pads[0].id||'Mando'} · Entrada activa`:`${pads[0].id||'Mando'} · Sin respuesta`):'No hay mandos detectados',()=>actions.openSection?.('gamepads'),{dot:true,kind:pads[0]?(pads[0].responding?'success':'warning'):'muted'}),row('keyboard','Teclado',keys.length?`Activas: ${keys.join(' · ')}`:'Sin teclas activas',()=>actions.openSection?.('keyboard'),{dot:true,kind:keys.length?'success':'muted'}),row('mouse','Mouse / Pointer',`${type} · X ${Math.round(Number(p.x)||0)} · Y ${Math.round(Number(p.y)||0)} · Δ ${Math.round(Number(p.deltaX)||0)}, ${Math.round(Number(p.deltaY)||0)}`,()=>actions.openSection?.('pointer'),{dot:true,kind:p.active?'success':'muted'}),row('touch','Touch','Pointer Events y gestos táctiles disponibles',()=>actions.openSection?.('touch'))]));
-  stack.append(group('RUNTIME',[row('cube','Compatibilidad','Canvas · WebGL · Audio · Storage',()=>actions.openSection?.('compatibility')),row('diagnostic','Diagnóstico','Comprobar capacidades reales del runtime',()=>actions.openSection?.('diagnostics')),row('terminal','Consola','Errores de ejecución visibles desde cada runtime',()=>actions.openSection?.('console')),row('lock','Permisos',snapshot.secure?'Contexto seguro':'Contexto limitado',()=>actions.openSection?.('permissions'))]));
+  stack.append(group('RUNTIME',[row('cube','Compatibilidad','Canvas · WebGL · Audio · Storage',()=>actions.openSection?.('compatibility')),row('diagnostic','Diagnóstico','Errores reales, almacenamiento y reporte JSON',()=>actions.openSection?.('diagnostics')),row('terminal','Consola','Historial técnico de errores de Raven',()=>actions.openSection?.('console')),row('lock','Permisos',snapshot.secure?'Contexto seguro':'Contexto limitado',()=>actions.openSection?.('permissions'))]));
   stack.append(group('RAVEN',[row('info','Versión',`Raven ${snapshot.version||'—'} · Cloud Studio`,()=>actions.openSection?.('version')),row('cube','Información','Launcher + runtime local universal',()=>actions.openSection?.('about')),row('data','Datos',`${stats.count||0} entradas de biblioteca · ${format.formatBytes(stats.size||0)}`,()=>actions.openSection?.('data'))]));
  }else{
   const back=()=>actions.backSection?.();let headerTitle='Configuración',headerSubtitle='';
@@ -5614,6 +5644,125 @@ exports.TOSRuntime=TOSRuntime;
  const RuntimeManager=__LOCAL_RUNTIME_REQUIRE__('runtime/RuntimeManager').RuntimeManager,TOSRuntime=__LOCAL_RUNTIME_REQUIRE__('runtime/tos/TOSRuntime').TOSRuntime;RuntimeManager.register({id:'tos',canOpen:p=>p?.runtimeId==='tos'||p?.source==='tos'||p?.platform==='tos',create:(p,e,o)=>new TOSRuntime(p,e,o)});
  const App=__LOCAL_RUNTIME_REQUIRE__('app/App').App,oldPreflight=App.prototype.preflightPendingBuild;App.prototype.preflightPendingBuild=async function(project){if(project?.runtimeId==='tos'){Reader.validateProject(project);return true}return await oldPreflight.call(this,project)};
  console.info('[TOSRuntime] Raven native T-OS integration A+B registered.');
+})();
+
+/* Raven 0.18.1 · Local, persistent diagnostic event journal. No remote telemetry. */
+(function RavenDiagnosticPatch(){
+'use strict';
+const REQ=globalThis.__LOCAL_RUNTIME_REQUIRE__;
+if(typeof REQ!=='function'||globalThis.RavenDiagnostics?.installed)return;
+const KEY='raven-diagnostics-v1',MAX=140,MAX_TEXT=3500;
+const originalConsole={warn:console.warn.bind(console),error:console.error.bind(console)};
+const primitive=value=>{try{return String(value??'')}catch{return'[unprintable]'}};
+function serialize(value,depth=0,seen=new WeakSet()){
+  if(value==null||typeof value==='number'||typeof value==='boolean')return value;
+  if(typeof value==='string')return value.slice(0,MAX_TEXT);
+  if(typeof value==='bigint')return String(value);
+  if(typeof value==='function')return '[Function]';
+  if(value instanceof Error||value instanceof DOMException){return {name:value.name||'Error',message:primitive(value.message).slice(0,MAX_TEXT),stack:primitive(value.stack).slice(0,6000),code:value.code??null,cause:depth<2&&value.cause?serialize(value.cause,depth+1,seen):undefined};}
+  if(value instanceof Blob)return{kind:value instanceof File?'File':'Blob',name:value instanceof File?value.name:undefined,size:value.size,type:value.type};
+  if(typeof value!=='object')return primitive(value).slice(0,MAX_TEXT);
+  if(seen.has(value))return '[circular]';
+  if(depth>=3)return '[nested]';
+  seen.add(value);
+  if(Array.isArray(value))return value.slice(0,18).map(v=>serialize(v,depth+1,seen));
+  const out={};for(const key of Object.keys(value).slice(0,28)){
+    if(/token|password|authorization|cookie|secret|nonce|credential|keymaterial/i.test(key)){out[key]='[redacted]';continue}
+    try{out[key]=serialize(value[key],depth+1,seen)}catch{out[key]='[unavailable]'}
+  }
+  return out;
+}
+let records=[];
+try{const value=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(value))records=value.filter(v=>v&&typeof v==='object').slice(-MAX)}catch{}
+const listeners=new Set();let saving=false;
+function persist(){if(saving)return;saving=true;try{
+  let result=records.slice(-MAX);
+  for(let k=0;k<4;k++)try{localStorage.setItem(KEY,JSON.stringify(result));break}catch{result=result.slice(Math.ceil(result.length/3));if(k===3)throw Error('journal unavailable')}
+}catch{}finally{saving=false}}
+function record(level,category,message,details={}){
+  const entry={id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),timestamp:new Date().toISOString(),level:['error','warning','info'].includes(level)?level:'info',category:primitive(category).slice(0,80),message:primitive(message).slice(0,MAX_TEXT),details:serialize(details)};
+  const last=records[records.length-1];if(last&&last.level===entry.level&&last.category===entry.category&&last.message===entry.message&&Date.now()-Date.parse(last.timestamp)<3500){last.count=(last.count||1)+1;last.timestamp=entry.timestamp;last.details=entry.details}else records.push(entry);
+  if(records.length>MAX)records.splice(0,records.length-MAX);
+  persist();for(const fn of listeners)try{fn()}catch{}return entry;
+}
+const D={installed:true,record,list:()=>records.slice(),clear:()=>{records=[];persist();for(const fn of listeners)try{fn()}catch{}},subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn)},app:null,lastStorageEstimate:null};
+D.counts=()=>({errors:records.filter(e=>e.level==='error').length,warnings:records.filter(e=>e.level==='warning').length,total:records.length});
+D.snapshot=function(){const app=D.app,active=app?.state?.project,library=Array.isArray(app?.library)?app.library:[];
+  return{schema:'raven.diagnostics/v1',exportedAt:new Date().toISOString(),ravenVersion:document.querySelector('meta[name="app-version"]')?.content||'unknown',device:{userAgent:navigator.userAgent,language:navigator.language,online:navigator.onLine,secureContext:isSecureContext,standalone:!!navigator.standalone,storageEstimate:D.lastStorageEstimate},library:{count:library.length,apps:library.map(a=>({id:a.id,name:a.displayName,version:a.version,size:a.size,source:a.source,sourceHash:a.sourceHash||null}))},activeRuntime:active?{libraryId:active.libraryId||null,name:active.name,runtimeId:active.runtimeId}:null,updateStatus:app?.settingsSnapshot?{lastError:app.settingsSnapshot.autoUpdateLastError||null,running:!!app.settingsSnapshot.autoUpdateRunning,lastScanAt:app.settingsSnapshot.autoUpdateLastScanAt||null}:null,events:D.list()};
+};
+D.refreshStorage=async()=>{try{const e=await navigator.storage?.estimate?.();const persistent=await navigator.storage?.persisted?.();D.lastStorageEstimate={usage:e?.usage??null,quota:e?.quota??null,persistent:typeof persistent==='boolean'?persistent:null}}catch(e){D.record('warning','storage.estimate','No se pudo leer la cuota de almacenamiento.',{error:e})}return D.lastStorageEstimate};
+// Explicit, read-only Safari Blob integrity check. Never alters library, games or revisions.
+D.checkStoredEntrypoints=async function(){
+ const items=(D.app?.library||[]).filter(a=>a?.id&&a?.entryPoint).slice(0,40);
+ if(!items.length){record('warning','storage.check','No hay aplicaciones cargadas para verificar.',{});return{checked:0,failed:0}}
+ let db;try{db=await D.app.storage.open()}catch(error){record('error','storage.check','No se pudo abrir IndexedDB para la comprobación.',{error});return{checked:0,failed:items.length}}
+ if(!db){record('error','storage.check','Biblioteca temporal: IndexedDB no está disponible.',{});return{checked:0,failed:items.length}}
+ let checked=0,failed=0;
+ for(const app of items){try{
+   const tx=db.transaction('files','readonly'),request=tx.objectStore('files').get(app.id+'|'+app.entryPoint);
+   const row=await new Promise((resolve,reject)=>{request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error||Error('IndexedDB get failed'));tx.onabort=()=>reject(tx.error||Error('IndexedDB transaction aborted'))});
+   if(!(row?.blob instanceof Blob))throw Error('Entrypoint no encontrado o no es un Blob.');
+   if(row.blob.size)await row.blob.slice(0,Math.min(row.blob.size,128)).arrayBuffer();
+   // Artwork is stored separately in the library record. A broken backing file can
+   // explain the missing thumbnail shown even when the game's main entrypoint works.
+   for(const key of ['iconBlob','coverBlob','bannerBlob','previewBlob']){
+     const artwork=app[key];if(!(artwork instanceof Blob)||!artwork.size)continue;
+     try{await artwork.slice(0,Math.min(128,artwork.size)).arrayBuffer()}
+     catch(error){failed++;record('error','storage.artwork','La imagen guardada ya no puede leerse desde Safari.',{appId:app.id,appName:app.displayName,asset:key,size:artwork.size,error})}
+   }
+   checked++;
+ }catch(error){failed++;record('error','storage.entrypoint','El archivo inicial no se puede leer desde el almacenamiento.',{appId:app.id,appName:app.displayName,entryPoint:app.entryPoint,error})}}
+ record(failed?'warning':'info','storage.check','Comprobación de archivos terminada.',{checked,failed,total:items.length});return{checked,failed,total:items.length};
+};
+
+function formatText(args){return args.map(a=>a instanceof Error?`${a.name}: ${a.message}`:typeof a==='string'?a:primitive(a?.message||a)).join(' ').slice(0,MAX_TEXT)}
+console.warn=function(...args){record('warning','console.warn',formatText(args),{arguments:args});return originalConsole.warn(...args)};
+console.error=function(...args){record('error','console.error',formatText(args),{arguments:args});return originalConsole.error(...args)};
+addEventListener('error',e=>{if(e.target&&e.target!==window){const target=e.target;record('warning','resource.error','No se pudo cargar un recurso.',{tag:target.tagName,src:target.currentSrc||target.src||null});return}record('error','window.error',e.message||'Excepción no controlada.',{file:e.filename,line:e.lineno,column:e.colno,error:e.error})},true);
+addEventListener('unhandledrejection',e=>{record('error','promise.rejection',e.reason?.message||'Promesa rechazada sin manejar.',{reason:e.reason})});
+// Capture runtime ErrorCollector errors which are not necessarily written to console.
+try{const EC=REQ('diagnostics/ErrorCollector').ErrorCollector,add=EC.prototype.add;EC.prototype.add=function(level,message,details={}){if(level==='error'||level==='warning')record(level,'runtime.collector',message,details);return add.call(this,level,message,details)}}catch(e){originalConsole.warn('[Raven Diagnostics] ErrorCollector hook not installed',e)}
+// Capture the actual library operation failure without erasing the last successfully loaded list.
+const P=REQ('app/App').App.prototype,refresh=P.refreshLibrary;
+P.refreshLibrary=async function(...args){const before=this.library;const result=await refresh.apply(this,args);if(this.state?.importError&&this.library?.length===0&&before?.length){record('error','library.read',this.state.importError,{previousCount:before.length});this.library=before}return result};
+const originalStart=P.start;
+P.start=async function(...args){D.app=this;D.refreshStorage().catch(()=>{});const result=await originalStart.apply(this,args);return result};
+const originalRender=P.render;
+for(const method of ['showHome','showSettings']){const fn=P[method];if(typeof fn==='function')P[method]=function(...args){if(this.state?.importError){record('info','raven.notice','Aviso anterior archivado en Diagnóstico.',{screen:this.state.screen,message:this.state.importError});this.state.importError=null}return fn.apply(this,args)}}
+let lastBanner=null;
+P.render=function(...args){const banner=this.state?.importError;if(banner&&banner!==lastBanner){lastBanner=banner;record('error','raven.ui',banner,{screen:this.state?.screen||null})}if(!banner)lastBanner=null;return originalRender.apply(this,args)};
+// Log the structured updater result, including exact failing stage in original catch.
+const update=P.transactionalUpdate;
+P.transactionalUpdate=async function(id,file,...args){const started=Date.now();record('info','update.start','Inicio de actualización.',{id,fileName:file?.name,fileSize:file?.size});try{const out=await update.call(this,id,file,...args);if(out)record('info','update.completed','Actualización confirmada.',{id,version:out.version,elapsedMs:Date.now()-started});else record('warning','update.incomplete','La actualización no pudo completarse.',{id,stage:this.updateStates?.get(id)?.stage||null,elapsedMs:Date.now()-started,reason:this.state?.importError||null});return out}catch(error){record('error','update.unhandled','Excepción no controlada durante actualización.',{id,error,elapsedMs:Date.now()-started});this.setUpdateState?.(id,{stage:'failed',label:'No se pudo actualizar',progress:null});if(this.state)this.state.importError=error?.message||'No se pudo actualizar.';try{this.render?.()}catch{}return null}};
+const Settings=REQ('ui/settings/SettingsView'),oldRender=Settings.renderSettings;
+const el=(tag,cls,text)=>{const v=document.createElement(tag);if(cls)v.className=cls;if(text!==undefined)v.textContent=String(text);return v};
+function btn(label,fn,style=''){const b=el('button','raven-diag-button '+style,label);b.type='button';b.addEventListener('click',fn);return b}
+function copy(text,status){const payload=String(text);const ok=()=>{status.textContent='Copiado al portapapeles.'};const failed=e=>{const t=el('textarea');t.value=payload;t.style.position='fixed';t.style.top='0';t.style.left='0';t.style.opacity='0';document.body.append(t);t.select();let result=false;try{result=document.execCommand('copy')}catch{}t.remove();status.textContent=result?'Copiado al portapapeles.':'No se pudo copiar. Usa Exportar JSON.';if(e)D.record('warning','diagnostics.clipboard','La copia moderna no estuvo disponible.',{error:e})};
+  if(navigator.clipboard?.writeText){navigator.clipboard.writeText(payload).then(ok,failed)}else failed(null)}
+function download(obj){const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='raven-diagnostico-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000)}
+function diagnosticPanel(root,section){const stack=root.querySelector('.settings-stack-v2');if(!stack)return;
+  const panel=el('section','raven-diag-panel'),status=el('p','raven-diag-feedback');status.setAttribute('aria-live','polite');
+  const summary=el('div','raven-diag-summary'),buttons=el('div','raven-diag-actions');
+  buttons.append(btn('Copiar JSON',()=>copy(JSON.stringify(D.snapshot(),null,2),status),'primary'),btn('Exportar .json',()=>download(D.snapshot())),btn('Comprobar archivos',async()=>{status.textContent='Comprobando lectura real…';const result=await D.checkStoredEntrypoints();paint();status.textContent=`${result.checked} correctos · ${result.failed} fallidos. Consulta los eventos.`}),btn('Actualizar',async()=>{await D.refreshStorage();paint();status.textContent='Diagnóstico actualizado.'}));
+  const filterLabel=el('label','raven-diag-filter','Mostrar '),filter=el('select','raven-diag-select');for(const [value,label] of [['all','Todos'],['error','Errores'],['warning','Avisos'],['info','Información']]){const opt=el('option','',label);opt.value=value;filter.append(opt)}filterLabel.append(filter);
+  const logs=el('div','raven-diag-logs');
+  const clean=btn('Borrar registro',()=>{if(!confirm('¿Borrar el historial de diagnóstico? No se eliminarán juegos ni partidas.'))return;D.clear();status.textContent='Historial de errores borrado.'},'muted');
+  const title=el('h3','raven-diag-heading',section==='console'?'Eventos y errores de Raven':'Errores registrados');
+  const intro=el('p','raven-diag-desc','Registro local de errores reales de Raven, importación, actualización, almacenamiento y runtimes. No se envía a ningún servidor.');
+  panel.append(title,intro,summary,buttons,filterLabel,logs,clean,status);
+  stack.append(panel);
+  function paint(){const counts=D.counts(),estimate=D.lastStorageEstimate,fmt=n=>typeof n==='number'?(n/1048576).toFixed(1)+' MB':'No disponible';
+    summary.textContent=`${counts.errors} errores · ${counts.warnings} avisos · ${counts.total} eventos · Uso ${fmt(estimate?.usage)} / Cuota ${fmt(estimate?.quota)}`;
+    const entries=D.list().filter(v=>filter.value==='all'||v.level===filter.value).reverse().slice(0,80);logs.replaceChildren();
+    if(!entries.length){logs.append(el('p','raven-diag-empty','No hay eventos registrados para este filtro. Los fallos futuros aparecerán aquí.'));return}
+    for(const entry of entries){const card=el('article','raven-diag-entry raven-diag-'+entry.level),head=el('div','raven-diag-entry-head');head.append(el('strong','',entry.level==='error'?'ERROR':entry.level==='warning'?'AVISO':'INFO'),el('time','',new Date(entry.timestamp).toLocaleString()));card.append(head,el('div','raven-diag-category',entry.category),el('p','raven-diag-message',entry.message));
+      const technical=el('details','raven-diag-technical'),pre=el('pre','',JSON.stringify(entry.details,null,2));technical.append(el('summary','','Detalles técnicos'),pre);const actions=el('div','raven-diag-inline-actions');actions.append(btn('Copiar evento',()=>copy(JSON.stringify(entry,null,2),status)));card.append(technical,actions);logs.append(card)}
+  }
+  filter.addEventListener('change',paint);const off=D.subscribe(paint);const previous=root.__cleanup;root.__cleanup=()=>{off();previous?.()};D.refreshStorage().then(paint).catch(()=>{});paint();
+}
+Settings.renderSettings=function(snapshot,actions,error,options={}){const result=oldRender.apply(this,arguments);if(options.section==='diagnostics'||options.section==='console')diagnosticPanel(result,options.section);return result};
+globalThis.RavenDiagnostics=D;
+record('info','raven.boot','Sistema de diagnóstico activo.',{version:document.querySelector('meta[name="app-version"]')?.content||'unknown'});
 })();
 
 __LOCAL_RUNTIME_REQUIRE__('main');
