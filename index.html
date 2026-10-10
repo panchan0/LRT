@@ -10,7 +10,7 @@
   <meta name="author" content="Cloud Studio">
   <meta name="creator" content="Cloud Studio">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.18.2">
+  <meta name="app-version" content="0.18.3">
   <meta name="raven:build" content="ui-system-v2">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -7545,7 +7545,7 @@ define("importer/ProjectValidator", ["require", "exports", "filesystem/PathResol
             const entry = project.files.get(project.entryPoint);
             if (!entry) return [{ level: 'error', message: 'El archivo de inicio no existe en el VFS.' }];
             if (!entry.size) issues.push({ level: 'error', message: 'El archivo de inicio está vacío.' });
-            const html = await entry.blob.text();
+            const html = await entry.blob.slice(0, Math.min(entry.blob.size, 1024 * 1024)).text();
             if (!/<html[\s>]|<!doctype\s+html/i.test(html)) issues.push({ level: 'warning', message: 'El inicio no parece un documento HTML completo.' });
             if (project.source === 'html') {
                 // Analiza únicamente referencias estructurales reales. Nunca escanea el texto de <script>,
@@ -7648,32 +7648,110 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
     exports.ZipImporter = void 0;
     const IGNORED = new Set(['.DS_Store', 'Thumbs.db']);
     const shouldIgnore = (path) => path.split('/').filter(Boolean).some(p => p === '__MACOSX' || IGNORED.has(p));
+    // Reads the ZIP directory and compressed members by Blob slices. Unlike
+    // JSZip.loadAsync(file.arrayBuffer()), it never materializes the archive.
+    class LargeZipReader {
+        static crcTable = (() => { const t = new Uint32Array(256); for (let i = 0; i < 256; i++) { let n = i; for(let b=0;b<8;b++)n=(n&1)?(0xedb88320^(n>>>1)):(n>>>1);t[i]=n>>>0;} return t; })();
+        static async entries(file) {
+            if (typeof DecompressionStream !== 'function' || typeof TransformStream !== 'function') throw new Error('Este navegador no dispone de descompresión ZIP por streaming. Para archivos grandes usa el HTML optimizado.');
+            const tailSize = Math.min(file.size, 65557), start = file.size - tailSize;
+            const tail = new DataView(await file.slice(start).arrayBuffer());
+            const u16 = (d, at) => d.getUint16(at, true), u32 = (d, at) => d.getUint32(at, true);
+            let end = -1;
+            for(let i=tail.byteLength-22;i>=0;i--) if(u32(tail,i)===0x06054b50 && i+22+u16(tail,i+20)===tail.byteLength){end=i;break;}
+            if(end<0)throw new Error('No se encontró el directorio central ZIP (archivo incompleto o dañado).');
+            const count = u16(tail,end+10), directorySize=u32(tail,end+12), directoryStart=u32(tail,end+16);
+            if(u16(tail,end+4)!==0||u16(tail,end+6)!==0||u16(tail,end+8)!==count)throw new Error('ZIP multidisco no admitido.');
+            if(count===65535||directorySize===0xffffffff||directoryStart===0xffffffff)throw new Error('ZIP64 no admitido por el importador móvil.');
+            if(count>5000)throw new Error(`El ZIP contiene demasiadas entradas (${count}).`);
+            if(directoryStart+directorySize>start+end)throw new Error('El directorio central del ZIP está fuera de rango.');
+            const central = new DataView(await file.slice(directoryStart,directoryStart+directorySize).arrayBuffer());
+            const decoder = new TextDecoder('utf-8');
+            const entries=[];let pos=0,total=0;
+            for(let i=0;i<count;i++){
+                if(pos+46>central.byteLength||u32(central,pos)!==0x02014b50)throw new Error('Cabecera central ZIP inválida.');
+                const flags=u16(central,pos+8),method=u16(central,pos+10),crc=u32(central,pos+16);
+                const compressed=u32(central,pos+20),size=u32(central,pos+24);
+                const n=u16(central,pos+28),extra=u16(central,pos+30),comment=u16(central,pos+32),disk=u16(central,pos+34),offset=u32(central,pos+42);
+                if(pos+46+n+extra+comment>central.byteLength)throw new Error('Entrada ZIP truncada.');
+                const name=decoder.decode(new Uint8Array(central.buffer,central.byteOffset+pos+46,n));
+                if(flags&1)throw new Error(`ZIP cifrado no admitido: ${name}`);
+                if(disk!==0||compressed===0xffffffff||size===0xffffffff||offset===0xffffffff)throw new Error('Entrada ZIP64/multidisco no admitida.');
+                if(method!==0&&method!==8)throw new Error(`Método ZIP ${method} no admitido: ${name}`);
+                if(size>128*1024*1024)throw new Error(`El archivo ${name} supera 128 MB descomprimido.`);
+                if(method===0 && compressed!==size)throw new Error(`Tamaño de entrada STORE inválido: ${name}`);
+                if(!(name.endsWith('/'))){total+=size;if(total>512*1024*1024)throw new Error('El ZIP descomprimido supera los 512 MB permitidos.');}
+                entries.push({name,dir:name.endsWith('/'),method,crc,compressed,size,offset});
+                pos+=46+n+extra+comment;
+            }
+            if(pos!==central.byteLength)throw new Error('Directorio central ZIP inconsistente.');
+            return {entries,totalBytes:total};
+        }
+        static async extract(file, entry, onProgress) {
+            const h=new DataView(await file.slice(entry.offset,entry.offset+30).arrayBuffer());
+            if(h.byteLength!==30||h.getUint32(0,true)!==0x04034b50)throw new Error(`Cabecera local ZIP dañada: ${entry.name}`);
+            const method=h.getUint16(8,true),nameLength=h.getUint16(26,true),extraLength=h.getUint16(28,true);
+            if(method!==entry.method)throw new Error(`Método ZIP inconsistente: ${entry.name}`);
+            const start=entry.offset+30+nameLength+extraLength,end=start+entry.compressed;
+            if(end>file.size)throw new Error(`Entrada ZIP truncada: ${entry.name}`);
+            let crc=0xffffffff,read=0,lastReport=0;
+            const MAX=128*1024*1024,table=this.crcTable;
+            let stream=file.slice(start,end).stream();
+            if(entry.method===8)stream=stream.pipeThrough(new DecompressionStream('deflate-raw'));
+            const check=new TransformStream({transform(chunk,controller){
+                read+=chunk.byteLength;
+                if(read>MAX||read>entry.size)throw new Error(`Entrada descomprimida excesiva: ${entry.name}`);
+                for(let i=0;i<chunk.length;i++)crc=table[(crc^chunk[i])&255]^(crc>>>8);
+                if(onProgress&&Date.now()-lastReport>250){lastReport=Date.now();try{onProgress(entry.size?Math.min(1,read/entry.size):1)}catch{}}
+                controller.enqueue(chunk);
+            }});
+            const data=await new Response(stream.pipeThrough(check)).blob();
+            if(read!==entry.size)throw new Error(`Tamaño ZIP incorrecto: ${entry.name} (${read}/${entry.size}).`);
+            if(((crc^0xffffffff)>>>0)!==(entry.crc>>>0))throw new Error(`CRC32 ZIP incorrecto: ${entry.name}`);
+            try{onProgress?.(1)}catch{}
+            return data;
+        }
+    }
     class ZipImporter {
         async import(file, options = {}) {
             FileImporter_js_1.FileImporter.validateZip(file);
             const report = value => { try { options.onProgress?.(value); } catch {} };
             report({stage:'reading',label:'Leyendo archivo…',progress:0});
-            const zipBytes=await FileImporter_js_1.FileImporter.readArrayBuffer(file,p=>report({stage:'reading',label:'Leyendo archivo…',progress:p}));
-            const zip = await JSZip.loadAsync(zipBytes);
+            // Large ZIPs go through a bounded-memory central-directory reader.
+            // JSZip's full archive ArrayBuffer can exhaust Safari's WebContent process.
+            const streaming = file.size >= 48 * 1024 * 1024;
+            let entries, directoryBytes=0;
+            if(streaming){
+                report({stage:'reading',label:'Leyendo índice del ZIP…',progress:0});
+                globalThis.RavenDiagnostics?.record('info','zip.streaming','Lectura de ZIP grande por entradas, sin copiar el archivo completo.',{compressedBytes:file.size,method:'central-directory + deflate-raw'});
+                const listing=await LargeZipReader.entries(file);entries=listing.entries;directoryBytes=listing.totalBytes;
+                globalThis.RavenDiagnostics?.record('info','zip.index','Índice ZIP validado.',{entries:entries.length,uncompressedBytes:directoryBytes});
+            }else{
+                const zipBytes=await FileImporter_js_1.FileImporter.readArrayBuffer(file,p=>report({stage:'reading',label:'Leyendo archivo…',progress:p}));
+                const zip = await JSZip.loadAsync(zipBytes);
+                entries=Object.values(zip.files);
+            }
             report({stage:'extracting',label:'Extrayendo…',progress:0});
             const files = new Map();
-            const entries = Object.values(zip.files);
             const MAX_FILES = 5000, MAX_TOTAL = 512 * 1024 * 1024, MAX_SINGLE = 128 * 1024 * 1024;
             if (entries.length > MAX_FILES) throw new Error(`El ZIP contiene demasiadas entradas (${entries.length}). Límite: ${MAX_FILES}.`);
-            let size = 0, usableCount = 0, processedCount = 0;
+            let size = 0, usableCount = 0, processedCount = 0, lastZipQuarter = 0;
             const extractable = entries.filter(entry => !entry.dir && !shouldIgnore(entry.name || ''));
             const extractTotal = Math.max(1, extractable.length);
+            const reportZipProgress = fraction => {const quarter=Math.floor(Math.min(1,fraction)*4);if(streaming&&quarter>lastZipQuarter){lastZipQuarter=quarter;globalThis.RavenDiagnostics?.record('info','zip.progress','Extracción de ZIP grande en curso.',{filesCompleted:processedCount,totalFiles:extractTotal,progressPercent:quarter*25,storedBytes:size})}};
             for (const entry of entries) {
                 if (entry.dir)
                     continue;
                 const path = PathResolver_js_3.PathResolver.normalizeArchivePath(entry.name);
                 if (!path || shouldIgnore(path))
                     continue;
-                const declaredSize = Number(entry?._data?.uncompressedSize || 0);
+                const declaredSize = Number(streaming?entry.size:(entry?._data?.uncompressedSize||0));
                 if (declaredSize > MAX_SINGLE) throw new Error(`El archivo ${path} supera el límite de 128 MB dentro del ZIP.`);
-                const data = await entry.async('uint8array', meta => report({stage:'extracting',label:'Extrayendo…',progress:Math.min(1,(processedCount + (Number(meta?.percent)||0)/100)/extractTotal)}));
-                if (data.byteLength > MAX_SINGLE) throw new Error(`El archivo ${path} supera el límite de 128 MB dentro del ZIP.`);
-                const blob = new Blob([data], { type: MimeResolver_js_2.MimeResolver.fromPath(path) });
+                const extractionProgress=percent=>{const fraction=Math.min(1,(processedCount+percent)/extractTotal);report({stage:'extracting',label:`Extrayendo ${processedCount+1}/${extractTotal}…`,progress:fraction});reportZipProgress(fraction)};
+                const blob=streaming
+                    ? (await LargeZipReader.extract(file,entry,extractionProgress)).slice(0,undefined,MimeResolver_js_2.MimeResolver.fromPath(path))
+                    : new Blob([await entry.async('uint8array',meta=>extractionProgress((Number(meta?.percent)||0)/100))],{type:MimeResolver_js_2.MimeResolver.fromPath(path)});
+                if(blob.size>MAX_SINGLE) throw new Error(`El archivo ${path} supera el límite de 128 MB dentro del ZIP.`);
                 size += blob.size; usableCount++;
                 if (size > MAX_TOTAL) throw new Error('El contenido descomprimido supera el límite de seguridad de 512 MB.');
                 if (usableCount > MAX_FILES) throw new Error(`El ZIP contiene demasiados archivos utilizables. Límite: ${MAX_FILES}.`);
@@ -7682,6 +7760,7 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
                 if ((processedCount & 7) === 0) await new Promise(resolve => setTimeout(resolve, 0));
             }
             report({stage:'extracting',label:'Extrayendo…',progress:1});
+            if(streaming)globalThis.RavenDiagnostics?.record('info','zip.extracted','Extracción ZIP completada sin cargar el contenedor entero.',{compressedBytes:file.size,uncompressedBytes:size,files:usableCount});
             if (!files.size)
                 throw new Error('El ZIP no contiene archivos utilizables.');
 
@@ -7785,7 +7864,8 @@ define("importer/ZipImporter", ["require", "exports", "filesystem/MimeResolver",
                 };
                 const entryFile = files.get(detected.entryPoint);
                 if (entryFile) {
-                    const text = await entryFile.blob.text();
+                    const htmlMetadataLimit = 1024 * 1024;
+                    const text = await entryFile.blob.slice(0,htmlMetadataLimit).text();
                     const doc = new DOMParser().parseFromString(text, 'text/html');
                     const title = (doc.querySelector('title')?.textContent || '').trim();
                     let manifest = null;
@@ -10605,7 +10685,7 @@ class App{
  root;router=new router.AppRouter();importer=new ProjectImporter.ProjectImporter();storage=new ProjectStorage.ProjectStorage();settings=new SettingsStorage.SettingsStorage();settingsSnapshot=null;inputHub=require('runtime/input/RavenInputHub').getRavenInputHub();homeShortcuts=new(require('launcher/HomeShortcutManager').HomeShortcutManager)();homeShortcutCleanup=null;shortcutDescriptor=null;directShortcutMode=false;shortcutInput=null;shortcutStatus=null;
  state={...state.initialState};input;coverInput;bannerInput;iconInput;runtime=null;library=[];updateTargetId=null;sourceMeta=null;launcherUrls=[];launcherViewMode='list';sheet=null;detailApp=null;analysisAnimateIn=false;transitionBusy=false;updateStates=new Map();returnScreen='home';
  constructor(root){this.root=root;try{const mode=localStorage.getItem('local-runtime-launcher-view');if(mode==='grid'||mode==='list')this.launcherViewMode=mode}catch{};const make=(accept,handler)=>{const i=document.createElement('input');i.type='file';i.accept=accept;i.hidden=true;i.addEventListener('change',handler);document.body.append(i);return i};this.input=make('.html,.htm,.zip,.gb,.gbc,.nes,.apk,.tos,.tapp,text/html,application/zip,application/x-zip-compressed,application/vnd.android.package-archive,application/octet-stream',()=>void this.fileSelected());this.coverInput=make('image/*',()=>void this.coverSelected());this.bannerInput=make('image/*',()=>void this.bannerSelected());this.iconInput=make('image/*',()=>void this.iconSelected());this.shortcutInput=make('.html,.htm,.zip,.gb,.gbc,.nes,.apk,.tos,.tapp,text/html,application/zip,application/x-zip-compressed,application/vnd.android.package-archive,application/octet-stream',()=>void this.shortcutFileSelected());this.directoryInput=document.createElement('input');this.directoryInput.type='file';this.directoryInput.hidden=true;this.directoryInput.multiple=true;this.directoryInput.setAttribute('webkitdirectory','');this.directoryInput.addEventListener('change',()=>void this.directorySelected());document.body.append(this.directoryInput)}
- async start(){this.inputHub.start();try{await navigator.storage?.persist?.()}catch{}this.shortcutDescriptor=this.homeShortcuts.getDescriptor();this.directShortcutMode=!!this.shortcutDescriptor?.mode;document.body.classList.toggle('raven-direct-shortcut',this.directShortcutMode);if(this.shortcutDescriptor)this.homeShortcuts.applyDescriptor(this.shortcutDescriptor);try{const recovered=await this.storage.recoverInterruptedUpdates?.();if(recovered?.length)console.warn('[Raven] Staging recuperado tras una interrupción.',recovered);await this.storage.migrateLegacySchema?.();await this.storage.consolidateDuplicates()}catch(e){console.warn('[Raven] Recuperación/migración/consolidación parcial.',e)}await this.refreshLibrary();const launchId=this.shortcutDescriptor?.appId||this.homeShortcuts.getLaunchId();if(launchId){const exists=await this.storage.get(launchId).catch(()=>null);if(exists){try{await this.applyShortcutHandoff(launchId)}catch{}await this.launchDirect(launchId);return}if(this.directShortcutMode){this.renderShortcutSetup();return}this.state.importError='El acceso directo apunta a una app que ya no está en la biblioteca.'}this.state.screen=this.router.navigate(this.library.length?'home':'launcher');this.render()}
+ async start(){this.inputHub.start();try{await navigator.storage?.persist?.()}catch{}this.shortcutDescriptor=this.homeShortcuts.getDescriptor();this.directShortcutMode=!!this.shortcutDescriptor?.mode;document.body.classList.toggle('raven-direct-shortcut',this.directShortcutMode);if(this.shortcutDescriptor)this.homeShortcuts.applyDescriptor(this.shortcutDescriptor);try{const recovered=await this.storage.recoverInterruptedUpdates?.();if(recovered?.length){for(const item of recovered)globalThis.RavenDiagnostics?.record('warning','update.interrupted','Actualización interrumpida en una ejecución anterior.',item);console.warn('[Raven] Staging recuperado tras una interrupción.',recovered)}await this.storage.migrateLegacySchema?.();await this.storage.consolidateDuplicates()}catch(e){console.warn('[Raven] Recuperación/migración/consolidación parcial.',e)}await this.refreshLibrary();const launchId=this.shortcutDescriptor?.appId||this.homeShortcuts.getLaunchId();if(launchId){const exists=await this.storage.get(launchId).catch(()=>null);if(exists){try{await this.applyShortcutHandoff(launchId)}catch{}await this.launchDirect(launchId);return}if(this.directShortcutMode){this.renderShortcutSetup();return}this.state.importError='El acceso directo apunta a una app que ya no está en la biblioteca.'}this.state.screen=this.router.navigate(this.library.length?'home':'launcher');this.render()}
  renderShortcutSetup(message=null){const d=this.shortcutDescriptor;if(!d)return;document.body.classList.add('raven-direct-shortcut');const main=document.createElement('main');main.className='shortcut-setup-screen';const card=document.createElement('section');card.className='shortcut-setup-card';const icon=document.createElement('div');icon.className='shortcut-setup-icon';if(d.iconDataUrl){const img=document.createElement('img');img.src=d.iconDataUrl;img.alt='';icon.append(img)}else icon.textContent=String(d.name||'A').slice(0,2);const title=document.createElement('h1');title.textContent=d.name||'App';const copy=document.createElement('p');copy.className='shortcut-setup-copy';copy.textContent=this.homeShortcuts.isStandalone()?'Vincula el archivo original una sola vez; después este icono abrirá directamente la app.':'Abre este enlace desde Safari y usa Añadir a pantalla de inicio.';card.append(icon,title,copy);if(message){const st=document.createElement('div');st.className='shortcut-setup-status';st.textContent=message;card.append(st)}if(this.homeShortcuts.isStandalone()){const pick=document.createElement('button');pick.type='button';pick.className='shortcut-setup-button';pick.textContent='Vincular archivo';pick.addEventListener('click',()=>{this.shortcutInput.value='';this.shortcutInput.click()});card.append(pick)}main.append(card);this.root.replaceChildren(main)}
  async shortcutFileSelected(){const d=this.shortcutDescriptor,file=this.shortcutInput?.files?.[0];if(!d||!file)return;try{this.renderShortcutSetup('Vinculando y guardando…');const[project,sourceHash]=await Promise.all([this.importer.import(file),this.hashFile(file)]);project.sourceName=file.name;project.sourceHash=sourceHash;const validation=await ProjectValidator.ProjectValidator.validate(project);const fatal=validation.find(x=>x.level==='error');if(fatal)throw new Error(fatal.message||'El archivo no es válido.');const compatibility=await CompatibilityScanner.CompatibilityScanner.scan(project);const coverBlob=d.iconDataUrl?this.homeShortcuts.dataURLToBlob(d.iconDataUrl):null;const app=await this.storage.commitPreparedBuild(project,{forcedId:d.appId,displayName:d.name,coverBlob,sourceName:file.name,sourceHash,compatibilityStatus:compatibility?.status});try{await this.applyShortcutHandoff(app.id)}catch{}project.libraryId=app.id;project.libraryName=app.displayName;project.name=app.displayName;project.storedVersion=app.version;await this.storage.touchOpened(app.id);this.state={...state.initialState,screen:this.router.navigate('runtime'),project};this.render()}catch(e){this.renderShortcutSetup(e instanceof Error?e.message:'No se pudo vincular el archivo.')}}
  async applyShortcutHandoff(appId){const d=this.shortcutDescriptor;if(!appId||!d?.progressToken||!d?.handoffId)return false;const receipt='raven-handoff:'+appId+':'+d.handoffId;try{if(localStorage.getItem(receipt)==='1')return false}catch{}const snapshot=await this.homeShortcuts.decodeProgress(d.progressToken);if(!snapshot)return false;await this.storage.importRuntimeState(appId,snapshot,{preferNewer:true});try{localStorage.setItem(receipt,'1')}catch{}return true}
@@ -12858,7 +12938,7 @@ exports.TOSRuntime=TOSRuntime;
  console.info('[TOSRuntime] Raven native T-OS integration A+B registered.');
 })();
 
-/* Raven 0.18.2 · Local, persistent diagnostic event journal. No remote telemetry. */
+/* Raven 0.18.3 · Local, persistent diagnostic event journal. No remote telemetry. */
 (function RavenDiagnosticPatch(){
 'use strict';
 const REQ=globalThis.__LOCAL_RUNTIME_REQUIRE__;
@@ -12979,6 +13059,6 @@ record('info','raven.boot','Sistema de diagnóstico activo.',{version:document.q
 
 __LOCAL_RUNTIME_REQUIRE__('main');</script>
 
-<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.2');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
+<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.3');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
 </body>
 </html>
