@@ -1,4 +1,4 @@
-const VERSION='0.18.3';
+const VERSION='0.18.4';
 const CACHE='raven-shell-'+VERSION;
 const PREFIX='raven-shell-';
 const params=new URL(self.location.href).searchParams;
@@ -7,6 +7,7 @@ const scope=self.registration.scope;
 const shellURL=new URL(ENTRY,scope).href;
 const manifestURL=new URL('manifest.webmanifest',scope).href;
 const iconURL=new URL('raven-icon.jpg',scope).href;
+const performanceURL=new URL('performance-raven-v0184.js',scope).href;
 
 async function fetchFresh(url){
   const response=await fetch(url,{cache:'reload'});
@@ -19,6 +20,8 @@ self.addEventListener('install',event=>{
     const cache=await caches.open(CACHE);
     const shell=await fetchFresh(shellURL);
     await cache.put(shellURL,shell.clone());
+    const performanceScript=await fetchFresh(performanceURL);
+    await cache.put(performanceURL,performanceScript.clone());
     for(const url of [manifestURL,iconURL]){
       try{const response=await fetchFresh(url);await cache.put(url,response.clone())}catch(error){console.warn('[Raven SW] Optional shell resource was not cached.',url,error)}
     }
