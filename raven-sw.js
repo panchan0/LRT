@@ -1,4 +1,4 @@
-const VERSION='0.18.4';
+const VERSION='0.18.5';
 const CACHE='raven-shell-'+VERSION;
 const PREFIX='raven-shell-';
 const params=new URL(self.location.href).searchParams;
@@ -7,7 +7,7 @@ const scope=self.registration.scope;
 const shellURL=new URL(ENTRY,scope).href;
 const manifestURL=new URL('manifest.webmanifest',scope).href;
 const iconURL=new URL('raven-icon.jpg',scope).href;
-const performanceURL=new URL('performance-raven-v0184.js',scope).href;
+const performanceURL=new URL('performance-raven-v0185.js',scope).href;
 
 async function fetchFresh(url){
   const response=await fetch(url,{cache:'reload'});
