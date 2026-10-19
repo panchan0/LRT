@@ -1,0 +1,22 @@
+{
+  "name": "Raven",
+  "short_name": "Raven",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#06070C",
+  "theme_color": "#06070C",
+  "icons": [
+    {
+      "src": "./raven-icon.jpg",
+      "sizes": "1536x1536",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "version": "0.18.4",
+  "author": "Cloud Studio",
+  "description": "Raven UI System v2 · launcher y runtime local universal con Web, ROMs, APK Android, Raven Files, Input System y T-OS nativo"
+}
