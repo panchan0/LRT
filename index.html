@@ -10,7 +10,7 @@
   <meta name="author" content="Cloud Studio">
   <meta name="creator" content="Cloud Studio">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.18.5">
+  <meta name="app-version" content="0.18.6">
   <meta name="raven:build" content="ui-system-v2">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -9764,6 +9764,25 @@ let __lwrAssetSeq=1;const __lwrAssetPending=new Map(),__lwrAssetUrls=new Map(),_
 // The opt-in performance sampler below is independent and disabled by default.
 const __lwrNativeRAF=requestAnimationFrame.bind(window);
 
+// Some iOS WebKit versions throw synchronously from ServiceWorkerContainer.register
+// inside opaque-origin sandbox frames. Apps ordinarily attach .catch() to the
+// promised result, so deliver the actual failure as a rejection, never fake a
+// successful registration. Retain the opaque sandbox and Raven's host SW.
+try {
+ const container=navigator.serviceWorker;
+ if(container&&typeof container.register==='function'){
+  const nativeRegister=container.register;
+  const safeRegister=function(...args){
+   try{return Promise.resolve(Reflect.apply(nativeRegister,container,args))}
+   catch(error){return Promise.reject(error)}
+  };
+  try{Object.defineProperty(container,'register',{configurable:true,value:safeRegister})}
+  catch{
+   try{Object.defineProperty(Object.getPrototypeOf(container),'register',{configurable:true,value:safeRegister})}catch{}
+  }
+ }
+}catch{}
+
 // Configure playback in the game document itself (important on iOS Silent Mode).
 // Observe AudioContext lifecycles without touching sound nodes, codecs, render calls or RAF.
 const __lwrAudioRefs=[],__lwrAudioUnlocked=new WeakSet(),__lwrWasPlaying=new WeakSet();
@@ -10767,6 +10786,19 @@ class App{
    this.setUpdateState(id,{stage:'integrity',label:'Verificando archivo…',progress:null});
    const sourceHash=await this.hashFile(file);
    pending.sourceName=file.name;pending.sourceHash=sourceHash;pending.libraryId=id;pending.libraryName=existing.displayName;
+   // Safeguard: a chosen update target is NOT proof that its package identity matches.
+   // A Raven ZIP was previously installed into Air Studio. Never overwrite known
+   // different app IDs and do not touch existing files or artwork on rejection.
+   const stableId=value=>String(value||'').trim().toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'');
+   const incomingId=stableId(pending.metadata?.id||pending.metadata?.appId||pending.metadata?.applicationId);
+   const oldKey=String(existing.identityKey||'');
+   const storedId=stableId(existing.metadata?.id||existing.metadata?.appId||existing.metadata?.applicationId||(oldKey.startsWith('id:')?oldKey.slice(3):''));
+   const priorName=stableId(existing.displayName||'');
+   if(incomingId&&((storedId&&storedId!==incomingId)||(incomingId==='raven'&&priorName&&!priorName.includes('raven')))){
+    const reason='La actualización pertenece a otra aplicación. Destino: '+(existing.displayName||'App')+'; paquete: '+(pending.metadata?.name||pending.name||file.name)+'. Importa el ZIP como aplicación nueva en lugar de reemplazar la existente.';
+    globalThis.RavenDiagnostics?.record('error','update.identity-mismatch',reason,{targetId:id,storedId:storedId||null,incomingId,sourceName:file.name});
+    throw new Error(reason);
+   }
    await journal('validating',{sourceHash});this.setUpdateState(id,{stage:'validating',label:'Validando actualización…',progress:null});
    const[compatibility,validation]=await Promise.all([CompatibilityScanner.CompatibilityScanner.scan(pending),ProjectValidator.ProjectValidator.validate(pending)]);
    const fatal=validation.find(v=>v.level==='error');if(fatal)throw new Error(fatal.message||'La actualización no es válida.');
@@ -10907,7 +10939,10 @@ define("main", ["require", "exports", "app/App"], function (require, exports, Ap
 define("storage/SettingsStorage", ["require","exports"], function(require,exports){
 "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.SettingsStorage=void 0;
 const DB='raven-preferences',VER=3,STORE='values',FILES='directoryFiles',MAX_FILES=4000,MAX_DIRS=4000,GiB=1024*1024*1024,MiB=1024*1024,FALLBACK_MIRROR_BYTES=8*GiB,STORAGE_RESERVE_FLOOR=128*MiB,STORAGE_RESERVE_CEIL=512*MiB;
-const done=tx=>new Promise((res,rej)=>{tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error||new Error('Settings transaction error'));tx.onabort=()=>rej(tx.error||new Error('Settings transaction aborted'))});
+const done=tx=>new Promise((res,rej)=>{
+ const details=(label,event)=>{const reason=event?.target?.error||tx.error;const stores=Array.from(tx.objectStoreNames||[]).join(',')||'unknown';const msg=reason?.message||reason?.name||'WebKit no devolvió el motivo';const failure=new Error(`${label} [${tx.mode}: ${stores}]: ${msg}`);failure.name=reason?.name||'IndexedDBTransactionError';if(reason)failure.cause=reason;return failure};
+ tx.oncomplete=()=>res();tx.onerror=event=>rej(details('Settings transaction error',event));tx.onabort=event=>rej(details('Settings transaction aborted',event));
+});
 const request=req=>new Promise((res,rej)=>{req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error||new Error('Settings request error'))});
 const supported=name=>/\.(?:html?|zip|gb|gbc|nes|tos|tapp)$/i.test(String(name||''));
 const clean=p=>String(p||'').replace(/\\/g,'/').replace(/^\/+|\/+$/g,'').replace(/\/{2,}/g,'/');
@@ -10919,7 +10954,7 @@ class SettingsStorage{
  supportsDirectoryPicker(){return !!(globalThis.isSecureContext&&typeof globalThis.showDirectoryPicker==='function')}
  supportsDirectoryUpload(){try{const i=document.createElement('input');return 'webkitdirectory' in i}catch{return false}}
  supportsFilePicker(){return !!(globalThis.isSecureContext&&typeof globalThis.showOpenFilePicker==='function')}
- async open(){if(!('indexedDB'in globalThis))return null;if(this.dbPromise)return this.dbPromise;this.dbPromise=new Promise(resolve=>{try{const r=indexedDB.open(DB,VER);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'key'});if(!db.objectStoreNames.contains(FILES)){const st=db.createObjectStore(FILES,{keyPath:'key'});st.createIndex('relativePath','relativePath',{unique:true})}};r.onsuccess=()=>{const db=r.result;db.onversionchange=()=>{try{db.close()}catch{};this.dbPromise=null};resolve(db)};r.onerror=()=>{this.dbPromise=null;resolve(null)};r.onblocked=()=>{this.dbPromise=null;resolve(null)}}catch{this.dbPromise=null;resolve(null)}});return this.dbPromise}
+ async open(){if(!('indexedDB'in globalThis))return null;if(this.dbPromise)return this.dbPromise;this.dbPromise=new Promise(resolve=>{try{const r=indexedDB.open(DB,VER);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'key'});if(!db.objectStoreNames.contains(FILES)){const st=db.createObjectStore(FILES,{keyPath:'key'});st.createIndex('relativePath','relativePath',{unique:true})}};r.onsuccess=()=>{const db=r.result;db.onversionchange=()=>{try{db.close()}catch{};this.dbPromise=null};db.onclose=()=>{this.dbPromise=null};resolve(db)};r.onerror=()=>{this.dbPromise=null;resolve(null)};r.onblocked=()=>{this.dbPromise=null;resolve(null)}}catch{this.dbPromise=null;resolve(null)}});return this.dbPromise}
  async get(key){const db=await this.open();if(!db)return this.memory.get(key)||null;try{const tx=db.transaction(STORE,'readonly'),p=done(tx),row=await request(tx.objectStore(STORE).get(key));await p;return row||this.memory.get(key)||null}catch{return this.memory.get(key)||null}}
  async put(row){if(!row?.key)return;this.memory.set(row.key,row);const db=await this.open();if(!db)return;try{const tx=db.transaction(STORE,'readwrite'),p=done(tx);tx.objectStore(STORE).put(row);await p}catch(e){console.warn('[Raven] Preferencia no persistida en IndexedDB.',e)}}
  async remove(key){this.memory.delete(key);const db=await this.open();if(!db)return;try{const tx=db.transaction(STORE,'readwrite'),p=done(tx);tx.objectStore(STORE).delete(key);await p}catch{}}
@@ -12983,10 +13018,10 @@ const REQ=globalThis.__LOCAL_RUNTIME_REQUIRE__;
 if(typeof REQ!=='function'||globalThis.RavenDiagnostics?.installed)return;
 const KEY='raven-diagnostics-v1',MAX=140,MAX_TEXT=3500;
 const originalConsole={warn:console.warn.bind(console),error:console.error.bind(console)};
-const primitive=value=>{try{return String(value??'')}catch{return'[unprintable]'}};
+const primitive=value=>{try{const text=String(value??'');return text.replace(/data:(?:text\/javascript|application\/javascript)[^\s]*;base64,[A-Za-z0-9+/=]{160,}/gi,match=>match.slice(0,90)+'…[base64 omitted]')}catch{return'[unprintable]'}};
 function serialize(value,depth=0,seen=new WeakSet()){
   if(value==null||typeof value==='number'||typeof value==='boolean')return value;
-  if(typeof value==='string')return value.slice(0,MAX_TEXT);
+  if(typeof value==='string')return primitive(value).slice(0,MAX_TEXT);
   if(typeof value==='bigint')return String(value);
   if(typeof value==='function')return '[Function]';
   if(value instanceof Error||value instanceof DOMException){return {name:value.name||'Error',message:primitive(value.message).slice(0,MAX_TEXT),stack:primitive(value.stack).slice(0,6000),code:value.code??null,cause:depth<2&&value.cause?serialize(value.cause,depth+1,seen):undefined};}
@@ -13098,6 +13133,6 @@ record('info','raven.boot','Sistema de diagnóstico activo.',{version:document.q
 __LOCAL_RUNTIME_REQUIRE__('main');</script>
 
 <script src="./performance-raven-v0185.js"></script>
-<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.5');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
+<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.6');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
 </body>
 </html>
