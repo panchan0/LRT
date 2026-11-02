@@ -10,7 +10,7 @@
   <meta name="author" content="Cloud Studio">
   <meta name="creator" content="Cloud Studio">
   <meta name="raven:app-id" content="raven">
-  <meta name="app-version" content="0.18.6">
+  <meta name="app-version" content="0.18.9">
   <meta name="raven:build" content="ui-system-v2">
   <meta name="apple-mobile-web-app-title" content="Raven">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -9369,6 +9369,7 @@ define("runtime/RuntimeBridge", ["require", "exports", "runtime/messages"], func
         errors;
         handlers;
         listening = false;
+        localSaveQueue = Promise.resolve();
         constructor(iframe, errors, handlers = {}) {
             this.iframe = iframe;
             this.errors = errors;
@@ -9382,6 +9383,7 @@ define("runtime/RuntimeBridge", ["require", "exports", "runtime/messages"], func
             window.removeEventListener('message', this.onMessage);
             this.listening = false;
         } }
+        flushLocalStorage() { return this.localSaveQueue; }
         onMessage = (event) => {
             if (event.source !== this.iframe.contentWindow || !(0, messages_js_1.isRuntimeMessage)(event.data))
                 return;
@@ -9438,9 +9440,14 @@ define("runtime/RuntimeBridge", ["require", "exports", "runtime/messages"], func
                 case 'runtime-error':
                     this.errors.error(str(p.message, 'Error de JavaScript dentro del proyecto.'), { technical: str(p.technical, ''), file: str(p.file, ''), source: 'runtime' });
                     break;
-                case 'storage-local-save':
-                    Promise.resolve(this.handlers.onLocalStorageSave?.(p.data && typeof p.data === 'object' ? p.data : {})).catch(() => {});
+                case 'storage-local-save': {
+                    // Preserve write order across asynchronous IndexedDB transactions.
+                    const data = p.data && typeof p.data === 'object' ? p.data : {};
+                    this.localSaveQueue = this.localSaveQueue.then(() => this.handlers.onLocalStorageSave?.(data)).catch(error => {
+                        globalThis.RavenDiagnostics?.record('error','runtime.local-storage','Fallo al persistir el almacenamiento local del proyecto.',{error});
+                    });
                     break;
+                }
                 case 'storage-idb-load':
                     Promise.resolve(this.handlers.onIdbLoad?.(str(p.name, 'default'), Number(p.version) || 0)).then(data => this.reply('storage-idb-response', { requestId: p.requestId, data: data || null })).catch(error => this.reply('storage-idb-response', { requestId: p.requestId, error: String(error) }));
                     break;
@@ -9486,7 +9493,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
     exports.HtmlRuntime = void 0;
     const NODE_TEXT_BUDGET = 32 * 1024 * 1024;
     const TEXT_EXT = new Set(['js','cjs','mjs','ts','mts','cts','jsx','tsx','json','jsonc','txt','md','css','html','htm','xml','csv','glsl','vert','frag','wgsl','yaml','yml']);
-    const NODE_HINT = /\brequire\s*\(|\bmodule\.exports\b|\bexports\.[A-Za-z_$]|\bprocess\.|\bBuffer\b|\b__dirname\b|\b__filename\b/;
+    const NODE_HINT = /\brequire\s*\(|\bmodule\.exports\b|\bexports\.[A-Za-z_$]|\bprocess\.|\bBuffer\s*(?:\.\s*[A-Za-z_$]|\()|\bnew\s+Buffer\s*\(|\b__dirname\b|\b__filename\b/;
     const BROWSER_UMD_HINT = /(?:typeof\s+exports|["']object["']\s*==\s*typeof\s+exports)[\s\S]{0,900}(?:typeof\s+module|["']object["']\s*==\s*typeof\s+module)[\s\S]{0,1800}(?:define\.amd|typeof\s+define|window|self|globalThis)/;
     const shouldUseNodeCompat = source => {
         if (typeof source !== 'string' || !NODE_HINT.test(source)) return false;
@@ -9524,10 +9531,38 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
             const file = this.vfs.get(normalized); if (!file) throw new Error(`No se encontró el recurso local ${normalized}.`);
             return { path: normalized, mimeType: file.mimeType || file.blob.type || 'application/octet-stream', size: file.size || file.blob.size || 0, blob: file.blob };
         }
-        dispose() {
-            if (this.disposed) return; this.bridge?.dispose(); this.bridge = null;
-            if (this.iframe) { this.iframe.srcdoc = ''; this.iframe.remove(); this.iframe = null; }
-            this.resolver.dispose(); this.nodeData = null; this.disposed = true;
+        async dispose() {
+            if (this.disposed) return;
+            this.disposed = true;
+            const frame = this.iframe, bridge = this.bridge;
+            let acknowledged = false;
+            // Let the embedded app observe an orderly pagehide BEFORE destroying its
+            // opaque-origin iframe. srcdoc='' + remove() does not reliably deliver it.
+            if (frame?.isConnected && frame.srcdoc && frame.contentWindow) {
+                try {
+                    acknowledged = await new Promise(resolve => {
+                        let finished = false;
+                        const finish = ok => { if (finished) return; finished = true; clearTimeout(timer); window.removeEventListener('message', onAck); resolve(ok); };
+                        const onAck = event => { if (event.source === frame.contentWindow && event.data?.channel === 'local-web-runtime/v1' && event.data?.type === 'runtime-close-ack') finish(true); };
+                        window.addEventListener('message', onAck);
+                        const timer = setTimeout(() => finish(false), 350);
+                        try { frame.contentWindow.postMessage({channel:'local-web-runtime/v1',type:'runtime-host-before-close'},'*'); }
+                        catch { finish(false); }
+                    });
+                } catch {}
+                // The child's pagehide handlers may write localStorage synchronously.
+                // Drain queued snapshots before removing the message bridge.
+                let storageFlushed = true;
+                try {
+                    const pending = bridge?.flushLocalStorage?.();
+                    if (pending) storageFlushed = await Promise.race([Promise.resolve(pending).then(() => true, () => false), new Promise(resolve => setTimeout(() => resolve(false), 1000))]);
+                } catch { storageFlushed = false; }
+                if (!storageFlushed) globalThis.RavenDiagnostics?.record('warning','runtime.close','El guardado local no confirmó finalización durante el cierre.',{app:this.project.name});
+                globalThis.RavenDiagnostics?.record('info','runtime.close','Cierre del runtime web solicitado por Raven.',{app:this.project.name,acknowledged,storageFlushed});
+            }
+            bridge?.dispose(); this.bridge = null;
+            if (frame) { frame.srcdoc = ''; frame.remove(); this.iframe = null; }
+            this.resolver.dispose(); this.nodeData = null;
         }
         async buildDocument() {
             const entry = this.project.entryPoint, source = await this.vfs.text(entry), doc = new DOMParser().parseFromString(source, 'text/html');
@@ -9705,7 +9740,7 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
                             const source = this.nodeData?.sources[path];
                             if (typeof source === 'string' && shouldUseNodeCompat(source)) {
                                 const wrapper = `globalThis.__LWR_NODE__.runEntry(${JSON.stringify(path)});`;
-                                script.src = this.resolver.createGenerated(new Blob([wrapper], { type: 'text/javascript;charset=utf-8' }));
+                                script.src = this.resolver.createDataUrl(wrapper, 'text/javascript;charset=utf-8');
                                 script.dataset.nodeCompat = 'true';
                             } else script.src = await this.resolver.getSandboxAssetUrl(path);
                         }
@@ -9758,6 +9793,15 @@ define("runtime/HtmlRuntime", ["require", "exports", "filesystem/AssetResolver",
 const C='local-web-runtime/v1',M=${scriptJson(manifest)},R=${scriptJson(reverse)},D=${scriptJson(entryDir)},ENTRY=${scriptJson(entry)},S=${scriptJson(nodeData.sources)},SZ=${scriptJson(nodeData.sizes)},NODE_NEEDED=${scriptJson(nodeData.needed)},ENV=${scriptJson(envData)},LSTORE=${scriptJson(runtimeStorage)};
 globalThis.__LWR_IMPORT_META_ENV__=Object.freeze(ENV);
 const send=(type,payload)=>parent.postMessage({channel:C,type,payload},'*');
+let __lwrHostCloseHandled=false;
+addEventListener('message',e=>{
+  const m=e.data;
+  if(!m||m.channel!==C||m.type!=='runtime-host-before-close'||__lwrHostCloseHandled)return;
+  __lwrHostCloseHandled=true;
+  try{dispatchEvent(new CustomEvent('raven:before-close',{detail:{reason:'host-close'}}))}catch{}
+  try{dispatchEvent(typeof PageTransitionEvent==='function'?new PageTransitionEvent('pagehide',{persisted:false}):new Event('pagehide'))}catch{}
+  send('runtime-close-ack',{ok:true});
+});
 const __lwrClone=v=>{try{return structuredClone(v)}catch{return v}};
 let __lwrAssetSeq=1;const __lwrAssetPending=new Map(),__lwrAssetUrls=new Map(),__lwrAssetOriginal=new WeakMap();
 // Raven does not intercept the game's requestAnimationFrame or GPU draw calls in normal operation.
@@ -9894,7 +9938,7 @@ const __lwrRewriteStyleNode=node=>{if(!(node instanceof HTMLStyleElement))return
 const __lwrLocalAssets=Object.keys(M).some(path=>path!==ENTRY);const __lwrStyleObserver=__lwrLocalAssets?new MutationObserver(records=>{for(const r of records){if(r.type==='attributes')__lwrRewriteStyleElement(r.target);for(const n of r.addedNodes||[]){if(n instanceof Element){__lwrRewriteStyleElement(n);__lwrRewriteStyleNode(n);for(const el of n.querySelectorAll?.('[style]')||[])__lwrRewriteStyleElement(el);for(const st of n.querySelectorAll?.('style')||[])__lwrRewriteStyleNode(st)}}}}):null;__lwrStyleObserver?.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style']});
 const __nativeInsertRule=CSSStyleSheet.prototype.insertRule;if(__lwrNeedsPathRewriting)CSSStyleSheet.prototype.insertRule=function(rule,index){if(typeof rule==='string'&&/url\\(/i.test(rule)){__rewriteCssValue(rule).then(v=>{try{__nativeInsertRule.call(this,v,index)}catch{}});return 0}return __nativeInsertRule.call(this,rule,index)};
 const NativeAudio=window.Audio;window.Audio=function(src){const a=new NativeAudio();if(src)a.src=src;return a};window.Audio.prototype=NativeAudio.prototype;
-if(typeof Worker==='function'){const NativeWorker=Worker;class RavenWorker extends EventTarget{constructor(url,opt){super();this._worker=null;this._queue=[];this.onmessage=null;this.onerror=null;const raw=url instanceof URL?url.href:String(url),hit=assetPath(raw),boot=hit?__lwrAssetUrl(hit.path,hit.suffix):Promise.resolve(raw);boot.then(u=>{const w=this._worker=new NativeWorker(u,opt);w.onmessage=e=>{this.onmessage?.(e);this.dispatchEvent(new MessageEvent('message',{data:e.data}))};w.onerror=e=>{this.onerror?.(e);this.dispatchEvent(new Event('error'))};for(const q of this._queue)w.postMessage(...q);this._queue=[]}).catch(e=>{this.onerror?.(e);try{this.dispatchEvent(new Event('error'))}catch{};send('runtime-error',{message:'No se pudo iniciar Worker.',technical:String(e)})})}postMessage(...a){this._worker?this._worker.postMessage(...a):this._queue.push(a)}terminate(){this._worker?.terminate();this._queue=[]}};globalThis.Worker=RavenWorker}
+if(typeof Worker==='function'){const NativeWorker=Worker;class RavenWorker extends EventTarget{constructor(url,opt){super();this._worker=null;this._queue=[];this.onmessage=null;this.onerror=null;const raw=url instanceof URL?url.href:String(url),hit=assetPath(raw);if(!hit)return new NativeWorker(url,opt);const boot=__lwrAssetUrl(hit.path,hit.suffix);boot.then(u=>{const w=this._worker=new NativeWorker(u,opt);w.onmessage=e=>{this.onmessage?.(e);this.dispatchEvent(new MessageEvent('message',{data:e.data}))};w.onerror=e=>{this.onerror?.(e);this.dispatchEvent(new Event('error'))};for(const q of this._queue)w.postMessage(...q);this._queue=[]}).catch(e=>{this.onerror?.(e);try{this.dispatchEvent(new Event('error'))}catch{};send('runtime-error',{message:'No se pudo iniciar Worker.',technical:String(e)})})}postMessage(...a){this._worker?this._worker.postMessage(...a):this._queue.push(a)}terminate(){this._worker?.terminate();this._queue=[]}};globalThis.Worker=RavenWorker}
 const F=fetch.bind(window);window.fetch=async(input,init)=>{const raw=typeof input==='string'?input:(input instanceof URL?input.href:(input instanceof Request?input.url:null)),method=String(init?.method||(input instanceof Request?input.method:'GET')||'GET').toUpperCase(),hit=raw?assetPath(raw):null;if(hit&&(method==='GET'||method==='HEAD')){const a=await __lwrRequestAsset(hit.path);if(!a?.blob)throw new TypeError('No se pudo cargar '+hit.path);const headers=new Headers({'Content-Type':a.mimeType||M[hit.path]?.mimeType||'application/octet-stream','Content-Length':String(a.size||a.blob.size||0),'X-Raven-Path':hit.path});return new Response(method==='HEAD'?null:a.blob,{status:200,statusText:'OK',headers})}return F(input,init)};
 const NativeXHR=XMLHttpRequest;class RavenXHR extends EventTarget{constructor(){super();this._x=new NativeXHR();this._local=null;this._method='GET';this._url='';this._async=true;this._headers=[];this._responseType='';this._timeout=0;this._withCredentials=false;this._mime=null;this._readyState=0;for(const n of ['loadstart','progress','abort','error','load','timeout','loadend','readystatechange'])this._x.addEventListener(n,e=>{this._readyState=this._x.readyState;try{this.dispatchEvent(new Event(n))}catch{};const h=this['on'+n];if(typeof h==='function')try{h.call(this,e)}catch{}})}open(method,url,async=true,user,password){this._method=String(method||'GET');this._url=String(url);this._async=async!==false;this._user=user;this._password=password;this._local=assetPath(this._url);if(this._local){this._readyState=1;queueMicrotask(()=>{try{this.dispatchEvent(new Event('readystatechange'))}catch{};this.onreadystatechange?.({target:this})});return}this._x.open(method,url,async,user,password);this._readyState=this._x.readyState}send(body=null){if(!this._local){this._x.send(body);return}__lwrAssetUrl(this._local.path,this._local.suffix).then(u=>{this._x.open(this._method,u,this._async,this._user,this._password);if(this._mime)try{this._x.overrideMimeType(this._mime)}catch{};try{this._x.responseType=this._responseType}catch{};try{this._x.timeout=this._timeout}catch{};try{this._x.withCredentials=this._withCredentials}catch{};for(const [k,v] of this._headers)this._x.setRequestHeader(k,v);this._x.send(body)}).catch(e=>{this.error=e;this.onerror?.(e);try{this.dispatchEvent(new Event('error'))}catch{}})}abort(){this._x.abort()}setRequestHeader(k,v){if(this._local)this._headers.push([k,v]);else this._x.setRequestHeader(k,v)}getAllResponseHeaders(){return this._x.getAllResponseHeaders()}getResponseHeader(k){return this._x.getResponseHeader(k)}overrideMimeType(v){if(this._local)this._mime=v;else return this._x.overrideMimeType(v)}get readyState(){return this._local&&!this._x.readyState?this._readyState:this._x.readyState}get response(){return this._x.response}get responseText(){return this._x.responseText}get responseType(){return this._local&&!this._x.readyState?this._responseType:this._x.responseType}set responseType(v){this._responseType=v;if(!this._local||this._x.readyState>=1)try{this._x.responseType=v}catch{}}get responseURL(){return this._x.responseURL}get responseXML(){return this._x.responseXML}get status(){return this._x.status}get statusText(){return this._x.statusText}get timeout(){return this._local&&!this._x.readyState?this._timeout:this._x.timeout}set timeout(v){this._timeout=Number(v)||0;if(!this._local||this._x.readyState>=1)try{this._x.timeout=this._timeout}catch{}}get withCredentials(){return this._local&&!this._x.readyState?this._withCredentials:this._x.withCredentials}set withCredentials(v){this._withCredentials=!!v;if(!this._local||this._x.readyState>=1)try{this._x.withCredentials=this._withCredentials}catch{}}};globalThis.XMLHttpRequest=RavenXHR;
 const P=HTMLMediaElement.prototype.play,B=new Set();HTMLMediaElement.prototype.play=function(...a){const r=P.apply(this,a);if(r&&typeof r.catch==='function')return r.catch(e=>{if(e?.name==='NotAllowedError'){B.add(this);send('audio-blocked')}throw e});return r};const unlock=()=>{for(const m of [...B]){if(!m.isConnected){B.delete(m);continue}try{Promise.resolve(P.call(m)).then(()=>B.delete(m)).catch(()=>{})}catch{}}};for(const event of ['touchend','pointerup','keydown'])addEventListener(event,unlock,{capture:true,passive:true});
@@ -10256,7 +10300,7 @@ exports.GameBoyConsoleUI=GameBoyConsoleUI;
 
 define("runtime/WebRuntimeAdapter", ["require", "exports", "runtime/HtmlRuntime"], function(require,exports,HtmlRuntime_js_adapter){
 "use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.WebRuntimeAdapter=void 0;
-class WebRuntimeAdapter{constructor(project,errors,options={}){this.project=project;this.inner=new HtmlRuntime_js_adapter.HtmlRuntime(project,errors,options)}mount(host){return this.inner.mount(host)}start(){}pause(){}resume(){}stop(){this.inner.dispose()}reset(){}saveState(){return null}loadState(){}getFrame(){return this.inner.getFrame()}capturePreview(){return null}getKind(){return'web'}getMetadata(){return this.project.metadata||{}}getInputProfile(){return{type:'native-web'}}getDisplayConfiguration(){return{type:'responsive'}}getConsoleProfile(){return null}dispose(){this.inner.dispose()}}
+class WebRuntimeAdapter{constructor(project,errors,options={}){this.project=project;this.inner=new HtmlRuntime_js_adapter.HtmlRuntime(project,errors,options)}mount(host){return this.inner.mount(host)}start(){}pause(){}resume(){}stop(){return this.inner.dispose()}reset(){}saveState(){return null}loadState(){}getFrame(){return this.inner.getFrame()}capturePreview(){return null}getKind(){return'web'}getMetadata(){return this.project.metadata||{}}getInputProfile(){return{type:'native-web'}}getDisplayConfiguration(){return{type:'responsive'}}getConsoleProfile(){return null}dispose(){return this.inner.dispose()}}
 exports.WebRuntimeAdapter=WebRuntimeAdapter;
 });
 
@@ -13133,6 +13177,6 @@ record('info','raven.boot','Sistema de diagnóstico activo.',{version:document.q
 __LOCAL_RUNTIME_REQUIRE__('main');</script>
 
 <script src="./performance-raven-v0185.js"></script>
-<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.6');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
+<script id="raven-offline-shell">(()=>{try{if(!('serviceWorker'in navigator))return;if(!/^https?:$/.test(location.protocol))return;if(window.top!==window.self)return;const entry=(location.pathname.split('/').pop()||'index.html');const sw=new URL('./raven-sw.js',location.href);sw.searchParams.set('entry',entry);sw.searchParams.set('v','0.18.9');navigator.serviceWorker.register(sw.href,{scope:'./',updateViaCache:'none'}).then(reg=>reg.update().catch(()=>{})).catch(()=>{});navigator.storage?.persist?.().catch?.(()=>{});}catch{}})();</script>
 </body>
 </html>

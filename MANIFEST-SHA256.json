@@ -1,0 +1,9 @@
+{
+  "ravenVersion": "0.18.9",
+  "release": "experimental",
+  "files": {
+    "index.html": "7c04ea821cf7ac57e04d73384c0b3ae196563bcd4f7426d6f9e8c48a2e672e01",
+    "manifest.webmanifest": "3977974bc7f3ad12cd1c7e20c61de06c3bb6525403491f7222bf1c2f7403b5d2",
+    "raven-sw.js": "ea1370f0ec96100d28cb348211392acbf62794b885e274a0062ed78ae93615f6"
+  }
+}
